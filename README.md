@@ -60,7 +60,54 @@ npm run build
 
 # 预览构建结果
 npm run preview
+
+# 部署到GitHub Pages
+npm run deploy
 ```
+
+## 🌐 在线体验
+
+访问 GitHub Pages 在线版本：`https://your-username.github.io/math-problem-generator/`
+
+## 📦 GitHub Pages 部署
+
+### 自动部署（推荐）
+
+项目已配置GitHub Actions自动部署：
+
+1. **Fork 或克隆项目到你的GitHub账户**
+2. **启用GitHub Pages**：
+   - 进入仓库 Settings → Pages
+   - Source 选择 "Deploy from a branch"
+   - Branch 选择 "gh-pages"
+   - 点击 Save
+
+3. **推送代码**：
+   ```bash
+   git push origin main
+   ```
+
+4. **自动构建**：GitHub Actions会自动构建并部署到 `gh-pages` 分支
+
+### 手动部署
+
+如果需要手动部署：
+
+```bash
+# 方法1: 使用npm脚本
+npm run deploy
+
+# 方法2: 使用部署脚本
+./deploy.sh
+```
+
+### 自定义域名
+
+如需使用自定义域名：
+
+1. 在 `public/` 目录下创建 `CNAME` 文件
+2. 文件内容为你的域名，如：`math.yourdomain.com`
+3. 在域名DNS设置中添加CNAME记录指向 `your-username.github.io`
 
 ## 📖 使用指南
 
