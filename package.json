@@ -1,5 +1,5 @@
 {
-  "name": "math-problem-generator",
+  "name": "PrimarySchoolMathematicsGenerator",
   "version": "1.0.0",
   "description": "Primary school math problem generation app",
   "scripts": {
