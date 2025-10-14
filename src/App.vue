@@ -51,6 +51,10 @@
               <input type="checkbox" id="divide" v-model="config.operations.divide" />
               <label for="divide">除法 (÷)</label>
             </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="useBrackets" v-model="config.useBrackets" />
+              <label for="useBrackets">使用括号 ()</label>
+            </div>
           </div>
         </div>
       </div>
@@ -123,6 +127,7 @@ export default {
           multiply: false,
           divide: false
         },
+        useBrackets: false,
         allowRepeatOperators: true,
         problemType: 'result'
       },
