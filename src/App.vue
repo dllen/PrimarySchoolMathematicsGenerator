@@ -313,16 +313,6 @@ export default {
     },
 
     getCircleNumber(num) {
-      // // 圆圈数字 Unicode 字符
-      // const circleNumbers = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩',
-      //                      '⑪', '⑫', '⑬', '⑭', '⑮', '⑯', '⑰', '⑱', '⑲', '⑳'];
-      
-      // if (num <= 20) {
-      //   return circleNumbers[num - 1];
-      // } else {
-      //   // 超过20的数字用普通圆圈包围
-      //   return `㊉${num}`;
-      // }
       return `${num}、`;
     }
   }
