@@ -57,7 +57,7 @@
 
       <div class="config-row">
         <div class="config-item">
-          <label>操作符是否重复:</label>
+          <label>运算符是否重复:</label>
           <div class="checkbox-group">
             <div class="checkbox-item">
               <input type="radio" id="allowRepeat" v-model="config.allowRepeatOperators" :value="true" />
