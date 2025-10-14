@@ -192,6 +192,72 @@ export default {
       return result;
     },
 
+    // 生成括号位置
+    generateBracketPosition(termCount) {
+      if (termCount < 3) return null;
+      
+      // 随机选择括号包含的项数（2或3项）
+      const bracketSize = Math.random() < 0.5 ? 2 : (termCount >= 4 ? 3 : 2);
+      // 随机选择括号起始位置
+      const maxStart = termCount - bracketSize;
+      const bracketStart = Math.floor(Math.random() * (maxStart + 1));
+      
+      return {
+        start: bracketStart,
+        end: bracketStart + bracketSize - 1
+      };
+    },
+
+    // 计算带括号的表达式
+    calculateWithBrackets(numbers, operations, bracketPos) {
+      if (!bracketPos) {
+        return this.calculateExpression(numbers, operations);
+      }
+
+      // 先计算括号内的部分
+      const bracketNumbers = numbers.slice(bracketPos.start, bracketPos.end + 1);
+      const bracketOps = operations.slice(bracketPos.start, bracketPos.end);
+      const bracketResult = this.calculateExpression(bracketNumbers, bracketOps);
+      
+      if (bracketResult === null) return null;
+
+      // 构造新的数字和操作符数组
+      const newNumbers = [
+        ...numbers.slice(0, bracketPos.start),
+        bracketResult,
+        ...numbers.slice(bracketPos.end + 1)
+      ];
+      const newOps = [
+        ...operations.slice(0, bracketPos.start),
+        ...operations.slice(bracketPos.end)
+      ];
+
+      return this.calculateExpression(newNumbers, newOps);
+    },
+
+    // 构建表达式字符串（带括号）
+    buildExpression(numbers, operations, bracketPos) {
+      let expression = '';
+      
+      for (let i = 0; i < numbers.length; i++) {
+        if (bracketPos && i === bracketPos.start) {
+          expression += '(';
+        }
+        
+        expression += i === 0 ? numbers[i] : ` ${numbers[i]}`;
+        
+        if (bracketPos && i === bracketPos.end) {
+          expression += ')';
+        }
+        
+        if (i < operations.length) {
+          expression += ` ${operations[i]}`;
+        }
+      }
+      
+      return expression;
+    },
+
     generateResultProblem() {
       const termCount = parseInt(this.config.termCount);
       const numbers = [];
@@ -215,14 +281,15 @@ export default {
         }
       }
       
-      const result = this.calculateExpression(numbers, operations);
+      // 生成括号位置（如果启用）
+      const bracketPos = this.config.useBrackets ? this.generateBracketPosition(termCount) : null;
+      
+      // 计算结果
+      const result = this.calculateWithBrackets(numbers, operations, bracketPos);
       if (result === null || result < 0) return this.generateResultProblem();
       
-      let expression = numbers[0].toString();
-      for (let i = 0; i < operations.length; i++) {
-        expression += ` ${operations[i]} ${numbers[i + 1]}`;
-      }
-      expression += ' = ______';
+      // 构建表达式
+      const expression = this.buildExpression(numbers, operations, bracketPos) + ' = ______';
       
       return {
         expression,
