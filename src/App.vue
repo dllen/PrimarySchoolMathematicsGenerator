@@ -121,15 +121,14 @@ export default {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     },
 
-    getRandomOperation() {
+    getRandomOperation(usedOperations) {
       const availableOps = [];
-      if (this.config.operations.add) availableOps.push('+');
-      if (this.config.operations.subtract) availableOps.push('-');
-      if (this.config.operations.multiply) availableOps.push('×');
-      if (this.config.operations.divide) availableOps.push('÷');
+      if (this.config.operations.add && !usedOperations.includes('+')) availableOps.push('+');
+      if (this.config.operations.subtract && !usedOperations.includes('-')) availableOps.push('-');
+      if (this.config.operations.multiply && !usedOperations.includes('×')) availableOps.push('×');
+      if (this.config.operations.divide && !usedOperations.includes('÷')) availableOps.push('÷');
       
       if (availableOps.length === 0) {
-        alert('请至少选择一种运算类型！');
         return null;
       }
       
@@ -172,7 +171,7 @@ export default {
       for (let i = 0; i < termCount; i++) {
         numbers.push(this.generateNumber());
         if (i < termCount - 1) {
-          const op = this.getRandomOperation();
+          const op = this.getRandomOperation(operations);
           if (!op) return null;
           operations.push(op);
         }
@@ -210,7 +209,7 @@ export default {
       for (let i = 0; i < termCount; i++) {
         numbers.push(this.generateNumber());
         if (i < termCount - 1) {
-          const op = this.getRandomOperation();
+          const op = this.getRandomOperation(operations);
           if (!op) return null;
           operations.push(op);
         }
