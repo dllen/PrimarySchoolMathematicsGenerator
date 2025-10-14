@@ -57,6 +57,22 @@
 
       <div class="config-row">
         <div class="config-item">
+          <label>操作符是否重复:</label>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="radio" id="allowRepeat" v-model="config.allowRepeatOperators" :value="true" />
+              <label for="allowRepeat">允许重复</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="radio" id="noRepeat" v-model="config.allowRepeatOperators" :value="false" />
+              <label for="noRepeat">不允许重复</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-row">
+        <div class="config-item">
           <label>题目类型:</label>
           <div class="checkbox-group">
             <div class="checkbox-item">
@@ -107,6 +123,7 @@ export default {
           multiply: false,
           divide: false
         },
+        allowRepeatOperators: true,
         problemType: 'result'
       },
       problems: [],
@@ -179,7 +196,7 @@ export default {
       for (let i = 0; i < termCount; i++) {
         numbers.push(this.generateNumber());
         if (i < termCount - 1) {
-          const op = this.getRandomOperation(operations, false);
+          const op = this.getRandomOperation(operations, !this.config.allowRepeatOperators);
           if (!op) return null;
           operations.push(op);
         }
@@ -217,7 +234,7 @@ export default {
       for (let i = 0; i < termCount; i++) {
         numbers.push(this.generateNumber());
         if (i < termCount - 1) {
-          const op = this.getRandomOperation(operations, false);
+          const op = this.getRandomOperation(operations, !this.config.allowRepeatOperators);
           if (!op) return null;
           operations.push(op);
         }
