@@ -240,11 +240,17 @@ export default {
       let expression = '';
       
       for (let i = 0; i < numbers.length; i++) {
-        if (bracketPos && i === bracketPos.start) {
+        const isBracketStart = bracketPos && i === bracketPos.start;
+        
+        if (isBracketStart && i > 0) {
+          expression += ' (';
+        } else if (isBracketStart && i === 0) {
           expression += '(';
+        } else if (i > 0) {
+          expression += ' ';
         }
         
-        expression += i === 0 ? numbers[i] : ` ${numbers[i]}`;
+        expression += numbers[i];
         
         if (bracketPos && i === bracketPos.end) {
           expression += ')';
