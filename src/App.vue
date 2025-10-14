@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="header">
-      <h1>小学数学问题生成器</h1>
-      <p>配置参数，生成数学练习题</p>
+      <h2>小学数学口算题生成器</h2>
+      <p>配置参数，生成数学练习题，<strong style="color: red">打印需要使用浏览器打开</strong></p>
     </div>
 
     <div class="config-panel">
