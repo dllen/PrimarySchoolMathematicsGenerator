@@ -8,15 +8,6 @@
     <div class="config-panel">
       <div class="config-row">
         <div class="config-item">
-          <label>数字位数:</label>
-          <select v-model="config.digits">
-            <option value="1">1位数</option>
-            <option value="2">2位数</option>
-            <option value="3">3位数</option>
-          </select>
-        </div>
-
-        <div class="config-item">
           <label>题目数量:</label>
           <input type="number" v-model="config.problemCount" min="1" max="100" />
         </div>
@@ -38,18 +29,36 @@
             <div class="checkbox-item">
               <input type="checkbox" id="add" v-model="config.operations.add" />
               <label for="add">加法 (+)</label>
+              <select v-if="config.operations.add" v-model="config.digits.add">
+                <option value="1">1位数</option>
+                <option value="2">2位数</option>
+                <option value="3">3位数</option>
+              </select>
             </div>
             <div class="checkbox-item">
               <input type="checkbox" id="subtract" v-model="config.operations.subtract" />
               <label for="subtract">减法 (-)</label>
+              <select v-if="config.operations.subtract" v-model="config.digits.subtract">
+                <option value="1">1位数</option>
+                <option value="2">2位数</option>
+                <option value="3">3位数</option>
+              </select>
             </div>
             <div class="checkbox-item">
               <input type="checkbox" id="multiply" v-model="config.operations.multiply" />
               <label for="multiply">乘法 (×)</label>
+              <select v-if="config.operations.multiply" v-model="config.digits.multiply">
+                <option value="1">1位数</option>
+                <option value="2">2位数</option>
+              </select>
             </div>
             <div class="checkbox-item">
               <input type="checkbox" id="divide" v-model="config.operations.divide" />
               <label for="divide">除法 (÷)</label>
+              <select v-if="config.operations.divide" v-model="config.digits.divide">
+                <option value="1">1位数</option>
+                <option value="2">2位数</option>
+              </select>
             </div>
             <div class="checkbox-item">
               <input type="checkbox" id="useBrackets" v-model="config.useBrackets" />
@@ -118,7 +127,12 @@ export default {
   data() {
     return {
       config: {
-        digits: '2',
+        digits: {
+          add: '2',
+          subtract: '2',
+          multiply: '1',
+          divide: '1'
+        },
         problemCount: 20,
         termCount: '2',
         operations: {
@@ -136,8 +150,15 @@ export default {
     }
   },
   methods: {
-    generateNumber() {
-      const digits = parseInt(this.config.digits);
+    generateNumber(op) {
+      const opMap = {
+        '+': 'add',
+        '-': 'subtract',
+        '×': 'multiply',
+        '÷': 'divide'
+      };
+      const digitKey = opMap[op];
+      const digits = parseInt(this.config.digits[digitKey]);
       const min = digits === 1 ? 1 : Math.pow(10, digits - 1);
       const max = Math.pow(10, digits) - 1;
       return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -192,13 +213,10 @@ export default {
       return result;
     },
 
-    // 生成括号位置
     generateBracketPosition(termCount) {
       if (termCount < 3) return null;
       
-      // 随机选择括号包含的项数（2或3项）
       const bracketSize = Math.random() < 0.5 ? 2 : (termCount >= 4 ? 3 : 2);
-      // 随机选择括号起始位置
       const maxStart = termCount - bracketSize;
       const bracketStart = Math.floor(Math.random() * (maxStart + 1));
       
@@ -208,20 +226,17 @@ export default {
       };
     },
 
-    // 计算带括号的表达式
     calculateWithBrackets(numbers, operations, bracketPos) {
       if (!bracketPos) {
         return this.calculateExpression(numbers, operations);
       }
 
-      // 先计算括号内的部分
       const bracketNumbers = numbers.slice(bracketPos.start, bracketPos.end + 1);
       const bracketOps = operations.slice(bracketPos.start, bracketPos.end);
       const bracketResult = this.calculateExpression(bracketNumbers, bracketOps);
       
       if (bracketResult === null) return null;
 
-      // 构造新的数字和操作符数组
       const newNumbers = [
         ...numbers.slice(0, bracketPos.start),
         bracketResult,
@@ -235,7 +250,6 @@ export default {
       return this.calculateExpression(newNumbers, newOps);
     },
 
-    // 构建表达式字符串（带括号）
     buildExpression(numbers, operations, bracketPos) {
       let expression = '';
       
@@ -269,9 +283,7 @@ export default {
       const numbers = [];
       const operations = [];
       
-      // 生成数字和运算符
       for (let i = 0; i < termCount; i++) {
-        numbers.push(this.generateNumber());
         if (i < termCount - 1) {
           const op = this.getRandomOperation(operations, !this.config.allowRepeatOperators);
           if (!op) return null;
@@ -279,7 +291,12 @@ export default {
         }
       }
       
-      // 特殊处理除法，确保能整除
+      for (let i = 0; i < termCount; i++) {
+          const op = i > 0 ? operations[i-1] : operations[0]
+          numbers.push(this.generateNumber(op));
+      }
+
+
       for (let i = 0; i < operations.length; i++) {
         if (operations[i] === '÷') {
           const divisor = numbers[i + 1];
@@ -287,14 +304,11 @@ export default {
         }
       }
       
-      // 生成括号位置（如果启用）
       const bracketPos = this.config.useBrackets ? this.generateBracketPosition(termCount) : null;
       
-      // 计算结果
       const result = this.calculateWithBrackets(numbers, operations, bracketPos);
       if (result === null || result < 0) return this.generateResultProblem();
       
-      // 构建表达式
       const expression = this.buildExpression(numbers, operations, bracketPos) + ' = ______';
       
       return {
@@ -308,17 +322,19 @@ export default {
       const numbers = [];
       const operations = [];
       
-      // 生成完整的表达式
       for (let i = 0; i < termCount; i++) {
-        numbers.push(this.generateNumber());
         if (i < termCount - 1) {
           const op = this.getRandomOperation(operations, !this.config.allowRepeatOperators);
           if (!op) return null;
           operations.push(op);
         }
       }
+
+      for (let i = 0; i < termCount; i++) {
+          const op = i > 0 ? operations[i-1] : operations[0]
+          numbers.push(this.generateNumber(op));
+      }
       
-      // 特殊处理除法
       for (let i = 0; i < operations.length; i++) {
         if (operations[i] === '÷') {
           const divisor = numbers[i + 1];
@@ -329,7 +345,6 @@ export default {
       const result = this.calculateExpression(numbers, operations);
       if (result === null || result < 0) return this.generateOperandProblem();
       
-      // 随机选择一个数字位置替换为问号
       const hiddenIndex = Math.floor(Math.random() * numbers.length);
       const hiddenNumber = numbers[hiddenIndex];
       
@@ -369,7 +384,7 @@ export default {
         if (problem) {
           this.problems.push(problem);
         } else {
-          i--; // 重新生成这道题
+          i--; 
         }
       }
     },
@@ -380,7 +395,6 @@ export default {
         return;
       }
       
-      // 隐藏答案后打印
       const wasShowingAnswers = this.showAnswers;
       this.showAnswers = false;
       
