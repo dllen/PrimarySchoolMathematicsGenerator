@@ -191,8 +191,10 @@ export default {
     getRandomOperation(usedOps = []) {
       const opMap = { add: '+', subtract: '-', multiply: '×', divide: '÷' };
       const available = Object.entries(this.config.operations)
-        .filter(([op, enabled]) => enabled)
+        .filter(([, enabled]) => enabled)
         .map(([op]) => opMap[op]);
+
+      if (available.length === 0) return null;
 
       if (this.config.allowRepeatOperators || usedOps.length === 0) {
         return available[Math.floor(Math.random() * available.length)];
@@ -205,106 +207,119 @@ export default {
       return available[Math.floor(Math.random() * available.length)]; // Fallback
     },
     
-    calculateWithBrackets(expression) {
+    calculate(expression) {
       try {
-        const evalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/');
+        const evalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/[()]/g, '');
         return new Function('return ' + evalExpression)();
       } catch (e) {
         return null;
       }
     },
-
+    
     generateResultProblem() {
-      const opMap = { '+': 'add', '-': 'subtract', '×': 'multiply', '÷': 'divide' };
-      for (let i = 0; i < 20; i++) { // Max 20 retries
-        const termCount = this.config.termCount;
-        let expression = '';
-        let currentResult = 0;
-        let ops = [];
-
-        // 1. Generate all operators first
-        for (let j = 0; j < termCount - 1; j++) {
-            const op = this.getRandomOperation(this.config.allowRepeatOperators ? [] : ops);
-            if (!op) return null;
-            ops.push(op);
-        }
-
-        // 2. Build the expression term by term
-        const firstOp = ops[0];
-        const firstDigitKey = opMap[firstOp];
-        let num1 = this.generateNumber(this.config.digits[firstDigitKey]);
-        currentResult = num1;
-        expression += num1;
+        const opMap = { '+': 'add', '-': 'subtract', '×': 'multiply', '÷': 'divide' };
         
-        for (let j = 0; j < ops.length; j++) {
-            const op = ops[j];
-            const digitKey = opMap[op];
-            let num2 = this.generateNumber(this.config.digits[digitKey]);
+        for (let attempt = 0; attempt < 50; attempt++) { // Max 50 retries
+            const termCount = this.config.termCount;
+            let numbers = [];
+            let ops = [];
 
-            // Specific handling for subtraction and division
-            if (op === '-') {
-                // Ensure the result is not negative
-                if (currentResult < num2) {
-                    [num1, num2] = [num2, num1]; // Swap them
-                    // We need to rebuild the expression from the start
-                    expression = num1;
-                    for(let k=0; k<j; k++) {
-                        expression += ` ${ops[k]} ${/* how to get previous numbers? */'?'}`;
-                    }
-                } 
-            } else if (op === '÷') {
-                // Ensure integer division
-                if(num2 === 0) num2 = 1; // Avoid division by zero
-                const remainder = currentResult % num2;
-                currentResult -= remainder; // Adjust previous result to be divisible
-                // This is tricky as it modifies a past part of the expression. 
-                // A better way is to generate numbers such that division is clean.
-                let tempResult = currentResult;
-                expression = tempResult; // This is a simplified and potentially buggy reconstruction
+            // 1. Generate operators
+            let usedOpsInProblem = [];
+            for (let i = 0; i < termCount - 1; i++) {
+                const op = this.getRandomOperation(usedOpsInProblem);
+                if (!op) return null; // No available operators
+                ops.push(op);
+                if (!this.config.allowRepeatOperators) {
+                    usedOpsInProblem.push(op);
+                }
+            }
+
+            // 2. Generate numbers based on operator digits
+            const firstOp = ops.length > 0 ? ops[0] : this.getRandomOperation();
+            if (!firstOp) return null;
+            const firstDigitKey = opMap[firstOp];
+            numbers.push(this.generateNumber(this.config.digits[firstDigitKey]));
+
+            for (let i = 0; i < ops.length; i++) {
+                const op = ops[i];
+                const digitKey = opMap[op];
+                numbers.push(this.generateNumber(this.config.digits[digitKey]));
             }
             
-            let tempExpression = `${expression} ${op} ${num2}`;
-            let nextResult = this.calculateWithBrackets(tempExpression);
+            // 3. Create initial expression and check constraints
+            let tempNumbers = [...numbers];
+            let tempOps = [...ops];
+            let isValid = true;
 
-            if (nextResult < 0 && op === '-') { // Retry this term
-                 j--; continue;
+            for (let i = 0; i < tempOps.length; i++) {
+                if (tempOps[i] === '-') {
+                    const subExpr = `${tempNumbers[i]} - ${tempNumbers[i+1]}`;
+                    if (this.calculate(subExpr) < 0) {
+                        [tempNumbers[i], tempNumbers[i+1]] = [tempNumbers[i+1], tempNumbers[i]];
+                    }
+                } else if (tempOps[i] === '÷') {
+                    if (tempNumbers[i+1] === 0) { // Avoid division by zero
+                        isValid = false; break;
+                    }
+                    const result = tempNumbers[i] / tempNumbers[i+1];
+                    if (!Number.isInteger(result)) {
+                        // Adjust the dividend to make it divisible
+                        tempNumbers[i] = result.toFixed(0) * tempNumbers[i+1];
+                    }
+                }
             }
-            if (op === '÷' && (num2 === 0 || currentResult % num2 !== 0)) {
-                j--; continue;
+            if (!isValid) continue;
+
+            // 4. Build the final expression string
+            let expression = tempNumbers[0].toString();
+            for (let i = 0; i < tempOps.length; i++) {
+                expression += ` ${tempOps[i]} ${tempNumbers[i+1]}`;
             }
 
-            expression = tempExpression;
-            currentResult = nextResult;
+            // 5. Add brackets if enabled
+            if (this.config.useBrackets && termCount > 2) {
+                const start = Math.floor(Math.random() * (termCount - 1));
+                const end = start + 1;
+                let exprParts = [];
+                tempNumbers.forEach((n, idx) => {
+                    exprParts.push(n);
+                    if(tempOps[idx]) exprParts.push(tempOps[idx]);
+                });
+
+                const partBefore = exprParts.slice(0, start * 2).join(' ');
+                const partBracket = '(' + exprParts.slice(start * 2, end * 2 + 1).join(' ') + ')';
+                const partAfter = exprParts.slice(end * 2 + 1).join(' ');
+                
+                expression = [partBefore, partBracket, partAfter].filter(p => p).join(' ');
+            }
+
+            // 6. Calculate final answer and validate
+            const answer = this.calculate(expression);
+
+            if (answer !== null && answer >= 0 && Number.isInteger(answer)) {
+                return { expression: expression.trim() + ' = ______', answer };
+            }
         }
-
-        // Recalculate the final answer from the generated expression string
-        let finalAnswer = this.calculateWithBrackets(expression);
-
-        // This simplified approach doesn't yet handle bracket generation logic gracefully.
-        // The original bracket logic is complex and needs to be re-integrated carefully.
-
-        if (finalAnswer !== null && finalAnswer >= 0 && Number.isInteger(finalAnswer)) {
-          return { expression: expression + ' = ______', answer: finalAnswer };
-        }
-      }
-      return null; // Failed to generate a valid problem
+        return null; // Failed to generate a valid problem
     },
 
     generateOperandProblem() {
         for (let i = 0; i < 20; i++) { // Max 20 retries
             const tempConfig = { ...this.config, useBrackets: false, problemType: 'result' };
-            const problem = this.generateResultProblem.call({ config: tempConfig, generateNumber: this.generateNumber, getRandomOperation: this.getRandomOperation, calculateWithBrackets: this.calculateWithBrackets });
+            const problem = this.generateResultProblem.call({ ...this, config: tempConfig });
 
             if (problem) {
                 const { expression, answer } = problem;
-                const parts = expression.replace(' = ______', '').split(/ [+\-×÷] /);
+                const cleanExpr = expression.replace(' = ______', '');
+                const parts = cleanExpr.split(/ [+\-×÷] /);
                 const hiddenIndex = Math.floor(Math.random() * parts.length);
-                const hiddenVal = parts[hiddenIndex].trim();
+                const hiddenVal = parts[hiddenIndex].trim().replace(/[()]/g, '');
                 
                 if (hiddenVal && !isNaN(hiddenVal)) {
                     const hiddenAnswer = parseInt(hiddenVal);
-                    const finalExpression = expression.replace(' = ______', ` = ${answer}`)
-                                                      .replace(new RegExp(`\\b${hiddenAnswer}\\b`), '______');
+                    let finalExpression = cleanExpr.replace(new RegExp(`\\b${hiddenVal}\\b`), '______');
+                    finalExpression += ` = ${answer}`;
 
                     if (finalExpression.includes('______')) {
                         return { expression: finalExpression, answer: hiddenAnswer };
@@ -335,9 +350,8 @@ export default {
 
       // Save to IndexedDB
       if (newProblems.length > 0) {
-        // Deep copy the config and problems to avoid DataCloneError
+        const problemsToSave = JSON.parse(JSON.stringify(newProblems));
         const configToSave = JSON.parse(JSON.stringify(this.config));
-        const problemsToSave = JSON.parse(JSON.stringify(this.problems));
         await addProblemSet(problemsToSave, configToSave);
       }
     },
@@ -453,8 +467,8 @@ export default {
 }
 
 .btn-secondary {
-    background-color: #6c757d;
-    color: white;
+    background-color: #cff4fc;
+    color: #2b2f32;
 }
 .btn-secondary:hover {
     background-color: #5a6268;
