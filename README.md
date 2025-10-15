@@ -5,7 +5,7 @@
 ## 🎯 功能特点
 
 ### 📊 灵活配置
-- **数字位数**: 支持1-3位数，适应不同年级需求
+- **数字位数**: 可为加、减、乘、除每种运算独立设置1-3位的数字位数，实现更精细的难度控制
 - **运算类型**: 加法(+)、减法(-)、乘法(×)、除法(÷)，可任意组合
 - **计算项个数**: 2-4项运算，支持复合运算
 - **题目数量**: 1-100道题可自定义，满足不同练习需求
@@ -35,8 +35,8 @@
 
 1. **克隆项目**
 ```bash
-git clone <repository-url>
-cd math-problem-generator
+git clone https://github.com/dllen/PrimarySchoolMathematicsGenerator.git
+cd PrimarySchoolMathematicsGenerator
 ```
 
 2. **安装依赖**
@@ -50,7 +50,7 @@ npm run dev
 ```
 
 4. **访问应用**
-打开浏览器访问 `http://localhost:5173`
+打开浏览器访问 `http://localhost:5000`
 
 ### 构建部署
 
@@ -65,60 +65,33 @@ npm run preview
 npm run deploy
 ```
 
-## 🌐 在线体验
+## 🧪 测试 (Testing)
 
-访问 GitHub Pages 在线版本：`https://your-username.github.io/math-problem-generator/`
+项目使用 [Vitest](https://vitest.dev/) 进行单元测试和组件测试，以确保代码质量和功能稳定性。
 
-## 📦 GitHub Pages 部署
+### 运行测试
 
-### 自动部署（推荐）
-
-项目已配置GitHub Actions自动部署：
-
-1. **Fork 或克隆项目到你的GitHub账户**
-2. **启用GitHub Pages**：
-   - 进入仓库 Settings → Pages
-   - Source 选择 "Deploy from a branch"
-   - Branch 选择 "gh-pages"
-   - 点击 Save
-
-3. **推送代码**：
-   ```bash
-   git push origin main
-   ```
-
-4. **自动构建**：GitHub Actions会自动构建并部署到 `gh-pages` 分支
-
-### 手动部署
-
-如果需要手动部署：
+执行以下命令来运行所有测试：
 
 ```bash
-# 方法1: 使用npm脚本
-npm run deploy
-
-# 方法2: 使用部署脚本
-./deploy.sh
+npm test
 ```
 
-### 自定义域名
+## 🌐 在线体验
 
-如需使用自定义域名：
-
-1. 在 `public/` 目录下创建 `CNAME` 文件
-2. 文件内容为你的域名，如：`math.yourdomain.com`
-3. 在域名DNS设置中添加CNAME记录指向 `your-username.github.io`
+访问 GitHub Pages 在线版本：`https://dllen.github.io/PrimarySchoolMathematicsGenerator/`
 
 ## 📖 使用指南
 
 ### 基本操作
 
 1. **配置参数**
-   - 选择数字位数（1-3位数）
-   - 设置题目数量（推荐20-50道）
-   - 选择计算项个数（2-4项）
-   - 勾选运算类型（可多选）
-   - 选择题目类型（求结果/求运算项）
+   - **题目数量**: 设置希望生成的题目总数（1-100）。
+   - **计算项个数**: 选择每个算式包含的数字个数（2-4项）。
+   - **运算类型**: 
+     - 勾选希望练习的运算类型（加、减、乘、除）。
+     - **为每种运算设置数字位数**：勾选一种运算后，旁边会出现下拉框，可为其单独设置1-3位的数字位数。
+   - **题目类型**: 选择“求结果”或“求运算项”。
 
 2. **生成题目**
    - 点击"生成题目"按钮
@@ -140,37 +113,21 @@ npm run deploy
 - **减法处理**: 确保结果为正数，符合小学数学要求
 - **随机分布**: 运算项位置随机隐藏，增加练习难度
 
-#### 题目示例
-
-**求结果类型:**
-```
-① 25 + 37 = ______
-② 84 - 29 = ______
-③ 12 × 8 = ______
-④ 96 ÷ 8 = ______
-```
-
-**求运算项类型:**
-```
-① ______ + 37 = 62
-② 84 - ______ = 55
-③ 12 × ______ = 96
-④ ______ ÷ 8 = 12
-```
-
 ## 🛠️ 技术栈
 
 - **前端框架**: Vue 3 (Composition API)
 - **构建工具**: Vite
+- **测试框架**: Vitest
 - **样式**: 原生CSS + 响应式设计
-- **字体**: Microsoft YaHei (中文优化)
+- **部署**: GitHub Pages
 
 ## 📁 项目结构
 
 ```
-math-problem-generator/
+PrimarySchoolMathematicsGenerator/
 ├── public/                 # 静态资源
 ├── src/
+│   ├── __tests__/       # 测试文件
 │   ├── App.vue            # 主应用组件
 │   ├── main.js            # 应用入口
 │   └── style.css          # 全局样式
@@ -179,30 +136,6 @@ math-problem-generator/
 ├── vite.config.js         # Vite配置
 └── README.md              # 项目文档
 ```
-
-## 🎯 适用场景
-
-- **家庭教育**: 家长为孩子生成练习题
-- **学校教学**: 教师快速生成课堂练习
-- **培训机构**: 批量生成不同难度的练习题
-- **自主学习**: 学生进行数学练习和自测
-
-## 🔧 自定义配置
-
-### 修改数字范围
-在 `generateNumber()` 方法中调整数字生成范围：
-
-```javascript
-generateNumber() {
-  const digits = parseInt(this.config.digits);
-  const min = digits === 1 ? 1 : Math.pow(10, digits - 1);
-  const max = Math.pow(10, digits) - 1;
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-```
-
-### 添加新运算类型
-在 `getRandomOperation()` 和 `calculateExpression()` 方法中添加新的运算逻辑。
 
 ## 🤝 贡献指南
 
@@ -216,13 +149,11 @@ generateNumber() {
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+本项目采用 MIT 许可证 - 查看 `LICENSE` 文件了解详情。
 
 ## 📞 联系方式
 
-如有问题或建议，请通过以下方式联系：
-
-- 提交 [Issue](../../issues)
+如有问题或建议，请通过提交 [Issue](../../issues) 联系。
 
 ---
 
