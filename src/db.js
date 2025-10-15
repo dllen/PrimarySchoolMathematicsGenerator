@@ -32,8 +32,8 @@ export async function addProblemSet(problems, config) {
     // Check the count and enforce the 20-record limit
     const count = await db.problemSets.count();
     if (count > 20) {
-      // If count is over 20, find the oldest record and delete it
-      const oldest = await db.problemSets.orderBy('id').first();
+      // If count is over 20, find the oldest record by timestamp and delete it
+      const oldest = await db.problemSets.orderBy('timestamp').first();
       if (oldest) {
         await db.problemSets.delete(oldest.id);
       }
@@ -46,8 +46,8 @@ export async function addProblemSet(problems, config) {
 // 4. Retrieve all historical problem sets, sorted by newest first
 export async function getHistory() {
   try {
-    // Order by 'id' in reverse to get newest first, as 'id' is auto-incrementing
-    return await db.problemSets.orderBy('id').reverse().toArray();
+    // Order by 'timestamp' in reverse to get newest first
+    return await db.problemSets.orderBy('timestamp').reverse().toArray();
   } catch (error) {
     console.error("Failed to get history:", error);
     return []; // Return an empty array on failure

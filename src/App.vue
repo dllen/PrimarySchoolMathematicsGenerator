@@ -6,7 +6,7 @@
       <h2>小学数学口算题生成器</h2>
       <p>配置参数，生成数学练习题，<strong style="color: red">打印需要使用浏览器打开</strong></p>
       <div class="header-actions">
-        <button class="btn btn-secondary" @click="showHistoryList">查看历史题目</button>
+        <button class="btn btn-secondary" @click="showHistoryList">查看历史</button>
       </div>
     </div>
 
@@ -105,7 +105,7 @@
       </div>
       <!-- Problems Display -->
       <div class="problems-container" v-if="problems.length > 0">
-        <h2>数学练习题</h2>
+        <h3>数学练习题</h3>
         <div class="problems-grid">
           <div class="problem-item" v-for="(problem, index) in problems" :key="index">
             <div class="problem-expression">{{ getCircleNumber(index + 1) }} {{ problem.expression }}</div>
@@ -118,7 +118,7 @@
     <!-- History List View -->
     <div v-if="viewMode === 'historyList'" class="history-panel">
       <div class="history-header">
-        <h2>历史记录 (最多20条)</h2>
+        <h3>历史记录 (最多20条)</h3>
         <button class="btn btn-secondary" @click="backToGenerator">返回主页</button>
       </div>
       <ul class="history-list">
