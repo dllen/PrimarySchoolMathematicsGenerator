@@ -1,412 +1,441 @@
+
 <template>
   <div class="container">
+    <!-- Header -->
     <div class="header">
       <h2>小学数学口算题生成器</h2>
       <p>配置参数，生成数学练习题，<strong style="color: red">打印需要使用浏览器打开</strong></p>
+      <div class="header-actions">
+        <button class="btn btn-secondary" @click="showHistoryList">查看历史题目</button>
+      </div>
     </div>
 
-    <div class="config-panel">
-      <div class="config-row">
-        <div class="config-item">
-          <label>题目数量:</label>
-          <input type="number" v-model="config.problemCount" min="1" max="100" />
+    <!-- Main Content: Switches between Generator, History List, and History Detail -->
+    <div v-if="viewMode === 'generator'">
+      <!-- Configuration Panel -->
+      <div class="config-panel">
+        <div class="config-row">
+          <div class="config-item">
+            <label>题目数量:</label>
+            <input type="number" v-model.number="config.problemCount" min="1" max="100" />
+          </div>
+          <div class="config-item">
+            <label>计算项个数:</label>
+            <select v-model.number="config.termCount">
+              <option value="2">2项</option>
+              <option value="3">3项</option>
+              <option value="4">4项</option>
+            </select>
+          </div>
         </div>
-
-        <div class="config-item">
-          <label>计算项个数:</label>
-          <select v-model="config.termCount">
-            <option value="2">2项</option>
-            <option value="3">3项</option>
-            <option value="4">4项</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="config-row">
-        <div class="config-item">
-          <label>运算类型:</label>
-          <div class="checkbox-group">
-            <div class="checkbox-item">
-              <input type="checkbox" id="add" v-model="config.operations.add" />
-              <label for="add">加法 (+)</label>
-              <select v-if="config.operations.add" v-model="config.digits.add">
-                <option value="1">1位数</option>
-                <option value="2">2位数</option>
-                <option value="3">3位数</option>
-              </select>
-            </div>
-            <div class="checkbox-item">
-              <input type="checkbox" id="subtract" v-model="config.operations.subtract" />
-              <label for="subtract">减法 (-)</label>
-              <select v-if="config.operations.subtract" v-model="config.digits.subtract">
-                <option value="1">1位数</option>
-                <option value="2">2位数</option>
-                <option value="3">3位数</option>
-              </select>
-            </div>
-            <div class="checkbox-item">
-              <input type="checkbox" id="multiply" v-model="config.operations.multiply" />
-              <label for="multiply">乘法 (×)</label>
-              <select v-if="config.operations.multiply" v-model="config.digits.multiply">
-                <option value="1">1位数</option>
-                <option value="2">2位数</option>
-              </select>
-            </div>
-            <div class="checkbox-item">
-              <input type="checkbox" id="divide" v-model="config.operations.divide" />
-              <label for="divide">除法 (÷)</label>
-              <select v-if="config.operations.divide" v-model="config.digits.divide">
-                <option value="1">1位数</option>
-                <option value="2">2位数</option>
-              </select>
-            </div>
-            <div class="checkbox-item">
-              <input type="checkbox" id="useBrackets" v-model="config.useBrackets" />
-              <label for="useBrackets">使用括号 ()</label>
+        <div class="config-row">
+          <div class="config-item">
+            <label>运算类型:</label>
+            <div class="checkbox-group">
+               <div class="checkbox-item">
+                <input type="checkbox" id="add" v-model="config.operations.add" />
+                <label for="add">加法 (+)</label>
+                <select v-if="config.operations.add" v-model.number="config.digits.add">
+                  <option value="1">1位数</option>
+                  <option value="2">2位数</option>
+                  <option value="3">3位数</option>
+                </select>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="subtract" v-model="config.operations.subtract" />
+                <label for="subtract">减法 (-)</label>
+                <select v-if="config.operations.subtract" v-model.number="config.digits.subtract">
+                  <option value="1">1位数</option>
+                  <option value="2">2位数</option>
+                  <option value="3">3位数</option>
+                </select>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="multiply" v-model="config.operations.multiply" />
+                <label for="multiply">乘法 (×)</label>
+                <select v-if="config.operations.multiply" v-model.number="config.digits.multiply">
+                  <option value="1">1位数</option>
+                  <option value="2">2位数</option>
+                </select>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="divide" v-model="config.operations.divide" />
+                <label for="divide">除法 (÷)</label>
+                <select v-if="config.operations.divide" v-model.number="config.digits.divide">
+                  <option value="1">1位数</option>
+                  <option value="2">2位数</option>
+                </select>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="useBrackets" v-model="config.useBrackets" />
+                <label for="useBrackets">使用括号 ()</label>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="config-row">
-        <div class="config-item">
-          <label>运算符是否重复:</label>
-          <div class="checkbox-group">
-            <div class="checkbox-item">
+        <div class="config-row">
+          <div class="config-item">
+            <label>运算符:</label>
+            <div class="checkbox-group">
               <input type="radio" id="allowRepeat" v-model="config.allowRepeatOperators" :value="true" />
               <label for="allowRepeat">允许重复</label>
-            </div>
-            <div class="checkbox-item">
               <input type="radio" id="noRepeat" v-model="config.allowRepeatOperators" :value="false" />
               <label for="noRepeat">不允许重复</label>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="config-row">
-        <div class="config-item">
-          <label>题目类型:</label>
-          <div class="checkbox-group">
-            <div class="checkbox-item">
+        <div class="config-row">
+          <div class="config-item">
+            <label>题目类型:</label>
+            <div class="checkbox-group">
               <input type="radio" id="findResult" v-model="config.problemType" value="result" />
               <label for="findResult">求结果</label>
-            </div>
-            <div class="checkbox-item">
               <input type="radio" id="findOperand" v-model="config.problemType" value="operand" />
               <label for="findOperand">求运算项</label>
             </div>
           </div>
         </div>
+        <div class="button-group">
+          <button class="btn btn-primary" @click="generateProblems">生成题目</button>
+          <button class="btn btn-success" @click="showAnswers = !showAnswers" v-if="problems.length > 0">
+            {{ showAnswers ? '隐藏答案' : '显示答案' }}
+          </button>
+          <button class="btn btn-info" @click="printProblems" v-if="problems.length > 0">打印题目</button>
+        </div>
       </div>
-
-      <div class="button-group">
-        <button class="btn btn-primary" @click="generateProblems">生成题目</button>
-        <button class="btn btn-success" @click="showAnswers = !showAnswers">
-          {{ showAnswers ? '隐藏答案' : '显示答案' }}
-        </button>
-        <button class="btn btn-info" @click="printProblems">打印题目</button>
-      </div>
-    </div>
-
-    <div class="problems-container" v-if="problems.length > 0">
-      <h2>数学练习题</h2>
-      <div class="problems-grid">
-        <div class="problem-item" v-for="(problem, index) in problems" :key="index">
-          <div class="problem-expression">{{ getCircleNumber(index + 1) }} {{ problem.expression }}</div>
-          <div class="problem-answer" v-if="showAnswers">答案: {{ problem.answer }}</div>
+      <!-- Problems Display -->
+      <div class="problems-container" v-if="problems.length > 0">
+        <h2>数学练习题</h2>
+        <div class="problems-grid">
+          <div class="problem-item" v-for="(problem, index) in problems" :key="index">
+            <div class="problem-expression">{{ getCircleNumber(index + 1) }} {{ problem.expression }}</div>
+            <div class="problem-answer" v-if="showAnswers">答案: {{ problem.answer }}</div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- History List View -->
+    <div v-if="viewMode === 'historyList'" class="history-panel">
+      <div class="history-header">
+        <h2>历史记录 (最多20条)</h2>
+        <button class="btn btn-secondary" @click="backToGenerator">返回主页</button>
+      </div>
+      <ul class="history-list">
+        <li v-for="item in history" :key="item.id" @click="showHistoryDetail(item)">
+          <span>{{ item.timestamp }}</span>
+          <span class="history-item-config">{{ formatConfig(item.config) }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- History Detail View -->
+    <div v-if="viewMode === 'historyDetail'" class="history-detail-panel">
+      <div class="history-header">
+        <h2>历史详情 ({{ selectedHistory.timestamp }})</h2>
+        <div class="button-group">
+          <button class="btn btn-success" @click="showHistoryAnswers = !showHistoryAnswers">
+            {{ showHistoryAnswers ? '隐藏答案' : '显示答案' }}
+          </button>
+          <button class="btn btn-info" @click="printHistory">打印</button>
+          <button class="btn btn-secondary" @click="backToHistoryList">返回列表</button>
+        </div>
+      </div>
+      <div class="problems-container" id="history-problems-to-print">
+        <div class="problems-grid">
+           <div class="problem-item" v-for="(problem, index) in selectedHistory.problems" :key="index">
+            <div class="problem-expression">{{ getCircleNumber(index + 1) }} {{ problem.expression }}</div>
+            <div class="problem-answer" v-if="showHistoryAnswers">答案: {{ problem.answer }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
+import { addProblemSet, getHistory } from './db.js';
+
 export default {
   name: 'MathProblemGenerator',
   data() {
     return {
       config: {
-        digits: {
-          add: '2',
-          subtract: '2',
-          multiply: '1',
-          divide: '1'
-        },
+        digits: { add: 2, subtract: 2, multiply: 1, divide: 1 },
         problemCount: 20,
-        termCount: '2',
-        operations: {
-          add: true,
-          subtract: true,
-          multiply: false,
-          divide: false
-        },
+        termCount: 2,
+        operations: { add: true, subtract: true, multiply: false, divide: false },
         useBrackets: false,
         allowRepeatOperators: true,
-        problemType: 'result'
+        problemType: 'result',
       },
       problems: [],
-      showAnswers: false
-    }
+      showAnswers: false,
+      // New state for history feature
+      viewMode: 'generator', // 'generator', 'historyList', 'historyDetail'
+      history: [],
+      selectedHistory: null,
+      showHistoryAnswers: false,
+    };
   },
   methods: {
+    // --- Main Problem Generation Logic ---
     generateNumber(op) {
-      const opMap = {
-        '+': 'add',
-        '-': 'subtract',
-        '×': 'multiply',
-        '÷': 'divide'
-      };
+      const opMap = { '+': 'add', '-': 'subtract', '×': 'multiply', '÷': 'divide' };
       const digitKey = opMap[op];
-      const digits = parseInt(this.config.digits[digitKey]);
-      const min = digits === 1 ? 1 : Math.pow(10, digits - 1);
+      const digits = this.config.digits[digitKey];
+      const min = Math.pow(10, digits - 1);
       const max = Math.pow(10, digits) - 1;
       return Math.floor(Math.random() * (max - min + 1)) + min;
     },
 
-    getRandomOperation(usedOperations = [], excludeUsed = false) {
-      const availableOps = [];
-      
-      if (excludeUsed) {
-        if (this.config.operations.add && !usedOperations.includes('+')) availableOps.push('+');
-        if (this.config.operations.subtract && !usedOperations.includes('-')) availableOps.push('-');
-        if (this.config.operations.multiply && !usedOperations.includes('×')) availableOps.push('×');
-        if (this.config.operations.divide && !usedOperations.includes('÷')) availableOps.push('÷');
-      } else {
-        if (this.config.operations.add) availableOps.push('+');
-        if (this.config.operations.subtract) availableOps.push('-');
-        if (this.config.operations.multiply) availableOps.push('×');
-        if (this.config.operations.divide) availableOps.push('÷');
+    getRandomOperation(usedOps = []) {
+      const available = Object.entries(this.config.operations)
+        .filter(([op, enabled]) => enabled)
+        .map(([op]) => ({ add: '+', subtract: '-', multiply: '×', divide: '÷' }[op]));
+
+      if (this.config.allowRepeatOperators || usedOps.length === 0) {
+        return available[Math.floor(Math.random() * available.length)];
       }
       
-      if (availableOps.length === 0) {
+      const unused = available.filter(op => !usedOps.includes(op));
+      if (unused.length > 0) {
+        return unused[Math.floor(Math.random() * unused.length)];
+      }
+      return available[Math.floor(Math.random() * available.length)]; // Fallback
+    },
+    
+    calculateWithBrackets(expression) {
+      try {
+        const evalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/');
+        // Using Function constructor for safer evaluation than eval()
+        return new Function('return ' + evalExpression)();
+      } catch (e) {
+        // This can happen with intermediate invalid expressions like '(5 * )'
         return null;
       }
-      
-      return availableOps[Math.floor(Math.random() * availableOps.length)];
-    },
-
-    calculateExpression(numbers, operations) {
-      let result = numbers[0];
-      
-      for (let i = 0; i < operations.length; i++) {
-        const op = operations[i];
-        const nextNum = numbers[i + 1];
-        
-        switch (op) {
-          case '+':
-            result += nextNum;
-            break;
-          case '-':
-            result -= nextNum;
-            break;
-          case '×':
-            result *= nextNum;
-            break;
-          case '÷':
-            if (nextNum === 0) return null;
-            result = Math.floor(result / nextNum);
-            break;
-        }
-      }
-      
-      return result;
-    },
-
-    generateBracketPosition(termCount) {
-      if (termCount < 3) return null;
-      
-      const bracketSize = Math.random() < 0.5 ? 2 : (termCount >= 4 ? 3 : 2);
-      const maxStart = termCount - bracketSize;
-      const bracketStart = Math.floor(Math.random() * (maxStart + 1));
-      
-      return {
-        start: bracketStart,
-        end: bracketStart + bracketSize - 1
-      };
-    },
-
-    calculateWithBrackets(numbers, operations, bracketPos) {
-      if (!bracketPos) {
-        return this.calculateExpression(numbers, operations);
-      }
-
-      const bracketNumbers = numbers.slice(bracketPos.start, bracketPos.end + 1);
-      const bracketOps = operations.slice(bracketPos.start, bracketPos.end);
-      const bracketResult = this.calculateExpression(bracketNumbers, bracketOps);
-      
-      if (bracketResult === null) return null;
-
-      const newNumbers = [
-        ...numbers.slice(0, bracketPos.start),
-        bracketResult,
-        ...numbers.slice(bracketPos.end + 1)
-      ];
-      const newOps = [
-        ...operations.slice(0, bracketPos.start),
-        ...operations.slice(bracketPos.end)
-      ];
-
-      return this.calculateExpression(newNumbers, newOps);
-    },
-
-    buildExpression(numbers, operations, bracketPos) {
-      let expression = '';
-      
-      for (let i = 0; i < numbers.length; i++) {
-        const isBracketStart = bracketPos && i === bracketPos.start;
-        
-        if (isBracketStart && i > 0) {
-          expression += ' (';
-        } else if (isBracketStart && i === 0) {
-          expression += '(';
-        } else if (i > 0) {
-          expression += ' ';
-        }
-        
-        expression += numbers[i];
-        
-        if (bracketPos && i === bracketPos.end) {
-          expression += ')';
-        }
-        
-        if (i < operations.length) {
-          expression += ` ${operations[i]}`;
-        }
-      }
-      
-      return expression;
     },
 
     generateResultProblem() {
-      const termCount = parseInt(this.config.termCount);
-      const numbers = [];
-      const operations = [];
-      
-      for (let i = 0; i < termCount; i++) {
-        if (i < termCount - 1) {
-          const op = this.getRandomOperation(operations, !this.config.allowRepeatOperators);
-          if (!op) return null;
-          operations.push(op);
-        }
-      }
-      
-      for (let i = 0; i < termCount; i++) {
-          const op = i > 0 ? operations[i-1] : operations[0]
-          numbers.push(this.generateNumber(op));
-      }
-
-
-      for (let i = 0; i < operations.length; i++) {
-        if (operations[i] === '÷') {
-          const divisor = numbers[i + 1];
-          numbers[i] = divisor * Math.floor(Math.random() * 10 + 1);
-        }
-      }
-      
-      const bracketPos = this.config.useBrackets ? this.generateBracketPosition(termCount) : null;
-      
-      const result = this.calculateWithBrackets(numbers, operations, bracketPos);
-      if (result === null || result < 0) return this.generateResultProblem();
-      
-      const expression = this.buildExpression(numbers, operations, bracketPos) + ' = ______';
-      
-      return {
-        expression,
-        answer: result
-      };
-    },
-
-    generateOperandProblem() {
-      const termCount = parseInt(this.config.termCount);
-      const numbers = [];
-      const operations = [];
-      
-      for (let i = 0; i < termCount; i++) {
-        if (i < termCount - 1) {
-          const op = this.getRandomOperation(operations, !this.config.allowRepeatOperators);
-          if (!op) return null;
-          operations.push(op);
-        }
-      }
-
-      for (let i = 0; i < termCount; i++) {
-          const op = i > 0 ? operations[i-1] : operations[0]
-          numbers.push(this.generateNumber(op));
-      }
-      
-      for (let i = 0; i < operations.length; i++) {
-        if (operations[i] === '÷') {
-          const divisor = numbers[i + 1];
-          numbers[i] = divisor * Math.floor(Math.random() * 10 + 1);
-        }
-      }
-      
-      const result = this.calculateExpression(numbers, operations);
-      if (result === null || result < 0) return this.generateOperandProblem();
-      
-      const hiddenIndex = Math.floor(Math.random() * numbers.length);
-      const hiddenNumber = numbers[hiddenIndex];
-      
-      let expression = '';
-      for (let i = 0; i < numbers.length; i++) {
-        if (i === hiddenIndex) {
-          expression += i === 0 ? '_____' : ' _____';
-        } else {
-          expression += i === 0 ? numbers[i] : ` ${numbers[i]}`;
-        }
+      for (let i = 0; i < 10; i++) { // Max 10 retries
+        const termCount = this.config.termCount;
+        let numbers = [];
+        let ops = [];
         
-        if (i < operations.length) {
-          expression += ` ${operations[i]}`;
+        for (let j = 0; j < termCount - 1; j++) {
+            const op = this.getRandomOperation(ops);
+            if (!op) return null;
+            ops.push(op);
+        }
+
+        const firstOp = ops.length > 0 ? ops[0] : this.getRandomOperation();
+        numbers.push(this.generateNumber(firstOp));
+
+        for (let j = 0; j < ops.length; j++) {
+            numbers.push(this.generateNumber(ops[j]));
+        }
+
+        // Ensure division results in integers
+        for (let j = 0; j < ops.length; j++) {
+            if (ops[j] === '÷') {
+                const a = numbers[j];
+                const b = numbers[j+1];
+                if (a % b !== 0) {
+                    numbers[j] = a - (a % b);
+                }
+            }
+        }
+
+        let expression = numbers.map((n, idx) => n + (ops[idx] ? ` ${ops[idx]} ` : '')).join('');
+        let answer = this.calculateWithBrackets(expression);
+
+        if (this.config.useBrackets && termCount > 2) {
+            const start = Math.floor(Math.random() * (termCount - 1));
+            const end = start + 1;
+            let tempExpr = '';
+            let exprParts = [];
+            numbers.forEach((n, idx) => {
+                exprParts.push(n);
+                if(ops[idx]) exprParts.push(ops[idx]);
+            });
+
+            tempExpr = exprParts.slice(0, start * 2).join(' ') + 
+                       ' (' + exprParts.slice(start * 2, end * 2 + 1).join(' ') + ') ' + 
+                       exprParts.slice(end * 2 + 1).join(' ');
+            expression = tempExpr.replace(/\s+/g, ' ').trim();
+            answer = this.calculateWithBrackets(expression);
+        }
+
+        if (answer !== null && answer >= 0 && Number.isInteger(answer)) {
+          return { expression: expression + ' = ______', answer };
         }
       }
-      expression += ` = ${result}`;
-      
-      return {
-        expression,
-        answer: hiddenNumber
-      };
+      return null; // Failed to generate a valid problem
+    },
+    
+    generateOperandProblem() {
+        for (let i = 0; i < 10; i++) { // Max 10 retries
+            const tempConfig = { ...this.config, useBrackets: false, problemType: 'result' };
+            const problem = this.generateResultProblem.call({ config: tempConfig });
+
+            if (problem) {
+                const { expression, answer } = problem;
+                const parts = expression.replace(' = ______', '').split(/ [+\-×÷] /);
+                const hiddenIndex = Math.floor(Math.random() * parts.length);
+                const hiddenAnswer = parseInt(parts[hiddenIndex].replace(/[()]/g, '').trim());
+
+                const finalExpression = expression
+                    .replace(' = ______', ` = ${answer}`)
+                    .replace(new RegExp(`(^|[^\d])${hiddenAnswer}(?=[^\d]|$)`), `$1______`);
+
+                if (finalExpression.includes('______')) {
+                    return { expression: finalExpression, answer: hiddenAnswer };
+                }
+            }
+        }
+        return null; // Failed
     },
 
-    generateProblems() {
+    async generateProblems() {
       this.problems = [];
       this.showAnswers = false;
-      
-      for (let i = 0; i < this.config.problemCount; i++) {
-        let problem;
-        
-        if (this.config.problemType === 'result') {
-          problem = this.generateResultProblem();
-        } else {
-          problem = this.generateOperandProblem();
-        }
+      const newProblems = [];
+      let attempts = 0;
+
+      while (newProblems.length < this.config.problemCount && attempts < 200) {
+        const problem = this.config.problemType === 'result' 
+          ? this.generateResultProblem()
+          : this.generateOperandProblem();
         
         if (problem) {
-          this.problems.push(problem);
-        } else {
-          i--; 
+          newProblems.push(problem);
         }
+        attempts++;
+      }
+      this.problems = newProblems;
+
+      // Save to IndexedDB
+      if (newProblems.length > 0) {
+        await addProblemSet(this.problems, { ...this.config });
       }
     },
 
     printProblems() {
-      if (this.problems.length === 0) {
-        alert('请先生成题目！');
-        return;
-      }
-      
-      const wasShowingAnswers = this.showAnswers;
+      if (this.problems.length === 0) { alert('请先生成题目！'); return; }
+      const wasShowing = this.showAnswers;
       this.showAnswers = false;
-      
-      setTimeout(() => {
-        window.print();
-        this.showAnswers = wasShowingAnswers;
-      }, 100);
+      this.$nextTick(() => { 
+        window.print(); 
+        this.showAnswers = wasShowing; 
+      });
     },
 
     getCircleNumber(num) {
       return `${num}、`;
+    },
+
+    // --- History Feature Methods ---
+    async showHistoryList() {
+      this.history = await getHistory();
+      this.viewMode = 'historyList';
+    },
+
+    showHistoryDetail(item) {
+      this.selectedHistory = item;
+      this.showHistoryAnswers = false;
+      this.viewMode = 'historyDetail';
+    },
+
+    backToGenerator() {
+      this.viewMode = 'generator';
+      this.selectedHistory = null;
+    },
+    
+    backToHistoryList() {
+        this.viewMode = 'historyList';
+        this.selectedHistory = null;
+    },
+
+    printHistory() {
+      this.showHistoryAnswers = false;
+      this.$nextTick(() => {
+        const printElement = document.getElementById('history-problems-to-print');
+        const originalBody = document.body.innerHTML;
+        const printContent = printElement.innerHTML;
+        
+        document.body.innerHTML = printContent;
+        window.print();
+        document.body.innerHTML = originalBody;
+        // A simple reload is the most robust way to restore Vue's state
+        window.location.reload(); 
+      });
+    },
+    
+    formatConfig(config) {
+        const ops = Object.entries(config.operations)
+            .filter(([_, v]) => v)
+            .map(([k]) => ({add: '+', subtract: '-', multiply: '×', divide: '÷'}[k]))
+            .join(', ');
+        return `题目: ${config.problemCount} | 类型: ${ops || 'N/A'} | ${config.termCount}项`;
     }
   }
-}
+};
 </script>
+
+<style>
+/* Styles for new history elements will be added to src/style.css */
+.header-actions {
+  margin-top: 15px;
+}
+
+.history-panel, .history-detail-panel {
+  background: white;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+}
+
+.history-list li {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s;
+}
+
+.history-list li:hover {
+  background-color: #f9f9f9;
+}
+
+.history-list li:last-child {
+  border-bottom: none;
+}
+
+.history-item-config {
+    color: #555;
+    font-size: 0.9em;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+</style>
