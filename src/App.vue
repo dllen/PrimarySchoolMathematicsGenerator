@@ -335,9 +335,10 @@ export default {
 
       // Save to IndexedDB
       if (newProblems.length > 0) {
-        // Deep copy the config to avoid DataCloneError
+        // Deep copy the config and problems to avoid DataCloneError
         const configToSave = JSON.parse(JSON.stringify(this.config));
-        await addProblemSet(this.problems, configToSave);
+        const problemsToSave = JSON.parse(JSON.stringify(this.problems));
+        await addProblemSet(problemsToSave, configToSave);
       }
     },
 
