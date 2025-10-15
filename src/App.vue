@@ -223,6 +223,7 @@ export default {
         const termCount = this.config.termCount;
         let expression = '';
         let ops = [];
+        let numbers = [];
 
         // 1. Generate all operators first
         let usedOpsInProblem = [];
@@ -233,95 +234,157 @@ export default {
             if (!this.config.allowRepeatOperators) usedOpsInProblem.push(op);
         }
 
-        // 2. Generate numbers according to each operator's digit requirements
-        let numbers = [];
-        
-        // First number: use the first operator's digit requirement
-        let firstOpDigits = this.config.digits[opMap[ops[0]]];
+        // 2. Generate numbers ensuring each operator's left and right operands meet digit requirements
+        // For the first number, it needs to satisfy the first operator's digit requirement
+        const firstOpDigits = this.config.digits[opMap[ops[0]]];
         numbers.push(this.generateNumber(firstOpDigits));
         
-        // Generate remaining numbers, each based on its corresponding operator
+        // For subsequent numbers, each must satisfy its corresponding operator's digit requirement
         for (let i = 0; i < ops.length; i++) {
             const opDigits = this.config.digits[opMap[ops[i]]];
             numbers.push(this.generateNumber(opDigits));
         }
 
-        // 3. Build and validate expression step by step
-        let currentResult = numbers[0];
+        // 3. For multi-term expressions, we need to ensure intermediate results also meet digit requirements
+        // This is complex because intermediate results become left operands for subsequent operations
+        let validExpression = true;
+        
+        // Check if we need to regenerate numbers to satisfy all constraints
+        if (termCount > 2) {
+            // For expressions like "a op1 b op2 c", we need to ensure:
+            // - a and b satisfy op1's digit requirement
+            // - (a op1 b) and c satisfy op2's digit requirement
+            
+            // Calculate intermediate result
+            let intermediateResult = this.calculate(`${numbers[0]} ${ops[0].replace('×', '*').replace('÷', '/')} ${numbers[1]}`);
+            
+            if (intermediateResult !== null && intermediateResult > 0) {
+                // Check if intermediate result has correct digits for next operation
+                for (let i = 1; i < ops.length; i++) {
+                    const nextOpDigits = this.config.digits[opMap[ops[i]]];
+                    const intermediateDigits = intermediateResult.toString().length;
+                    
+                    // If intermediate result doesn't match required digits, regenerate
+                    if (intermediateDigits !== nextOpDigits) {
+                        // Try to find a valid combination
+                        let found = false;
+                        for (let retry = 0; retry < 30; retry++) {
+                            const newFirst = this.generateNumber(this.config.digits[opMap[ops[0]]]);
+                            const newSecond = this.generateNumber(this.config.digits[opMap[ops[0]]]);
+                            
+                            let testResult = this.calculate(`${newFirst} ${ops[0].replace('×', '*').replace('÷', '/')} ${newSecond}`);
+                            
+                            if (testResult !== null && testResult > 0 && 
+                                testResult.toString().length === nextOpDigits) {
+                                numbers[0] = newFirst;
+                                numbers[1] = newSecond;
+                                intermediateResult = testResult;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            validExpression = false;
+                            break;
+                        }
+                    }
+                    
+                    // Update intermediate result for next iteration
+                    if (i < ops.length - 1) {
+                        intermediateResult = this.calculate(`${intermediateResult} ${ops[i].replace('×', '*').replace('÷', '/')} ${numbers[i + 1]}`);
+                        if (intermediateResult === null || intermediateResult <= 0) {
+                            validExpression = false;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                validExpression = false;
+            }
+        }
+
+        if (!validExpression) {
+            continue; // Try next attempt
+        }
+
+        // 4. Build expression and validate constraints
         expression = numbers[0].toString();
+        let currentResult = numbers[0];
         
         for (let i = 0; i < ops.length; i++) {
             const op = ops[i];
-            const nextNum = numbers[i + 1];
+            let nextNum = numbers[i + 1];
             
-            // Validate operation constraints
+            // Handle subtraction constraint (result must be non-negative)
             if (op === '-' && currentResult < nextNum) {
-                // For subtraction, ensure result is non-negative
-                // Swap numbers if needed
-                if (i === 0) {
-                    [numbers[0], numbers[1]] = [numbers[1], numbers[0]];
-                    currentResult = numbers[0];
-                    expression = numbers[0].toString();
-                } else {
-                    // For multi-term expressions, try a different number
-                    let validNum = null;
-                    for (let retry = 0; retry < 20; retry++) {
-                        const testNum = this.generateNumber(this.config.digits[opMap[op]]);
-                        if (currentResult >= testNum) {
-                            validNum = testNum;
-                            break;
-                        }
+                // Try to find a smaller number that satisfies digit requirement
+                let validNum = null;
+                const requiredDigits = this.config.digits[opMap[op]];
+                
+                for (let retry = 0; retry < 20; retry++) {
+                    const testNum = this.generateNumber(requiredDigits);
+                    if (currentResult >= testNum) {
+                        validNum = testNum;
+                        break;
                     }
-                    if (validNum === null) break; // Skip this attempt
-                    numbers[i + 1] = validNum;
                 }
+                
+                if (validNum === null) {
+                    validExpression = false;
+                    break;
+                }
+                nextNum = validNum;
+                numbers[i + 1] = validNum;
             }
             
+            // Handle division constraint (result must be integer)
             if (op === '÷') {
-                let divisor = numbers[i + 1];
-                if (divisor === 0) divisor = 1;
+                if (nextNum === 0) nextNum = 1;
                 
                 // Ensure division results in integer
-                if (i === 0) {
-                    numbers[0] = numbers[0] - (numbers[0] % divisor);
-                    currentResult = numbers[0];
-                    expression = numbers[0].toString();
-                } else {
-                    // For multi-term, find a divisor that works
-                    let validDivisor = null;
-                    for (let retry = 0; retry < 20; retry++) {
-                        const testDivisor = this.generateNumber(this.config.digits[opMap[op]]);
-                        if (testDivisor !== 0 && currentResult % testDivisor === 0) {
-                            validDivisor = testDivisor;
-                            break;
-                        }
+                const requiredDigits = this.config.digits[opMap[op]];
+                let validDivisor = null;
+                
+                for (let retry = 0; retry < 20; retry++) {
+                    const testDivisor = this.generateNumber(requiredDigits);
+                    if (testDivisor !== 0 && currentResult % testDivisor === 0) {
+                        validDivisor = testDivisor;
+                        break;
                     }
-                    if (validDivisor === null) break; // Skip this attempt
-                    numbers[i + 1] = validDivisor;
                 }
+                
+                if (validDivisor === null) {
+                    validExpression = false;
+                    break;
+                }
+                nextNum = validDivisor;
+                numbers[i + 1] = validDivisor;
             }
             
-            // Apply the operation
-            const finalNum = numbers[i + 1];
-            expression += ` ${op} ${finalNum}`;
+            // Build expression
+            expression += ` ${op} ${nextNum}`;
             
             // Calculate new result
             const tempResult = this.calculate(expression);
             if (tempResult === null || tempResult < 0 || !Number.isInteger(tempResult)) {
-                break; // Invalid result, try next attempt
+                validExpression = false;
+                break;
             }
             currentResult = tempResult;
+        }
+
+        if (!validExpression) {
+            continue; // Try next attempt
         }
 
         // Final validation
         const finalAnswer = this.calculate(expression);
         if (finalAnswer === null || finalAnswer < 0 || !Number.isInteger(finalAnswer)) {
-            continue; // Try again if the expression is invalid
+            continue;
         }
 
-        // 4. Add brackets if enabled
+        // 5. Add brackets if enabled
         if (this.config.useBrackets && termCount > 2) {
-            // Simple bracket addition for visual effect
             expression = `(${expression})`;
         }
 
