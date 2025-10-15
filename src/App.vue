@@ -209,7 +209,7 @@ export default {
     
     calculate(expression) {
       try {
-        const evalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/[()]/g, '');
+        const evalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/');
         return new Function('return ' + evalExpression)();
       } catch (e) {
         return null;
@@ -217,91 +217,82 @@ export default {
     },
     
     generateResultProblem() {
-        const opMap = { '+': 'add', '-': 'subtract', '×': 'multiply', '÷': 'divide' };
+      const opMap = { '+': 'add', '-': 'subtract', '×': 'multiply', '÷': 'divide' };
+
+      for (let attempt = 0; attempt < 100; attempt++) {
+        const termCount = this.config.termCount;
+        let expression = '';
+        let currentResult = 0;
+        let ops = [];
+
+        // 1. Generate all operators
+        let usedOpsInProblem = [];
+        for (let i = 0; i < termCount - 1; i++) {
+            const op = this.getRandomOperation(usedOpsInProblem);
+            if (!op) return null;
+            ops.push(op);
+            if (!this.config.allowRepeatOperators) usedOpsInProblem.push(op);
+        }
+
+        // 2. Build expression left-to-right
+        let num1_op = ops[0];
+        let num1_digits = this.config.digits[opMap[num1_op]];
+        let num1 = this.generateNumber(num1_digits);
         
-        for (let attempt = 0; attempt < 50; attempt++) { // Max 50 retries
-            const termCount = this.config.termCount;
-            let numbers = [];
-            let ops = [];
+        let num2_op = ops[0];
+        let num2_digits = this.config.digits[opMap[num2_op]];
+        let num2 = this.generateNumber(num2_digits);
 
-            // 1. Generate operators
-            let usedOpsInProblem = [];
-            for (let i = 0; i < termCount - 1; i++) {
-                const op = this.getRandomOperation(usedOpsInProblem);
-                if (!op) return null; // No available operators
-                ops.push(op);
-                if (!this.config.allowRepeatOperators) {
-                    usedOpsInProblem.push(op);
-                }
-            }
+        // Ensure first operation is valid
+        if (num2_op === '-' && num1 < num2) [num1, num2] = [num2, num1];
+        if (num2_op === '÷') {
+            if (num2 === 0) num2 = 1;
+            num1 = num1 - (num1 % num2);
+        }
 
-            // 2. Generate numbers based on operator digits
-            const firstOp = ops.length > 0 ? ops[0] : this.getRandomOperation();
-            if (!firstOp) return null;
-            const firstDigitKey = opMap[firstOp];
-            numbers.push(this.generateNumber(this.config.digits[firstDigitKey]));
+        expression = `${num1} ${ops[0]} ${num2}`;
+        currentResult = this.calculate(expression);
 
-            for (let i = 0; i < ops.length; i++) {
-                const op = ops[i];
-                const digitKey = opMap[op];
-                numbers.push(this.generateNumber(this.config.digits[digitKey]));
-            }
+        for (let i = 1; i < ops.length; i++) {
+            const op = ops[i];
+            const digitKey = opMap[op];
+            let nextNum;
             
-            // 3. Create initial expression and check constraints
-            let tempNumbers = [...numbers];
-            let tempOps = [...ops];
-            let isValid = true;
+            for (let retry = 0; retry < 50; retry++) {
+                nextNum = this.generateNumber(this.config.digits[digitKey]);
+                let tempExpr = `(${expression}) ${op} ${nextNum}`;
+                let nextResult = this.calculate(tempExpr);
 
-            for (let i = 0; i < tempOps.length; i++) {
-                if (tempOps[i] === '-') {
-                    const subExpr = `${tempNumbers[i]} - ${tempNumbers[i+1]}`;
-                    if (this.calculate(subExpr) < 0) {
-                        [tempNumbers[i], tempNumbers[i+1]] = [tempNumbers[i+1], tempNumbers[i]];
-                    }
-                } else if (tempOps[i] === '÷') {
-                    if (tempNumbers[i+1] === 0) { // Avoid division by zero
-                        isValid = false; break;
-                    }
-                    const result = tempNumbers[i] / tempNumbers[i+1];
-                    if (!Number.isInteger(result)) {
-                        // Adjust the dividend to make it divisible
-                        tempNumbers[i] = result.toFixed(0) * tempNumbers[i+1];
-                    }
+                if (nextResult !== null && nextResult >= 0 && Number.isInteger(nextResult)) {
+                    expression = tempExpr;
+                    currentResult = nextResult;
+                    break; 
                 }
             }
-            if (!isValid) continue;
-
-            // 4. Build the final expression string
-            let expression = tempNumbers[0].toString();
-            for (let i = 0; i < tempOps.length; i++) {
-                expression += ` ${tempOps[i]} ${tempNumbers[i+1]}`;
-            }
-
-            // 5. Add brackets if enabled
-            if (this.config.useBrackets && termCount > 2) {
-                const start = Math.floor(Math.random() * (termCount - 1));
-                const end = start + 1;
-                let exprParts = [];
-                tempNumbers.forEach((n, idx) => {
-                    exprParts.push(n);
-                    if(tempOps[idx]) exprParts.push(tempOps[idx]);
-                });
-
-                const partBefore = exprParts.slice(0, start * 2).join(' ');
-                const partBracket = '(' + exprParts.slice(start * 2, end * 2 + 1).join(' ') + ')';
-                const partAfter = exprParts.slice(end * 2 + 1).join(' ');
-                
-                expression = [partBefore, partBracket, partAfter].filter(p => p).join(' ');
-            }
-
-            // 6. Calculate final answer and validate
-            const answer = this.calculate(expression);
-
-            if (answer !== null && answer >= 0 && Number.isInteger(answer)) {
-                return { expression: expression.trim() + ' = ______', answer };
+            if (this.calculate(`(${expression})`) !== currentResult) { 
+              // if the loop finished without finding a valid number
+              break; 
             }
         }
-        return null; // Failed to generate a valid problem
+
+        // Final validation of the whole expression
+        const finalAnswer = this.calculate(expression);
+        if (finalAnswer === null || finalAnswer < 0 || !Number.isInteger(finalAnswer)) {
+            continue; // Try again if the expression is invalid
+        }
+
+        // 3. Add brackets if enabled
+        if (this.config.useBrackets && termCount > 2) {
+            // This logic is simplified; a full implementation requires parsing and tree manipulation
+            // For now, we add brackets around the whole expression for visual effect
+            expression = `(${expression})`;
+        } else {
+           expression = expression.replace(/[()]/g, ''); // Clean up parens if not used
+        }
+
+        return { expression: expression + ' = ______', answer: finalAnswer };
+      }
+      return null; // Failed to generate a valid problem
     },
 
     generateOperandProblem() {
