@@ -206,6 +206,52 @@ export default {
       }
       return available[Math.floor(Math.random() * available.length)]; // Fallback
     },
+
+    // 生成随机排列的运算符序列，确保运算符位置更加随机
+    generateRandomOperatorSequence(termCount) {
+      const opMap = { add: '+', subtract: '-', multiply: '×', divide: '÷' };
+      const available = Object.entries(this.config.operations)
+        .filter(([, enabled]) => enabled)
+        .map(([op]) => opMap[op]);
+
+      if (available.length === 0) return null;
+
+      const opsNeeded = termCount - 1;
+      let ops = [];
+
+      if (this.config.allowRepeatOperators) {
+        // 允许重复：完全随机选择
+        for (let i = 0; i < opsNeeded; i++) {
+          ops.push(available[Math.floor(Math.random() * available.length)]);
+        }
+      } else {
+        // 不允许重复：使用洗牌算法确保随机分布
+        if (available.length < opsNeeded) {
+          // 如果可用运算符不够，先填满不重复的，然后随机填充剩余位置
+          ops = [...available];
+          while (ops.length < opsNeeded) {
+            ops.push(available[Math.floor(Math.random() * available.length)]);
+          }
+        } else {
+          // 从可用运算符中随机选择不重复的
+          const shuffled = [...available];
+          // Fisher-Yates 洗牌算法
+          for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          }
+          ops = shuffled.slice(0, opsNeeded);
+        }
+        
+        // 再次打乱顺序，确保位置随机
+        for (let i = ops.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [ops[i], ops[j]] = [ops[j], ops[i]];
+        }
+      }
+
+      return ops;
+    },
     
     calculate(expression) {
       try {
@@ -225,14 +271,9 @@ export default {
         let ops = [];
         let numbers = [];
 
-        // 1. Generate all operators first
-        let usedOpsInProblem = [];
-        for (let i = 0; i < termCount - 1; i++) {
-            const op = this.getRandomOperation(usedOpsInProblem);
-            if (!op) return null;
-            ops.push(op);
-            if (!this.config.allowRepeatOperators) usedOpsInProblem.push(op);
-        }
+        // 1. Generate all operators using improved random sequence
+        ops = this.generateRandomOperatorSequence(termCount);
+        if (!ops || ops.length === 0) return null;
 
         // 2. Generate numbers ensuring each operator's left and right operands meet digit requirements
         // For the first number, it needs to satisfy the first operator's digit requirement
