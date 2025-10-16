@@ -324,14 +324,44 @@ export default {
           return;
         }
 
+        // 保存原始样式
+        const originalStyle = element.style.cssText;
+        const originalWidth = element.style.width;
+        const originalPadding = element.style.padding;
+        
+        // A4 纸尺寸 (210mm x 297mm)，转换为像素 (96 DPI)
+        // 210mm = 794px, 297mm = 1123px
+        const a4Width = 794;
+        const a4Height = 1123;
+        const padding = 40; // 页边距
+
+        // 临时应用 A4 排版样式
+        element.style.width = `${a4Width}px`;
+        element.style.padding = `${padding}px`;
+        element.style.boxSizing = 'border-box';
+        element.style.backgroundColor = '#ffffff';
+
         // 临时显示打印头部
         const printHeader = element.querySelector('.print-header');
         if (printHeader) {
           printHeader.style.display = 'block';
         }
 
+        // 调整题目网格为 2 列布局（适合 A4 纸）
+        const problemsGrid = element.querySelector('.problems-grid');
+        const originalGridStyle = problemsGrid ? problemsGrid.style.cssText : '';
+        if (problemsGrid) {
+          problemsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+          problemsGrid.style.gap = '15px';
+        }
+
+        // 等待样式应用
+        await this.$nextTick();
+
         // 生成图片
         const canvas = await html2canvas(element, {
+          width: a4Width,
+          windowWidth: a4Width,
           scale: 2,
           backgroundColor: '#ffffff',
           logging: false,
@@ -339,19 +369,12 @@ export default {
           allowTaint: true,
           foreignObjectRendering: false,
           removeContainer: true,
-          ignoreElements: (element) => {
-            // 忽略可能包含不支持样式的元素
-            return false;
-          },
           onclone: (clonedDoc) => {
-            // 在克隆的文档中移除可能导致问题的样式
             const clonedElement = clonedDoc.getElementById(elementId);
             if (clonedElement) {
-              // 强制设置所有文本颜色为标准格式
               const allElements = clonedElement.querySelectorAll('*');
               allElements.forEach(el => {
                 const computedStyle = window.getComputedStyle(el);
-                // 将计算后的颜色转换为 rgb 格式
                 if (computedStyle.color) {
                   el.style.color = computedStyle.color;
                 }
@@ -363,9 +386,13 @@ export default {
           }
         });
 
-        // 恢复打印头部隐藏
+        // 恢复原始样式
+        element.style.cssText = originalStyle;
         if (printHeader) {
           printHeader.style.display = 'none';
+        }
+        if (problemsGrid) {
+          problemsGrid.style.cssText = originalGridStyle;
         }
 
         // 转换为图片并下载
@@ -392,12 +419,37 @@ export default {
 
       try {
         const element = document.getElementById('problems-to-print');
+        
+        // 保存原始样式
+        const originalStyle = element.style.cssText;
+        
+        // A4 纸尺寸
+        const a4Width = 794;
+        const padding = 40;
+
+        // 应用 A4 排版样式
+        element.style.width = `${a4Width}px`;
+        element.style.padding = `${padding}px`;
+        element.style.boxSizing = 'border-box';
+        element.style.backgroundColor = '#ffffff';
+
         const printHeader = element.querySelector('.print-header');
         if (printHeader) {
           printHeader.style.display = 'block';
         }
 
+        const problemsGrid = element.querySelector('.problems-grid');
+        const originalGridStyle = problemsGrid ? problemsGrid.style.cssText : '';
+        if (problemsGrid) {
+          problemsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+          problemsGrid.style.gap = '15px';
+        }
+
+        await this.$nextTick();
+
         const canvas = await html2canvas(element, {
+          width: a4Width,
+          windowWidth: a4Width,
           scale: 2,
           backgroundColor: '#ffffff',
           logging: false,
@@ -422,8 +474,13 @@ export default {
           }
         });
 
+        // 恢复原始样式
+        element.style.cssText = originalStyle;
         if (printHeader) {
           printHeader.style.display = 'none';
+        }
+        if (problemsGrid) {
+          problemsGrid.style.cssText = originalGridStyle;
         }
 
         canvas.toBlob(async (blob) => {
@@ -509,12 +566,37 @@ export default {
 
       try {
         const element = document.getElementById('history-problems-to-print');
+        
+        // 保存原始样式
+        const originalStyle = element.style.cssText;
+        
+        // A4 纸尺寸
+        const a4Width = 794;
+        const padding = 40;
+
+        // 应用 A4 排版样式
+        element.style.width = `${a4Width}px`;
+        element.style.padding = `${padding}px`;
+        element.style.boxSizing = 'border-box';
+        element.style.backgroundColor = '#ffffff';
+
         const printHeader = element.querySelector('.print-header');
         if (printHeader) {
           printHeader.style.display = 'block';
         }
 
+        const problemsGrid = element.querySelector('.problems-grid');
+        const originalGridStyle = problemsGrid ? problemsGrid.style.cssText : '';
+        if (problemsGrid) {
+          problemsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+          problemsGrid.style.gap = '15px';
+        }
+
+        await this.$nextTick();
+
         const canvas = await html2canvas(element, {
+          width: a4Width,
+          windowWidth: a4Width,
           scale: 2,
           backgroundColor: '#ffffff',
           logging: false,
@@ -539,8 +621,13 @@ export default {
           }
         });
 
+        // 恢复原始样式
+        element.style.cssText = originalStyle;
         if (printHeader) {
           printHeader.style.display = 'none';
+        }
+        if (problemsGrid) {
+          problemsGrid.style.cssText = originalGridStyle;
         }
 
         canvas.toBlob(async (blob) => {
