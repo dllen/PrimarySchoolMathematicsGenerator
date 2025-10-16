@@ -335,7 +335,32 @@ export default {
           scale: 2,
           backgroundColor: '#ffffff',
           logging: false,
-          useCORS: true
+          useCORS: true,
+          allowTaint: true,
+          foreignObjectRendering: false,
+          removeContainer: true,
+          ignoreElements: (element) => {
+            // 忽略可能包含不支持样式的元素
+            return false;
+          },
+          onclone: (clonedDoc) => {
+            // 在克隆的文档中移除可能导致问题的样式
+            const clonedElement = clonedDoc.getElementById(elementId);
+            if (clonedElement) {
+              // 强制设置所有文本颜色为标准格式
+              const allElements = clonedElement.querySelectorAll('*');
+              allElements.forEach(el => {
+                const computedStyle = window.getComputedStyle(el);
+                // 将计算后的颜色转换为 rgb 格式
+                if (computedStyle.color) {
+                  el.style.color = computedStyle.color;
+                }
+                if (computedStyle.backgroundColor) {
+                  el.style.backgroundColor = computedStyle.backgroundColor;
+                }
+              });
+            }
+          }
         });
 
         // 恢复打印头部隐藏
@@ -376,7 +401,25 @@ export default {
           scale: 2,
           backgroundColor: '#ffffff',
           logging: false,
-          useCORS: true
+          useCORS: true,
+          allowTaint: true,
+          foreignObjectRendering: false,
+          removeContainer: true,
+          onclone: (clonedDoc) => {
+            const clonedElement = clonedDoc.getElementById('problems-to-print');
+            if (clonedElement) {
+              const allElements = clonedElement.querySelectorAll('*');
+              allElements.forEach(el => {
+                const computedStyle = window.getComputedStyle(el);
+                if (computedStyle.color) {
+                  el.style.color = computedStyle.color;
+                }
+                if (computedStyle.backgroundColor) {
+                  el.style.backgroundColor = computedStyle.backgroundColor;
+                }
+              });
+            }
+          }
         });
 
         if (printHeader) {
@@ -475,7 +518,25 @@ export default {
           scale: 2,
           backgroundColor: '#ffffff',
           logging: false,
-          useCORS: true
+          useCORS: true,
+          allowTaint: true,
+          foreignObjectRendering: false,
+          removeContainer: true,
+          onclone: (clonedDoc) => {
+            const clonedElement = clonedDoc.getElementById('history-problems-to-print');
+            if (clonedElement) {
+              const allElements = clonedElement.querySelectorAll('*');
+              allElements.forEach(el => {
+                const computedStyle = window.getComputedStyle(el);
+                if (computedStyle.color) {
+                  el.style.color = computedStyle.color;
+                }
+                if (computedStyle.backgroundColor) {
+                  el.style.backgroundColor = computedStyle.backgroundColor;
+                }
+              });
+            }
+          }
         });
 
         if (printHeader) {
