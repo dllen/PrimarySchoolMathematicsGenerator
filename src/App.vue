@@ -297,11 +297,11 @@ export default {
     },
 
     async printProblems() {
-      if (this.problems.length === 0) { 
-        alert('请先生成题目！'); 
-        return; 
+      if (this.problems.length === 0) {
+        alert('请先生成题目！');
+        return;
       }
-      
+
       // 移动设备使用图片下载
       if (this.isMobile) {
         await this.downloadAsImage('problems-to-print');
@@ -428,7 +428,7 @@ export default {
 
         canvas.toBlob(async (blob) => {
           const file = new File([blob], '数学题目.png', { type: 'image/png' });
-          
+
           if (navigator.share && navigator.canShare({ files: [file] })) {
             try {
               await navigator.share({
@@ -480,7 +480,7 @@ export default {
 
     async printHistory() {
       this.showHistoryAnswers = false;
-      
+
       if (this.isMobile) {
         await this.$nextTick();
         await this.downloadAsImage('history-problems-to-print');
@@ -506,7 +506,7 @@ export default {
 
       this.showHistoryAnswers = false;
       await this.$nextTick();
-      
+
       try {
         const element = document.getElementById('history-problems-to-print');
         const printHeader = element.querySelector('.print-header');
@@ -545,7 +545,7 @@ export default {
 
         canvas.toBlob(async (blob) => {
           const file = new File([blob], '数学题目.png', { type: 'image/png' });
-          
+
           if (navigator.share && navigator.canShare({ files: [file] })) {
             try {
               await navigator.share({

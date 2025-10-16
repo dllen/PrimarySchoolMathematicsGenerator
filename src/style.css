@@ -90,6 +90,12 @@ body {
   gap: 5px;
 }
 
+.checkbox-item label {
+  text-align: left;
+  font-weight: normal;
+  min-width: auto;
+}
+
 .checkbox-item input[type="checkbox"] {
   width: 18px;
   height: 18px;
