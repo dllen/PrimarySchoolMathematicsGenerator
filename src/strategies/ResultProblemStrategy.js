@@ -188,6 +188,70 @@ export class ResultProblemStrategy extends ProblemGeneratorStrategy {
       return null;
     }
 
+    // 随机打乱表达式顺序（不按运算优先级排列）
+    expression = this.shuffleExpression(expression, finalAnswer);
+
     return { expression, finalAnswer };
+  }
+
+  /**
+   * 随机打乱表达式中的运算顺序
+   * 例如：将 "7 × 4 + 85" 打乱为 "85 + 7 × 4"
+   * @param {string} expression 原始表达式
+   * @param {number} expectedAnswer 期望的答案
+   * @returns {string} 打乱后的表达式
+   */
+  shuffleExpression(expression, expectedAnswer) {
+    // 解析表达式，提取数字和运算符
+    const tokens = expression.split(/\s+/);
+    const numbers = [];
+    const operators = [];
+    
+    for (let i = 0; i < tokens.length; i++) {
+      if (i % 2 === 0) {
+        numbers.push(tokens[i]);
+      } else {
+        operators.push(tokens[i]);
+      }
+    }
+
+    // 如果只有一个运算符，不需要打乱
+    if (operators.length <= 1) {
+      return expression;
+    }
+
+    // 尝试多次打乱，找到一个结果相同的排列
+    for (let attempt = 0; attempt < 100; attempt++) {
+      // 创建数字和运算符的副本
+      const shuffledNumbers = [...numbers];
+      const shuffledOperators = [...operators];
+
+      // 使用 Fisher-Yates 洗牌算法打乱数字
+      for (let i = shuffledNumbers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledNumbers[i], shuffledNumbers[j]] = [shuffledNumbers[j], shuffledNumbers[i]];
+      }
+
+      // 使用 Fisher-Yates 洗牌算法打乱运算符
+      for (let i = shuffledOperators.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledOperators[i], shuffledOperators[j]] = [shuffledOperators[j], shuffledOperators[i]];
+      }
+
+      // 重新构建表达式
+      let shuffledExpr = shuffledNumbers[0];
+      for (let i = 0; i < shuffledOperators.length; i++) {
+        shuffledExpr += ` ${shuffledOperators[i]} ${shuffledNumbers[i + 1]}`;
+      }
+
+      // 验证打乱后的表达式结果是否相同
+      const shuffledAnswer = this.calculate(shuffledExpr);
+      if (shuffledAnswer === expectedAnswer) {
+        return shuffledExpr;
+      }
+    }
+
+    // 如果打乱失败，返回原表达式
+    return expression;
   }
 }
