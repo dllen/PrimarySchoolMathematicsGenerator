@@ -217,6 +217,7 @@
 </template>
 
 <script>
+import html2canvas from 'html2canvas';
 import { addProblemSet, getHistory } from './db.js';
 import { ProblemGeneratorContext } from './strategies/ProblemGeneratorFactory.js';
 
