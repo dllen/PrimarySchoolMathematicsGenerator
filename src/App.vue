@@ -103,7 +103,28 @@
         </div>
       </div>
       <!-- Problems Display -->
-      <div class="problems-container" v-if="problems.length > 0">
+      <div class="problems-container" v-if="problems.length > 0" id="problems-to-print">
+        <!-- Print Header (only visible when printing) -->
+        <div class="print-header">
+          <div class="print-header-row">
+            <div class="print-header-item">
+              <span class="print-label">年级：</span>
+              <span class="print-underline"></span>
+            </div>
+            <div class="print-header-item">
+              <span class="print-label">姓名：</span>
+              <span class="print-underline"></span>
+            </div>
+            <div class="print-header-item">
+              <span class="print-label">日期：</span>
+              <span class="print-underline"></span>
+            </div>
+            <div class="print-header-item">
+              <span class="print-label">分数：</span>
+              <span class="print-underline"></span>
+            </div>
+          </div>
+        </div>
         <h3>数学练习题</h3>
         <div class="problems-grid">
           <div class="problem-item" v-for="(problem, index) in problems" :key="index">
@@ -141,6 +162,28 @@
         </div>
       </div>
       <div class="problems-container" id="history-problems-to-print">
+        <!-- Print Header (only visible when printing) -->
+        <div class="print-header">
+          <div class="print-header-row">
+            <div class="print-header-item">
+              <span class="print-label">年级：</span>
+              <span class="print-underline"></span>
+            </div>
+            <div class="print-header-item">
+              <span class="print-label">姓名：</span>
+              <span class="print-underline"></span>
+            </div>
+            <div class="print-header-item">
+              <span class="print-label">日期：</span>
+              <span class="print-underline"></span>
+            </div>
+            <div class="print-header-item">
+              <span class="print-label">分数：</span>
+              <span class="print-underline"></span>
+            </div>
+          </div>
+        </div>
+        <h3>数学练习题</h3>
         <div class="problems-grid">
           <div class="problem-item" v-for="(problem, index) in selectedHistory.problems" :key="index">
             <div class="problem-expression">{{ getCircleNumber(index + 1) }} {{ problem.expression }}</div>
