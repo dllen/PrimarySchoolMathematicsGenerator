@@ -328,7 +328,7 @@ export default {
         const originalStyle = element.style.cssText;
         const originalWidth = element.style.width;
         const originalPadding = element.style.padding;
-        
+
         // A4 纸尺寸 (210mm x 297mm)，转换为像素 (96 DPI)
         // 210mm = 794px, 297mm = 1123px
         const a4Width = 794;
@@ -419,10 +419,10 @@ export default {
 
       try {
         const element = document.getElementById('problems-to-print');
-        
+
         // 保存原始样式
         const originalStyle = element.style.cssText;
-        
+
         // A4 纸尺寸
         const a4Width = 794;
         const padding = 40;
@@ -566,10 +566,10 @@ export default {
 
       try {
         const element = document.getElementById('history-problems-to-print');
-        
+
         // 保存原始样式
         const originalStyle = element.style.cssText;
-        
+
         // A4 纸尺寸
         const a4Width = 794;
         const padding = 40;
