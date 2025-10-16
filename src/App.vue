@@ -1,4 +1,3 @@
-
 <template>
   <div class="container">
     <!-- Header -->
@@ -32,7 +31,7 @@
           <div class="config-item">
             <label>运算类型:</label>
             <div class="checkbox-group">
-               <div class="checkbox-item">
+              <div class="checkbox-item">
                 <input type="checkbox" id="add" v-model="config.operations.add" />
                 <label for="add">加法 (+)</label>
                 <select v-if="config.operations.add" v-model.number="config.digits.add">
@@ -143,7 +142,7 @@
       </div>
       <div class="problems-container" id="history-problems-to-print">
         <div class="problems-grid">
-           <div class="problem-item" v-for="(problem, index) in selectedHistory.problems" :key="index">
+          <div class="problem-item" v-for="(problem, index) in selectedHistory.problems" :key="index">
             <div class="problem-expression">{{ getCircleNumber(index + 1) }} {{ problem.expression }}</div>
             <div class="problem-answer" v-if="showHistoryAnswers">答案: {{ problem.answer }}</div>
           </div>
@@ -156,6 +155,7 @@
 
 <script>
 import { addProblemSet, getHistory } from './db.js';
+import { ProblemGeneratorContext } from './strategies/ProblemGeneratorFactory.js';
 
 export default {
   name: 'MathProblemGenerator',
@@ -177,305 +177,43 @@ export default {
       history: [],
       selectedHistory: null,
       showHistoryAnswers: false,
+      // 题目生成器上下文
+      problemGenerator: null,
     };
   },
+  mounted() {
+    // 初始化题目生成器
+    this.initializeProblemGenerator();
+  },
   methods: {
-    // --- Main Problem Generation Logic ---
-    generateNumber(digits) {
-      if (digits < 1) return 0;
-      const min = Math.pow(10, digits - 1);
-      const max = Math.pow(10, digits) - 1;
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+    // --- 题目生成器初始化和管理 ---
+    initializeProblemGenerator() {
+      this.problemGenerator = new ProblemGeneratorContext(this.config);
+      this.problemGenerator.setStrategy(this.config.problemType);
     },
 
-    getRandomOperation(usedOps = []) {
-      const opMap = { add: '+', subtract: '-', multiply: '×', divide: '÷' };
-      const available = Object.entries(this.config.operations)
-        .filter(([, enabled]) => enabled)
-        .map(([op]) => opMap[op]);
-
-      if (available.length === 0) return null;
-
-      if (this.config.allowRepeatOperators || usedOps.length === 0) {
-        return available[Math.floor(Math.random() * available.length)];
-      }
-      
-      const unused = available.filter(op => !usedOps.includes(op));
-      if (unused.length > 0) {
-        return unused[Math.floor(Math.random() * unused.length)];
-      }
-      return available[Math.floor(Math.random() * available.length)]; // Fallback
-    },
-
-    // 生成随机排列的运算符序列，确保运算符位置更加随机
-    generateRandomOperatorSequence(termCount) {
-      const opMap = { add: '+', subtract: '-', multiply: '×', divide: '÷' };
-      const available = Object.entries(this.config.operations)
-        .filter(([, enabled]) => enabled)
-        .map(([op]) => opMap[op]);
-
-      if (available.length === 0) return null;
-
-      const opsNeeded = termCount - 1;
-      let ops = [];
-
-      if (this.config.allowRepeatOperators) {
-        // 允许重复：完全随机选择
-        for (let i = 0; i < opsNeeded; i++) {
-          ops.push(available[Math.floor(Math.random() * available.length)]);
-        }
+    updateProblemGenerator() {
+      if (this.problemGenerator) {
+        this.problemGenerator.updateConfig(this.config);
+        this.problemGenerator.setStrategy(this.config.problemType);
       } else {
-        // 不允许重复：使用洗牌算法确保随机分布
-        if (available.length < opsNeeded) {
-          // 如果可用运算符不够，先填满不重复的，然后随机填充剩余位置
-          ops = [...available];
-          while (ops.length < opsNeeded) {
-            ops.push(available[Math.floor(Math.random() * available.length)]);
-          }
-        } else {
-          // 从可用运算符中随机选择不重复的
-          const shuffled = [...available];
-          // Fisher-Yates 洗牌算法
-          for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-          }
-          ops = shuffled.slice(0, opsNeeded);
-        }
-        
-        // 再次打乱顺序，确保位置随机
-        for (let i = ops.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [ops[i], ops[j]] = [ops[j], ops[i]];
-        }
+        this.initializeProblemGenerator();
       }
-
-      return ops;
-    },
-    
-    calculate(expression) {
-      try {
-        const evalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/');
-        return new Function('return ' + evalExpression)();
-      } catch (e) {
-        return null;
-      }
-    },
-    
-    generateResultProblem() {
-      const opMap = { '+': 'add', '-': 'subtract', '×': 'multiply', '÷': 'divide' };
-
-      for (let attempt = 0; attempt < 100; attempt++) {
-        const termCount = this.config.termCount;
-        let expression = '';
-        let ops = [];
-        let numbers = [];
-
-        // 1. Generate all operators using improved random sequence
-        ops = this.generateRandomOperatorSequence(termCount);
-        if (!ops || ops.length === 0) return null;
-
-        // 2. Generate numbers ensuring each operator's left and right operands meet digit requirements
-        // For the first number, it needs to satisfy the first operator's digit requirement
-        const firstOpDigits = this.config.digits[opMap[ops[0]]];
-        numbers.push(this.generateNumber(firstOpDigits));
-        
-        // For subsequent numbers, each must satisfy its corresponding operator's digit requirement
-        for (let i = 0; i < ops.length; i++) {
-            const opDigits = this.config.digits[opMap[ops[i]]];
-            numbers.push(this.generateNumber(opDigits));
-        }
-
-        // 3. For multi-term expressions, we need to ensure intermediate results also meet digit requirements
-        // This is complex because intermediate results become left operands for subsequent operations
-        let validExpression = true;
-        
-        // Check if we need to regenerate numbers to satisfy all constraints
-        if (termCount > 2) {
-            // For expressions like "a op1 b op2 c", we need to ensure:
-            // - a and b satisfy op1's digit requirement
-            // - (a op1 b) and c satisfy op2's digit requirement
-            
-            // Calculate intermediate result
-            let intermediateResult = this.calculate(`${numbers[0]} ${ops[0].replace('×', '*').replace('÷', '/')} ${numbers[1]}`);
-            
-            if (intermediateResult !== null && intermediateResult > 0) {
-                // Check if intermediate result has correct digits for next operation
-                for (let i = 1; i < ops.length; i++) {
-                    const nextOpDigits = this.config.digits[opMap[ops[i]]];
-                    const intermediateDigits = intermediateResult.toString().length;
-                    
-                    // If intermediate result doesn't match required digits, regenerate
-                    if (intermediateDigits !== nextOpDigits) {
-                        // Try to find a valid combination
-                        let found = false;
-                        for (let retry = 0; retry < 30; retry++) {
-                            const newFirst = this.generateNumber(this.config.digits[opMap[ops[0]]]);
-                            const newSecond = this.generateNumber(this.config.digits[opMap[ops[0]]]);
-                            
-                            let testResult = this.calculate(`${newFirst} ${ops[0].replace('×', '*').replace('÷', '/')} ${newSecond}`);
-                            
-                            if (testResult !== null && testResult > 0 && 
-                                testResult.toString().length === nextOpDigits) {
-                                numbers[0] = newFirst;
-                                numbers[1] = newSecond;
-                                intermediateResult = testResult;
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            validExpression = false;
-                            break;
-                        }
-                    }
-                    
-                    // Update intermediate result for next iteration
-                    if (i < ops.length - 1) {
-                        intermediateResult = this.calculate(`${intermediateResult} ${ops[i].replace('×', '*').replace('÷', '/')} ${numbers[i + 1]}`);
-                        if (intermediateResult === null || intermediateResult <= 0) {
-                            validExpression = false;
-                            break;
-                        }
-                    }
-                }
-            } else {
-                validExpression = false;
-            }
-        }
-
-        if (!validExpression) {
-            continue; // Try next attempt
-        }
-
-        // 4. Build expression and validate constraints
-        expression = numbers[0].toString();
-        let currentResult = numbers[0];
-        
-        for (let i = 0; i < ops.length; i++) {
-            const op = ops[i];
-            let nextNum = numbers[i + 1];
-            
-            // Handle subtraction constraint (result must be non-negative)
-            if (op === '-' && currentResult < nextNum) {
-                // Try to find a smaller number that satisfies digit requirement
-                let validNum = null;
-                const requiredDigits = this.config.digits[opMap[op]];
-                
-                for (let retry = 0; retry < 20; retry++) {
-                    const testNum = this.generateNumber(requiredDigits);
-                    if (currentResult >= testNum) {
-                        validNum = testNum;
-                        break;
-                    }
-                }
-                
-                if (validNum === null) {
-                    validExpression = false;
-                    break;
-                }
-                nextNum = validNum;
-                numbers[i + 1] = validNum;
-            }
-            
-            // Handle division constraint (result must be integer)
-            if (op === '÷') {
-                if (nextNum === 0) nextNum = 1;
-                
-                // Ensure division results in integer
-                const requiredDigits = this.config.digits[opMap[op]];
-                let validDivisor = null;
-                
-                for (let retry = 0; retry < 20; retry++) {
-                    const testDivisor = this.generateNumber(requiredDigits);
-                    if (testDivisor !== 0 && currentResult % testDivisor === 0) {
-                        validDivisor = testDivisor;
-                        break;
-                    }
-                }
-                
-                if (validDivisor === null) {
-                    validExpression = false;
-                    break;
-                }
-                nextNum = validDivisor;
-                numbers[i + 1] = validDivisor;
-            }
-            
-            // Build expression
-            expression += ` ${op} ${nextNum}`;
-            
-            // Calculate new result
-            const tempResult = this.calculate(expression);
-            if (tempResult === null || tempResult < 0 || !Number.isInteger(tempResult)) {
-                validExpression = false;
-                break;
-            }
-            currentResult = tempResult;
-        }
-
-        if (!validExpression) {
-            continue; // Try next attempt
-        }
-
-        // Final validation
-        const finalAnswer = this.calculate(expression);
-        if (finalAnswer === null || finalAnswer < 0 || !Number.isInteger(finalAnswer)) {
-            continue;
-        }
-
-        // 5. Add brackets if enabled
-        if (this.config.useBrackets && termCount > 2) {
-            expression = `(${expression})`;
-        }
-
-        return { expression: expression + ' = ______', answer: finalAnswer };
-      }
-      return null; // Failed to generate a valid problem
-    },
-
-    generateOperandProblem() {
-        for (let i = 0; i < 20; i++) { // Max 20 retries
-            const tempConfig = { ...this.config, useBrackets: false, problemType: 'result' };
-            const problem = this.generateResultProblem.call({ ...this, config: tempConfig });
-
-            if (problem) {
-                const { expression, answer } = problem;
-                const cleanExpr = expression.replace(' = ______', '');
-                const parts = cleanExpr.split(/ [+\-×÷] /);
-                const hiddenIndex = Math.floor(Math.random() * parts.length);
-                const hiddenVal = parts[hiddenIndex].trim().replace(/[()]/g, '');
-                
-                if (hiddenVal && !isNaN(hiddenVal)) {
-                    const hiddenAnswer = parseInt(hiddenVal);
-                    let finalExpression = cleanExpr.replace(new RegExp(`\\b${hiddenVal}\\b`), '______');
-                    finalExpression += ` = ${answer}`;
-
-                    if (finalExpression.includes('______')) {
-                        return { expression: finalExpression, answer: hiddenAnswer };
-                    }
-                }
-            }
-        }
-        return null; // Failed
     },
 
     async generateProblems() {
       this.problems = [];
       this.showAnswers = false;
-      const newProblems = [];
-      let attempts = 0;
 
-      while (newProblems.length < this.config.problemCount && attempts < 500) {
-        const problem = this.config.problemType === 'result' 
-          ? this.generateResultProblem()
-          : this.generateOperandProblem();
-        
-        if (problem) {
-          newProblems.push(problem);
-        }
-        attempts++;
-      }
+      // 更新题目生成器配置和策略
+      this.updateProblemGenerator();
+
+      // 使用策略模式生成题目
+      const newProblems = this.problemGenerator.generateProblems(
+        this.config.problemCount,
+        500 // 最大尝试次数
+      );
+
       this.problems = newProblems;
 
       // Save to IndexedDB
@@ -490,9 +228,9 @@ export default {
       if (this.problems.length === 0) { alert('请先生成题目！'); return; }
       const wasShowing = this.showAnswers;
       this.showAnswers = false;
-      this.$nextTick(() => { 
-        window.print(); 
-        this.showAnswers = wasShowing; 
+      this.$nextTick(() => {
+        window.print();
+        this.showAnswers = wasShowing;
       });
     },
 
@@ -516,10 +254,10 @@ export default {
       this.viewMode = 'generator';
       this.selectedHistory = null;
     },
-    
+
     backToHistoryList() {
-        this.viewMode = 'historyList';
-        this.selectedHistory = null;
+      this.viewMode = 'historyList';
+      this.selectedHistory = null;
     },
 
     printHistory() {
@@ -528,21 +266,21 @@ export default {
         const printElement = document.getElementById('history-problems-to-print');
         const originalBody = document.body.innerHTML;
         const printContent = printElement.innerHTML;
-        
+
         document.body.innerHTML = printContent;
         window.print();
         document.body.innerHTML = originalBody;
-        window.location.reload(); 
+        window.location.reload();
       });
     },
-    
+
     formatConfig(config) {
-        if (!config || !config.operations) return '配置不可用';
-        const ops = Object.entries(config.operations)
-            .filter(([_, v]) => v)
-            .map(([k]) => ({add: '+', subtract: '-', multiply: '×', divide: '÷'}[k]))
-            .join(', ');
-        return `题目: ${config.problemCount} | 类型: ${ops || 'N/A'} | ${config.termCount}项`;
+      if (!config || !config.operations) return '配置不可用';
+      const ops = Object.entries(config.operations)
+        .filter(([_, v]) => v)
+        .map(([k]) => ({ add: '+', subtract: '-', multiply: '×', divide: '÷' }[k]))
+        .join(', ');
+      return `题目: ${config.problemCount} | 类型: ${ops || 'N/A'} | ${config.termCount}项`;
     }
   }
 };
@@ -554,11 +292,12 @@ export default {
   margin-top: 15px;
 }
 
-.history-panel, .history-detail-panel {
+.history-panel,
+.history-detail-panel {
   background: white;
   border-radius: 10px;
   padding: 25px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .history-header {
@@ -592,15 +331,16 @@ export default {
 }
 
 .history-item-config {
-    color: #555;
-    font-size: 0.9em;
+  color: #555;
+  font-size: 0.9em;
 }
 
 .btn-secondary {
-    background-color: #cff4fc;
-    color: #2b2f32;
+  background-color: #cff4fc;
+  color: #2b2f32;
 }
+
 .btn-secondary:hover {
-    background-color: #5a6268;
+  background-color: #5a6268;
 }
 </style>
