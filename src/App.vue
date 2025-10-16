@@ -73,25 +73,33 @@
             </div>
           </div>
         </div>
-        <div class="config-row">
-          <div class="config-item">
+        <div class="config-row config-row-inline">
+          <div class="config-item config-item-inline">
             <label>运算符:</label>
-            <div class="checkbox-group">
-              <input type="radio" id="allowRepeat" v-model="config.allowRepeatOperators" :value="true" />
-              <label for="allowRepeat">允许重复</label>
-              <input type="radio" id="noRepeat" v-model="config.allowRepeatOperators" :value="false" />
-              <label for="noRepeat">不允许重复</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" id="allowRepeat" v-model="config.allowRepeatOperators" :value="true" />
+                <label for="allowRepeat">允许重复</label>
+              </div>
+              <div class="radio-item">
+                <input type="radio" id="noRepeat" v-model="config.allowRepeatOperators" :value="false" />
+                <label for="noRepeat">不允许重复</label>
+              </div>
             </div>
           </div>
         </div>
-        <div class="config-row">
-          <div class="config-item">
+        <div class="config-row config-row-inline">
+          <div class="config-item config-item-inline">
             <label>题目类型:</label>
-            <div class="checkbox-group">
-              <input type="radio" id="findResult" v-model="config.problemType" value="result" />
-              <label for="findResult">求结果</label>
-              <input type="radio" id="findOperand" v-model="config.problemType" value="operand" />
-              <label for="findOperand">求运算项</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" id="findResult" v-model="config.problemType" value="result" />
+                <label for="findResult">求结果</label>
+              </div>
+              <div class="radio-item">
+                <input type="radio" id="findOperand" v-model="config.problemType" value="operand" />
+                <label for="findOperand">求运算项</label>
+              </div>
             </div>
           </div>
         </div>
