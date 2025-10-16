@@ -109,7 +109,7 @@
             {{ showAnswers ? '隐藏答案' : '显示答案' }}
           </button>
           <button class="btn btn-info" @click="printProblems" v-if="problems.length > 0">
-            {{ isMobile ? '下载图片' : '打印题目' }}
+            {{ isMobile ? '下载图片(打印)' : '打印题目' }}
           </button>
           <button class="btn btn-share" @click="shareProblems" v-if="problems.length > 0 && isMobile">
             分享题目
