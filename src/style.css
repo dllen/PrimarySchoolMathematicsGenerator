@@ -304,3 +304,137 @@ body {
 .btn-secondary:hover {
     background-color: #5a6268;
 }
+
+.btn-share {
+    background-color: #ff9800;
+    color: white;
+}
+
+.btn-share:hover {
+    background-color: #e68900;
+}
+
+.history-tip {
+    text-align: center;
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f0f8ff;
+    border-radius: 5px;
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .header h1 {
+    font-size: 1.8em;
+  }
+
+  .header h2 {
+    font-size: 1.5em;
+  }
+
+  .config-panel {
+    padding: 15px;
+  }
+
+  .config-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .config-item {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .config-item label {
+    min-width: auto;
+    margin-bottom: 5px;
+  }
+
+  .config-item input,
+  .config-item select {
+    width: 100%;
+  }
+
+  .checkbox-group {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .checkbox-item {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .button-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .problems-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .problem-item {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .history-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .history-header h2,
+  .history-header h3 {
+    text-align: center;
+    font-size: 1.3em;
+  }
+
+  .history-list li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .history-item-config {
+    font-size: 0.85em;
+  }
+}
+
+/* 针对小屏幕手机的额外优化 */
+@media screen and (max-width: 480px) {
+  .header h2 {
+    font-size: 1.3em;
+  }
+
+  .header p {
+    font-size: 0.9em;
+  }
+
+  .problem-item {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 12px;
+  }
+}

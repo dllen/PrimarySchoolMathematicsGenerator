@@ -3,7 +3,8 @@
     <!-- Header -->
     <div class="header">
       <h2>小学数学口算题生成器</h2>
-      <p>配置参数，生成数学练习题，<strong style="color: red">打印需要使用浏览器打开</strong></p>
+      <p v-if="!isMobile">配置参数，生成数学练习题</p>
+      <p v-else>配置参数，生成数学练习题，可下载图片或分享</p>
       <div class="header-actions">
         <button class="btn btn-secondary" @click="showHistoryList">查看历史</button>
       </div>
@@ -99,7 +100,12 @@
           <button class="btn btn-success" @click="showAnswers = !showAnswers" v-if="problems.length > 0">
             {{ showAnswers ? '隐藏答案' : '显示答案' }}
           </button>
-          <button class="btn btn-info" @click="printProblems" v-if="problems.length > 0">打印题目</button>
+          <button class="btn btn-info" @click="printProblems" v-if="problems.length > 0">
+            {{ isMobile ? '下载图片' : '打印题目' }}
+          </button>
+          <button class="btn btn-share" @click="shareProblems" v-if="problems.length > 0 && isMobile">
+            分享题目
+          </button>
         </div>
       </div>
       <!-- Problems Display -->
@@ -141,6 +147,7 @@
         <h3>历史记录 (最多20条)</h3>
         <button class="btn btn-secondary" @click="backToGenerator">返回主页</button>
       </div>
+      <p class="history-tip" v-if="isMobile">提示：点击记录查看详情，可下载或分享题目</p>
       <ul class="history-list">
         <li v-for="item in history" :key="item.id" @click="showHistoryDetail(item)">
           <span>{{ item.timestamp }}</span>
@@ -157,7 +164,12 @@
           <button class="btn btn-success" @click="showHistoryAnswers = !showHistoryAnswers">
             {{ showHistoryAnswers ? '隐藏答案' : '显示答案' }}
           </button>
-          <button class="btn btn-info" @click="printHistory">打印</button>
+          <button class="btn btn-info" @click="printHistory">
+            {{ isMobile ? '下载图片' : '打印' }}
+          </button>
+          <button class="btn btn-share" @click="shareHistory" v-if="isMobile">
+            分享
+          </button>
           <button class="btn btn-secondary" @click="backToHistoryList">返回列表</button>
         </div>
       </div>
@@ -204,6 +216,7 @@ export default {
   name: 'MathProblemGenerator',
   data() {
     return {
+      isMobile: false,
       config: {
         digits: { add: 2, subtract: 2, multiply: 1, divide: 1 },
         problemCount: 20,
@@ -227,8 +240,15 @@ export default {
   mounted() {
     // 初始化题目生成器
     this.initializeProblemGenerator();
+    // 检测是否为移动设备
+    this.checkMobile();
   },
   methods: {
+    // --- 移动设备检测 ---
+    checkMobile() {
+      this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    },
+
     // --- 题目生成器初始化和管理 ---
     initializeProblemGenerator() {
       this.problemGenerator = new ProblemGeneratorContext(this.config);
@@ -267,14 +287,117 @@ export default {
       }
     },
 
-    printProblems() {
-      if (this.problems.length === 0) { alert('请先生成题目！'); return; }
-      const wasShowing = this.showAnswers;
-      this.showAnswers = false;
-      this.$nextTick(() => {
-        window.print();
-        this.showAnswers = wasShowing;
-      });
+    async printProblems() {
+      if (this.problems.length === 0) { 
+        alert('请先生成题目！'); 
+        return; 
+      }
+      
+      // 移动设备使用图片下载
+      if (this.isMobile) {
+        await this.downloadAsImage('problems-to-print');
+      } else {
+        // 桌面设备使用打印
+        const wasShowing = this.showAnswers;
+        this.showAnswers = false;
+        this.$nextTick(() => {
+          window.print();
+          this.showAnswers = wasShowing;
+        });
+      }
+    },
+
+    async downloadAsImage(elementId) {
+      try {
+        const element = document.getElementById(elementId);
+        if (!element) {
+          alert('找不到题目内容');
+          return;
+        }
+
+        // 临时显示打印头部
+        const printHeader = element.querySelector('.print-header');
+        if (printHeader) {
+          printHeader.style.display = 'block';
+        }
+
+        // 生成图片
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          logging: false,
+          useCORS: true
+        });
+
+        // 恢复打印头部隐藏
+        if (printHeader) {
+          printHeader.style.display = 'none';
+        }
+
+        // 转换为图片并下载
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          const timestamp = new Date().toLocaleString('zh-CN').replace(/[/:]/g, '-');
+          link.download = `数学题目_${timestamp}.png`;
+          link.href = url;
+          link.click();
+          URL.revokeObjectURL(url);
+        });
+      } catch (error) {
+        console.error('生成图片失败:', error);
+        alert('生成图片失败，请重试');
+      }
+    },
+
+    async shareProblems() {
+      if (this.problems.length === 0) {
+        alert('请先生成题目！');
+        return;
+      }
+
+      try {
+        const element = document.getElementById('problems-to-print');
+        const printHeader = element.querySelector('.print-header');
+        if (printHeader) {
+          printHeader.style.display = 'block';
+        }
+
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          logging: false,
+          useCORS: true
+        });
+
+        if (printHeader) {
+          printHeader.style.display = 'none';
+        }
+
+        canvas.toBlob(async (blob) => {
+          const file = new File([blob], '数学题目.png', { type: 'image/png' });
+          
+          if (navigator.share && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({
+                files: [file],
+                title: '数学练习题',
+                text: '分享数学练习题'
+              });
+            } catch (error) {
+              if (error.name !== 'AbortError') {
+                console.error('分享失败:', error);
+                alert('分享失败，请使用下载功能');
+              }
+            }
+          } else {
+            alert('您的浏览器不支持分享功能，请使用下载功能');
+          }
+        });
+      } catch (error) {
+        console.error('生成分享内容失败:', error);
+        alert('生成分享内容失败，请重试');
+      }
     },
 
     getCircleNumber(num) {
@@ -303,18 +426,77 @@ export default {
       this.selectedHistory = null;
     },
 
-    printHistory() {
+    async printHistory() {
       this.showHistoryAnswers = false;
-      this.$nextTick(() => {
-        const printElement = document.getElementById('history-problems-to-print');
-        const originalBody = document.body.innerHTML;
-        const printContent = printElement.innerHTML;
+      
+      if (this.isMobile) {
+        await this.$nextTick();
+        await this.downloadAsImage('history-problems-to-print');
+      } else {
+        this.$nextTick(() => {
+          const printElement = document.getElementById('history-problems-to-print');
+          const originalBody = document.body.innerHTML;
+          const printContent = printElement.innerHTML;
 
-        document.body.innerHTML = printContent;
-        window.print();
-        document.body.innerHTML = originalBody;
-        window.location.reload();
-      });
+          document.body.innerHTML = printContent;
+          window.print();
+          document.body.innerHTML = originalBody;
+          window.location.reload();
+        });
+      }
+    },
+
+    async shareHistory() {
+      if (!this.selectedHistory) {
+        alert('没有选中的历史记录');
+        return;
+      }
+
+      this.showHistoryAnswers = false;
+      await this.$nextTick();
+      
+      try {
+        const element = document.getElementById('history-problems-to-print');
+        const printHeader = element.querySelector('.print-header');
+        if (printHeader) {
+          printHeader.style.display = 'block';
+        }
+
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          logging: false,
+          useCORS: true
+        });
+
+        if (printHeader) {
+          printHeader.style.display = 'none';
+        }
+
+        canvas.toBlob(async (blob) => {
+          const file = new File([blob], '数学题目.png', { type: 'image/png' });
+          
+          if (navigator.share && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({
+                files: [file],
+                title: '数学练习题',
+                text: '分享数学练习题'
+              });
+            } catch (error) {
+              if (error.name !== 'AbortError') {
+                console.error('分享失败:', error);
+                alert('分享失败，请使用下载功能');
+              }
+            }
+          } else {
+            alert('您的浏览器不支持分享功能，请使用下载功能');
+          }
+        });
+      } catch (error) {
+        console.error('生成分享内容失败:', error);
+        alert('生成分享内容失败，请重试');
+      }
     },
 
     formatConfig(config) {
