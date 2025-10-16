@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="header">
       <h2>小学数学口算题生成器</h2>
-      <p v-if="!isMobile">配置参数，生成数学练习题</p>
-      <p v-else>配置参数，生成数学练习题，可下载图片或分享</p>
+      <p style="color: red;font-weight: bolder;" v-if="!isMobile">配置参数，生成数学练习题</p>
+      <p style="color: red;font-weight: bolder;" v-else>配置参数，生成数学练习题，可下载图片或分享</p>
       <div class="header-actions">
         <button class="btn btn-secondary" @click="showHistoryList">查看历史</button>
       </div>
