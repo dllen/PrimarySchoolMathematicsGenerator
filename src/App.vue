@@ -125,7 +125,7 @@
             </div>
           </div>
         </div>
-        <h3>数学练习题</h3>
+        <!-- Problems Grid -->
         <div class="problems-grid">
           <div class="problem-item" v-for="(problem, index) in problems" :key="index">
             <div class="problem-expression">{{ getCircleNumber(index + 1) }} {{ problem.expression }}</div>
