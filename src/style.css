@@ -435,7 +435,6 @@ body {
 
   .checkbox-item {
     width: 100%;
-    justify-content: space-between;
   }
 
   /* Radio group 在移动端保持横向 */
