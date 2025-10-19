@@ -3,10 +3,16 @@
     <!-- Header -->
     <div class="header">
       <h2>小学数学口算题生成器</h2>
-      <p style="color: red;font-weight: bolder;" v-if="!isMobile">配置参数，生成数学练习题</p>
-      <p style="color: red;font-weight: bolder;" v-else>配置参数，生成数学练习题，可下载图片或分享</p>
+      <p style="color: red; font-weight: bolder" v-if="!isMobile">
+        配置参数，生成数学练习题
+      </p>
+      <p style="color: red; font-weight: bolder" v-else>
+        配置参数，生成数学练习题，可下载图片或分享
+      </p>
       <div class="header-actions">
-        <button class="btn btn-secondary" @click="showHistoryList">查看历史</button>
+        <button class="btn btn-secondary" @click="showHistoryList">
+          查看历史
+        </button>
       </div>
     </div>
 
@@ -17,7 +23,12 @@
         <div class="config-row">
           <div class="config-item">
             <label>题目数量:</label>
-            <input type="number" v-model.number="config.problemCount" min="1" max="100" />
+            <input
+              type="number"
+              v-model.number="config.problemCount"
+              min="1"
+              max="100"
+            />
           </div>
           <div class="config-item">
             <label>计算项个数:</label>
@@ -33,41 +44,73 @@
             <label>运算类型:</label>
             <div class="checkbox-group">
               <div class="checkbox-item">
-                <input type="checkbox" id="add" v-model="config.operations.add" />
+                <input
+                  type="checkbox"
+                  id="add"
+                  v-model="config.operations.add"
+                />
                 <label for="add">加法 (+)</label>
-                <select v-if="config.operations.add" v-model.number="config.digits.add">
+                <select
+                  v-if="config.operations.add"
+                  v-model.number="config.digits.add"
+                >
                   <option value="1">1位数</option>
                   <option value="2">2位数</option>
                   <option value="3">3位数</option>
                 </select>
               </div>
               <div class="checkbox-item">
-                <input type="checkbox" id="subtract" v-model="config.operations.subtract" />
+                <input
+                  type="checkbox"
+                  id="subtract"
+                  v-model="config.operations.subtract"
+                />
                 <label for="subtract">减法 (-)</label>
-                <select v-if="config.operations.subtract" v-model.number="config.digits.subtract">
+                <select
+                  v-if="config.operations.subtract"
+                  v-model.number="config.digits.subtract"
+                >
                   <option value="1">1位数</option>
                   <option value="2">2位数</option>
                   <option value="3">3位数</option>
                 </select>
               </div>
               <div class="checkbox-item">
-                <input type="checkbox" id="multiply" v-model="config.operations.multiply" />
+                <input
+                  type="checkbox"
+                  id="multiply"
+                  v-model="config.operations.multiply"
+                />
                 <label for="multiply">乘法 (×)</label>
-                <select v-if="config.operations.multiply" v-model.number="config.digits.multiply">
+                <select
+                  v-if="config.operations.multiply"
+                  v-model.number="config.digits.multiply"
+                >
                   <option value="1">1位数</option>
                   <option value="2">2位数</option>
                 </select>
               </div>
               <div class="checkbox-item">
-                <input type="checkbox" id="divide" v-model="config.operations.divide" />
+                <input
+                  type="checkbox"
+                  id="divide"
+                  v-model="config.operations.divide"
+                />
                 <label for="divide">除法 (÷)</label>
-                <select v-if="config.operations.divide" v-model.number="config.digits.divide">
+                <select
+                  v-if="config.operations.divide"
+                  v-model.number="config.digits.divide"
+                >
                   <option value="1">1位数</option>
                   <option value="2">2位数</option>
                 </select>
               </div>
               <div class="checkbox-item">
-                <input type="checkbox" id="useBrackets" v-model="config.useBrackets" />
+                <input
+                  type="checkbox"
+                  id="useBrackets"
+                  v-model="config.useBrackets"
+                />
                 <label for="useBrackets">使用括号 ()</label>
               </div>
             </div>
@@ -78,11 +121,21 @@
             <label>运算符:</label>
             <div class="radio-group">
               <div class="radio-item">
-                <input type="radio" id="allowRepeat" v-model="config.allowRepeatOperators" :value="true" />
+                <input
+                  type="radio"
+                  id="allowRepeat"
+                  v-model="config.allowRepeatOperators"
+                  :value="true"
+                />
                 <label for="allowRepeat">允许重复</label>
               </div>
               <div class="radio-item">
-                <input type="radio" id="noRepeat" v-model="config.allowRepeatOperators" :value="false" />
+                <input
+                  type="radio"
+                  id="noRepeat"
+                  v-model="config.allowRepeatOperators"
+                  :value="false"
+                />
                 <label for="noRepeat">不允许重复</label>
               </div>
             </div>
@@ -93,31 +146,59 @@
             <label>题目类型:</label>
             <div class="radio-group">
               <div class="radio-item">
-                <input type="radio" id="findResult" v-model="config.problemType" value="result" />
+                <input
+                  type="radio"
+                  id="findResult"
+                  v-model="config.problemType"
+                  value="result"
+                />
                 <label for="findResult">求结果</label>
               </div>
               <div class="radio-item">
-                <input type="radio" id="findOperand" v-model="config.problemType" value="operand" />
+                <input
+                  type="radio"
+                  id="findOperand"
+                  v-model="config.problemType"
+                  value="operand"
+                />
                 <label for="findOperand">求运算项</label>
               </div>
             </div>
           </div>
         </div>
         <div class="button-group">
-          <button class="btn btn-primary" @click="generateProblems">生成题目</button>
-          <button class="btn btn-success" @click="showAnswers = !showAnswers" v-if="problems.length > 0">
-            {{ showAnswers ? '隐藏答案' : '显示答案' }}
+          <button class="btn btn-primary" @click="generateProblems">
+            生成题目
           </button>
-          <button class="btn btn-info" @click="printProblems" v-if="problems.length > 0">
-            {{ isMobile ? '下载图片(打印)' : '打印题目' }}
+          <button
+            class="btn btn-success"
+            @click="showAnswers = !showAnswers"
+            v-if="problems.length > 0"
+          >
+            {{ showAnswers ? "隐藏答案" : "显示答案" }}
           </button>
-          <button class="btn btn-share" @click="shareProblems" v-if="problems.length > 0 && isMobile">
+          <button
+            class="btn btn-info"
+            @click="printProblems"
+            v-if="problems.length > 0"
+          >
+            {{ isMobile ? "下载图片(打印)" : "打印题目" }}
+          </button>
+          <button
+            class="btn btn-share"
+            @click="shareProblems"
+            v-if="problems.length > 0 && isMobile"
+          >
             分享题目
           </button>
         </div>
       </div>
       <!-- Problems Display -->
-      <div class="problems-container" v-if="problems.length > 0" id="problems-to-print">
+      <div
+        class="problems-container"
+        v-if="problems.length > 0"
+        id="problems-to-print"
+      >
         <!-- Print Header (only visible when printing) -->
         <div class="print-header">
           <div class="print-header-row">
@@ -141,9 +222,17 @@
         </div>
         <!-- Problems Grid -->
         <div class="problems-grid">
-          <div class="problem-item" v-for="(problem, index) in problems" :key="index">
-            <div class="problem-expression">{{ getCircleNumber(index + 1) }} {{ problem.expression }}</div>
-            <div class="problem-answer" v-if="showAnswers">答案: {{ problem.answer }}</div>
+          <div
+            class="problem-item"
+            v-for="(problem, index) in problems"
+            :key="index"
+          >
+            <div class="problem-expression">
+              {{ getCircleNumber(index + 1) }} {{ problem.expression }}
+            </div>
+            <div class="problem-answer" v-if="showAnswers">
+              答案: {{ problem.answer }}
+            </div>
           </div>
         </div>
       </div>
@@ -153,13 +242,23 @@
     <div v-if="viewMode === 'historyList'" class="history-panel">
       <div class="history-header">
         <h3>历史记录 (最多20条)</h3>
-        <button class="btn btn-secondary" @click="backToGenerator">返回主页</button>
+        <button class="btn btn-secondary" @click="backToGenerator">
+          返回主页
+        </button>
       </div>
-      <p class="history-tip" v-if="isMobile">提示：点击记录查看详情，可下载或分享题目</p>
+      <p class="history-tip" v-if="isMobile">
+        提示：点击记录查看详情，可下载或分享题目
+      </p>
       <ul class="history-list">
-        <li v-for="item in history" :key="item.id" @click="showHistoryDetail(item)">
+        <li
+          v-for="item in history"
+          :key="item.id"
+          @click="showHistoryDetail(item)"
+        >
           <span>{{ item.timestamp }}</span>
-          <span class="history-item-config">{{ formatConfig(item.config) }}</span>
+          <span class="history-item-config">{{
+            formatConfig(item.config)
+          }}</span>
         </li>
       </ul>
     </div>
@@ -169,16 +268,21 @@
       <div class="history-header">
         <h2>历史详情 ({{ selectedHistory.timestamp }})</h2>
         <div class="button-group">
-          <button class="btn btn-success" @click="showHistoryAnswers = !showHistoryAnswers">
-            {{ showHistoryAnswers ? '隐藏答案' : '显示答案' }}
+          <button
+            class="btn btn-success"
+            @click="showHistoryAnswers = !showHistoryAnswers"
+          >
+            {{ showHistoryAnswers ? "隐藏答案" : "显示答案" }}
           </button>
           <button class="btn btn-info" @click="printHistory">
-            {{ isMobile ? '下载图片' : '打印' }}
+            {{ isMobile ? "下载图片" : "打印" }}
           </button>
           <button class="btn btn-share" @click="shareHistory" v-if="isMobile">
             分享
           </button>
-          <button class="btn btn-secondary" @click="backToHistoryList">返回列表</button>
+          <button class="btn btn-secondary" @click="backToHistoryList">
+            返回列表
+          </button>
         </div>
       </div>
       <div class="problems-container" id="history-problems-to-print">
@@ -205,24 +309,31 @@
         </div>
         <h3>数学练习题</h3>
         <div class="problems-grid">
-          <div class="problem-item" v-for="(problem, index) in selectedHistory.problems" :key="index">
-            <div class="problem-expression">{{ getCircleNumber(index + 1) }} {{ problem.expression }}</div>
-            <div class="problem-answer" v-if="showHistoryAnswers">答案: {{ problem.answer }}</div>
+          <div
+            class="problem-item"
+            v-for="(problem, index) in selectedHistory.problems"
+            :key="index"
+          >
+            <div class="problem-expression">
+              {{ getCircleNumber(index + 1) }} {{ problem.expression }}
+            </div>
+            <div class="problem-answer" v-if="showHistoryAnswers">
+              答案: {{ problem.answer }}
+            </div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
-import html2canvas from 'html2canvas-pro';
-import { addProblemSet, getHistory } from './db.js';
-import { ProblemGeneratorContext } from './strategies/ProblemGeneratorFactory.js';
+import html2canvas from "html2canvas-pro";
+import { addProblemSet, getHistory } from "./db.js";
+import { ProblemGeneratorContext } from "./strategies/ProblemGeneratorFactory.js";
 
 export default {
-  name: 'MathProblemGenerator',
+  name: "MathProblemGenerator",
   data() {
     return {
       isMobile: false,
@@ -230,15 +341,20 @@ export default {
         digits: { add: 2, subtract: 2, multiply: 1, divide: 1 },
         problemCount: 20,
         termCount: 2,
-        operations: { add: true, subtract: true, multiply: false, divide: false },
+        operations: {
+          add: true,
+          subtract: true,
+          multiply: false,
+          divide: false,
+        },
         useBrackets: false,
         allowRepeatOperators: true,
-        problemType: 'result',
+        problemType: "result",
       },
       problems: [],
       showAnswers: false,
       // New state for history feature
-      viewMode: 'generator', // 'generator', 'historyList', 'historyDetail'
+      viewMode: "generator", // 'generator', 'historyList', 'historyDetail'
       history: [],
       selectedHistory: null,
       showHistoryAnswers: false,
@@ -255,7 +371,10 @@ export default {
   methods: {
     // --- 移动设备检测 ---
     checkMobile() {
-      this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      this.isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
     },
 
     // --- 题目生成器初始化和管理 ---
@@ -298,13 +417,13 @@ export default {
 
     async printProblems() {
       if (this.problems.length === 0) {
-        alert('请先生成题目！');
+        alert("请先生成题目！");
         return;
       }
 
       // 移动设备使用图片下载
       if (this.isMobile) {
-        await this.downloadAsImage('problems-to-print');
+        await this.downloadAsImage("problems-to-print");
       } else {
         // 桌面设备使用打印
         const wasShowing = this.showAnswers;
@@ -320,39 +439,38 @@ export default {
       try {
         const element = document.getElementById(elementId);
         if (!element) {
-          alert('找不到题目内容');
+          alert("找不到题目内容");
           return;
         }
 
         // 保存原始样式
         const originalStyle = element.style.cssText;
-        const originalWidth = element.style.width;
-        const originalPadding = element.style.padding;
 
         // A4 纸尺寸 (210mm x 297mm)，转换为像素 (96 DPI)
         // 210mm = 794px, 297mm = 1123px
         const a4Width = 794;
-        const a4Height = 1123;
         const padding = 40; // 页边距
 
         // 临时应用 A4 排版样式
         element.style.width = `${a4Width}px`;
         element.style.padding = `${padding}px`;
-        element.style.boxSizing = 'border-box';
-        element.style.backgroundColor = '#ffffff';
+        element.style.boxSizing = "border-box";
+        element.style.backgroundColor = "#ffffff";
 
         // 临时显示打印头部
-        const printHeader = element.querySelector('.print-header');
+        const printHeader = element.querySelector(".print-header");
         if (printHeader) {
-          printHeader.style.display = 'block';
+          printHeader.style.display = "block";
         }
 
         // 调整题目网格为 2 列布局（适合 A4 纸）
-        const problemsGrid = element.querySelector('.problems-grid');
-        const originalGridStyle = problemsGrid ? problemsGrid.style.cssText : '';
+        const problemsGrid = element.querySelector(".problems-grid");
+        const originalGridStyle = problemsGrid
+          ? problemsGrid.style.cssText
+          : "";
         if (problemsGrid) {
-          problemsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-          problemsGrid.style.gap = '15px';
+          problemsGrid.style.gridTemplateColumns = "repeat(2, 1fr)";
+          problemsGrid.style.gap = "15px";
         }
 
         // 等待样式应用
@@ -363,7 +481,7 @@ export default {
           width: a4Width,
           windowWidth: a4Width,
           scale: 2,
-          backgroundColor: '#ffffff',
+          backgroundColor: "#ffffff",
           logging: false,
           useCORS: true,
           allowTaint: true,
@@ -372,8 +490,8 @@ export default {
           onclone: (clonedDoc) => {
             const clonedElement = clonedDoc.getElementById(elementId);
             if (clonedElement) {
-              const allElements = clonedElement.querySelectorAll('*');
-              allElements.forEach(el => {
+              const allElements = clonedElement.querySelectorAll("*");
+              allElements.forEach((el) => {
                 const computedStyle = window.getComputedStyle(el);
                 if (computedStyle.color) {
                   el.style.color = computedStyle.color;
@@ -383,13 +501,13 @@ export default {
                 }
               });
             }
-          }
+          },
         });
 
         // 恢复原始样式
         element.style.cssText = originalStyle;
         if (printHeader) {
-          printHeader.style.display = 'none';
+          printHeader.style.display = "none";
         }
         if (problemsGrid) {
           problemsGrid.style.cssText = originalGridStyle;
@@ -398,27 +516,39 @@ export default {
         // 转换为图片并下载
         canvas.toBlob((blob) => {
           const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          const timestamp = new Date().toLocaleString('zh-CN').replace(/[/:]/g, '-');
+          const link = document.createElement("a");
+          const timestamp = new Date()
+            .toLocaleString("zh-CN")
+            .replace(/[/:]/g, "-");
           link.download = `数学题目_${timestamp}.png`;
           link.href = url;
           link.click();
           URL.revokeObjectURL(url);
         });
       } catch (error) {
-        console.error('生成图片失败:', error);
-        alert('生成图片失败，请重试');
+        console.error("生成图片失败:", error);
+        alert("生成图片失败，请重试");
       }
     },
 
     async shareProblems() {
       if (this.problems.length === 0) {
-        alert('请先生成题目！');
+        alert("请先生成题目！");
+        return;
+      }
+
+      // 检查分享API支持
+      if (!navigator.share) {
+        alert("分享失败，您的浏览器不支持分享功能，请使用下载功能");
         return;
       }
 
       try {
-        const element = document.getElementById('problems-to-print');
+        const element = document.getElementById("problems-to-print");
+        if (!element) {
+          alert("找不到题目内容");
+          return;
+        }
 
         // 保存原始样式
         const originalStyle = element.style.cssText;
@@ -430,19 +560,21 @@ export default {
         // 应用 A4 排版样式
         element.style.width = `${a4Width}px`;
         element.style.padding = `${padding}px`;
-        element.style.boxSizing = 'border-box';
-        element.style.backgroundColor = '#ffffff';
+        element.style.boxSizing = "border-box";
+        element.style.backgroundColor = "#ffffff";
 
-        const printHeader = element.querySelector('.print-header');
+        const printHeader = element.querySelector(".print-header");
         if (printHeader) {
-          printHeader.style.display = 'block';
+          printHeader.style.display = "block";
         }
 
-        const problemsGrid = element.querySelector('.problems-grid');
-        const originalGridStyle = problemsGrid ? problemsGrid.style.cssText : '';
+        const problemsGrid = element.querySelector(".problems-grid");
+        const originalGridStyle = problemsGrid
+          ? problemsGrid.style.cssText
+          : "";
         if (problemsGrid) {
-          problemsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-          problemsGrid.style.gap = '15px';
+          problemsGrid.style.gridTemplateColumns = "repeat(2, 1fr)";
+          problemsGrid.style.gap = "15px";
         }
 
         await this.$nextTick();
@@ -451,17 +583,17 @@ export default {
           width: a4Width,
           windowWidth: a4Width,
           scale: 2,
-          backgroundColor: '#ffffff',
+          backgroundColor: "#ffffff",
           logging: false,
           useCORS: true,
           allowTaint: true,
           foreignObjectRendering: false,
           removeContainer: true,
           onclone: (clonedDoc) => {
-            const clonedElement = clonedDoc.getElementById('problems-to-print');
+            const clonedElement = clonedDoc.getElementById("problems-to-print");
             if (clonedElement) {
-              const allElements = clonedElement.querySelectorAll('*');
-              allElements.forEach(el => {
+              const allElements = clonedElement.querySelectorAll("*");
+              allElements.forEach((el) => {
                 const computedStyle = window.getComputedStyle(el);
                 if (computedStyle.color) {
                   el.style.color = computedStyle.color;
@@ -471,41 +603,59 @@ export default {
                 }
               });
             }
-          }
+          },
         });
 
         // 恢复原始样式
         element.style.cssText = originalStyle;
         if (printHeader) {
-          printHeader.style.display = 'none';
+          printHeader.style.display = "none";
         }
         if (problemsGrid) {
           problemsGrid.style.cssText = originalGridStyle;
         }
 
         canvas.toBlob(async (blob) => {
-          const file = new File([blob], '数学题目.png', { type: 'image/png' });
+          try {
+            const file = new File([blob], "数学题目.png", {
+              type: "image/png",
+            });
 
-          if (navigator.share && navigator.canShare({ files: [file] })) {
-            try {
+            // 检查是否支持文件分享
+            if (navigator.canShare && !navigator.canShare({ files: [file] })) {
+              // 降级到文本分享
               await navigator.share({
-                files: [file],
-                title: '数学练习题',
-                text: '分享数学练习题'
+                title: "数学练习题",
+                text: `我生成了${this.problems.length}道数学练习题，快来一起练习吧！`,
+                url: window.location.href,
               });
-            } catch (error) {
-              if (error.name !== 'AbortError') {
-                console.error('分享失败:', error);
-                alert('分享失败，请使用下载功能');
-              }
+              alert("已分享链接，图片请使用下载功能");
+              return;
             }
-          } else {
-            alert('您的浏览器不支持分享功能，请使用下载功能');
+
+            // 尝试分享文件
+            await navigator.share({
+              files: [file],
+              title: "数学练习题",
+              text: "分享数学练习题",
+            });
+          } catch (shareError) {
+            console.error("分享失败:", shareError);
+
+            if (shareError.name === "AbortError") {
+              // 用户取消分享，不显示错误
+              return;
+            }
+
+            // 分享失败，提供下载选项
+            alert(
+              "分享失败，请使用下载功能。\n\n可能原因：\n1. 网络连接问题\n2. 应用不支持图片分享\n3. 系统限制"
+            );
           }
         });
       } catch (error) {
-        console.error('生成分享内容失败:', error);
-        alert('生成分享内容失败，请重试');
+        console.error("生成分享内容失败:", error);
+        alert("分享失败，请使用下载功能");
       }
     },
 
@@ -516,22 +666,22 @@ export default {
     // --- History Feature Methods ---
     async showHistoryList() {
       this.history = await getHistory();
-      this.viewMode = 'historyList';
+      this.viewMode = "historyList";
     },
 
     showHistoryDetail(item) {
       this.selectedHistory = item;
       this.showHistoryAnswers = false;
-      this.viewMode = 'historyDetail';
+      this.viewMode = "historyDetail";
     },
 
     backToGenerator() {
-      this.viewMode = 'generator';
+      this.viewMode = "generator";
       this.selectedHistory = null;
     },
 
     backToHistoryList() {
-      this.viewMode = 'historyList';
+      this.viewMode = "historyList";
       this.selectedHistory = null;
     },
 
@@ -540,10 +690,12 @@ export default {
 
       if (this.isMobile) {
         await this.$nextTick();
-        await this.downloadAsImage('history-problems-to-print');
+        await this.downloadAsImage("history-problems-to-print");
       } else {
         this.$nextTick(() => {
-          const printElement = document.getElementById('history-problems-to-print');
+          const printElement = document.getElementById(
+            "history-problems-to-print"
+          );
           const originalBody = document.body.innerHTML;
           const printContent = printElement.innerHTML;
 
@@ -557,7 +709,13 @@ export default {
 
     async shareHistory() {
       if (!this.selectedHistory) {
-        alert('没有选中的历史记录');
+        alert("没有选中的历史记录");
+        return;
+      }
+
+      // 检查分享API支持
+      if (!navigator.share) {
+        alert("分享失败，您的浏览器不支持分享功能，请使用下载功能");
         return;
       }
 
@@ -565,7 +723,11 @@ export default {
       await this.$nextTick();
 
       try {
-        const element = document.getElementById('history-problems-to-print');
+        const element = document.getElementById("history-problems-to-print");
+        if (!element) {
+          alert("找不到题目内容");
+          return;
+        }
 
         // 保存原始样式
         const originalStyle = element.style.cssText;
@@ -577,19 +739,21 @@ export default {
         // 应用 A4 排版样式
         element.style.width = `${a4Width}px`;
         element.style.padding = `${padding}px`;
-        element.style.boxSizing = 'border-box';
-        element.style.backgroundColor = '#ffffff';
+        element.style.boxSizing = "border-box";
+        element.style.backgroundColor = "#ffffff";
 
-        const printHeader = element.querySelector('.print-header');
+        const printHeader = element.querySelector(".print-header");
         if (printHeader) {
-          printHeader.style.display = 'block';
+          printHeader.style.display = "block";
         }
 
-        const problemsGrid = element.querySelector('.problems-grid');
-        const originalGridStyle = problemsGrid ? problemsGrid.style.cssText : '';
+        const problemsGrid = element.querySelector(".problems-grid");
+        const originalGridStyle = problemsGrid
+          ? problemsGrid.style.cssText
+          : "";
         if (problemsGrid) {
-          problemsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-          problemsGrid.style.gap = '15px';
+          problemsGrid.style.gridTemplateColumns = "repeat(2, 1fr)";
+          problemsGrid.style.gap = "15px";
         }
 
         await this.$nextTick();
@@ -598,17 +762,19 @@ export default {
           width: a4Width,
           windowWidth: a4Width,
           scale: 2,
-          backgroundColor: '#ffffff',
+          backgroundColor: "#ffffff",
           logging: false,
           useCORS: true,
           allowTaint: true,
           foreignObjectRendering: false,
           removeContainer: true,
           onclone: (clonedDoc) => {
-            const clonedElement = clonedDoc.getElementById('history-problems-to-print');
+            const clonedElement = clonedDoc.getElementById(
+              "history-problems-to-print"
+            );
             if (clonedElement) {
-              const allElements = clonedElement.querySelectorAll('*');
-              allElements.forEach(el => {
+              const allElements = clonedElement.querySelectorAll("*");
+              allElements.forEach((el) => {
                 const computedStyle = window.getComputedStyle(el);
                 if (computedStyle.color) {
                   el.style.color = computedStyle.color;
@@ -618,53 +784,75 @@ export default {
                 }
               });
             }
-          }
+          },
         });
 
         // 恢复原始样式
         element.style.cssText = originalStyle;
         if (printHeader) {
-          printHeader.style.display = 'none';
+          printHeader.style.display = "none";
         }
         if (problemsGrid) {
           problemsGrid.style.cssText = originalGridStyle;
         }
 
         canvas.toBlob(async (blob) => {
-          const file = new File([blob], '数学题目.png', { type: 'image/png' });
+          try {
+            const file = new File([blob], "数学题目.png", {
+              type: "image/png",
+            });
 
-          if (navigator.share && navigator.canShare({ files: [file] })) {
-            try {
+            // 检查是否支持文件分享
+            if (navigator.canShare && !navigator.canShare({ files: [file] })) {
+              // 降级到文本分享
               await navigator.share({
-                files: [file],
-                title: '数学练习题',
-                text: '分享数学练习题'
+                title: "数学练习题",
+                text: `我生成了${this.selectedHistory.problems.length}道数学练习题，快来一起练习吧！`,
+                url: window.location.href,
               });
-            } catch (error) {
-              if (error.name !== 'AbortError') {
-                console.error('分享失败:', error);
-                alert('分享失败，请使用下载功能');
-              }
+              alert("已分享链接，图片请使用下载功能");
+              return;
             }
-          } else {
-            alert('您的浏览器不支持分享功能，请使用下载功能');
+
+            // 尝试分享文件
+            await navigator.share({
+              files: [file],
+              title: "数学练习题",
+              text: "分享数学练习题",
+            });
+          } catch (shareError) {
+            console.error("分享失败:", shareError);
+
+            if (shareError.name === "AbortError") {
+              // 用户取消分享，不显示错误
+              return;
+            }
+
+            // 分享失败，提供下载选项
+            alert(
+              "分享失败，请使用下载功能。\n\n可能原因：\n1. 网络连接问题\n2. 应用不支持图片分享\n3. 系统限制"
+            );
           }
         });
       } catch (error) {
-        console.error('生成分享内容失败:', error);
-        alert('生成分享内容失败，请重试');
+        console.error("生成分享内容失败:", error);
+        alert("分享失败，请使用下载功能");
       }
     },
 
     formatConfig(config) {
-      if (!config || !config.operations) return '配置不可用';
+      if (!config || !config.operations) return "配置不可用";
       const ops = Object.entries(config.operations)
         .filter(([_, v]) => v)
-        .map(([k]) => ({ add: '+', subtract: '-', multiply: '×', divide: '÷' }[k]))
-        .join(', ');
-      return `题目: ${config.problemCount} | 类型: ${ops || 'N/A'} | ${config.termCount}项`;
-    }
-  }
+        .map(
+          ([k]) => ({ add: "+", subtract: "-", multiply: "×", divide: "÷" }[k])
+        )
+        .join(", ");
+      return `题目: ${config.problemCount} | 类型: ${ops || "N/A"} | ${
+        config.termCount
+      }项`;
+    },
+  },
 };
 </script>
 
@@ -724,5 +912,24 @@ export default {
 
 .btn-secondary:hover {
   background-color: #5a6268;
+}
+
+.btn-share {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-share:hover {
+  background-color: #218838;
+}
+
+.history-tip {
+  color: #6c757d;
+  font-size: 0.9em;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  border-left: 4px solid #007bff;
 }
 </style>
