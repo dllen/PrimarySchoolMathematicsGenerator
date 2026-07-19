@@ -2,6 +2,12 @@ import { ProblemGeneratorStrategy } from './ProblemGeneratorStrategy.js';
 import { ResultProblemStrategy } from './ResultProblemStrategy.js';
 import { OperandProblemStrategy } from './OperandProblemStrategy.js';
 
+/**
+ * ArithmeticStrategy delegates to ResultProblemStrategy / OperandProblemStrategy,
+ * both of which use Math.random() internally. The seeded `rng` argument is accepted
+ * for interface uniformity but ignored — arithmetic generation is non-deterministic.
+ * Application / Olympiad strategies ARE seeded (via templates calling rng.*).
+ */
 export class ArithmeticStrategy extends ProblemGeneratorStrategy {
   constructor(config) {
     super(config);
