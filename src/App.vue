@@ -101,7 +101,7 @@ export default {
       difficulty: 'easy',
       knowledgePoints: [],
       answerMode: 'hidden',
-      composition: { arithmetic: 20, application: 0, olympiad: 0 },
+      composition: { arithmetic: 0, application: 0, olympiad: 0 },
     });
 
     const generator = useProblemGenerator();
