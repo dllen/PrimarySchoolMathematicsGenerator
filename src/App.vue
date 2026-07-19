@@ -12,11 +12,32 @@
     </div>
 
     <div v-if="viewMode === 'generator'">
-      <ConfigPanel :config="config" @update:config="config = $event" />
+      <!-- 预设选择器 -->
+      <PresetSelector
+        @apply="applyPreset"
+        @edit="showPresetManager = true"
+        @create="showPresetManager = true"
+        @delete="handlePresetDelete"
+      />
+
+      <!-- 配置向导/高级配置 -->
+      <ConfigWizard
+        v-if="currentView === 'wizard'"
+        :model-value="wizardState.config"
+        @update:model-value="wizardState.config = $event"
+        @complete="handleWizardComplete"
+      />
+
+      <ConfigPanel
+        v-else
+        :config="config"
+        @update:config="config = $event"
+      />
+
       <ActionBar
         :problems="problems"
         :is-mobile="isMobile"
-        @generate="generateProblems"
+        @generate="handleWizardComplete || generateProblems"
         @export-pdf="exportPdf"
         @print="handlePrint"
         @share="handleShare"
@@ -74,16 +95,25 @@ import { useProblemGenerator } from './composables/useProblemGenerator.js';
 import { usePdfExport } from './composables/usePdfExport.js';
 import { usePrint } from './composables/usePrint.js';
 import { addProblemSet, getHistory, db } from './db.js';
+import PresetSelector from './components/PresetSelector.vue';
+import PresetManager from './components/PresetManager.vue';
+import { deleteCustomPreset } from './constants/presets.js';
+import PresetSelector from './components/PresetSelector.vue';
+import PresetManager from './components/PresetManager.vue';
 
 export default {
   components: {
     ToastContainer,
     ConfigPanel,
+    ConfigWizard,
     ActionBar,
     ProblemGrid,
     AnswerPage,
     HistoryList,
     HistoryDetail,
+    ConfirmDialog,
+    PresetSelector,
+    PresetManager,
   },
   setup() {
     const today = new Date().toISOString().slice(0, 10);
@@ -94,6 +124,7 @@ export default {
     const selectedHistory = ref(null);
     const printRoot = ref(null);
     const exporting = ref(false);
+    const showPresetManager = ref(false);
 
     const config = ref({
       problemCount: 20,
