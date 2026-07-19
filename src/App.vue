@@ -98,8 +98,6 @@ import { addProblemSet, getHistory, db } from './db.js';
 import PresetSelector from './components/PresetSelector.vue';
 import PresetManager from './components/PresetManager.vue';
 import { deleteCustomPreset } from './constants/presets.js';
-import PresetSelector from './components/PresetSelector.vue';
-import PresetManager from './components/PresetManager.vue';
 
 export default {
   components: {
