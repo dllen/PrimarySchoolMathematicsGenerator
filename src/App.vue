@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <ToastContainer />
     <div class="header">
       <h2>小学数学口算题生成器</h2>
       <p style="color: red; font-weight: bolder" v-if="!isMobile">
@@ -68,6 +69,7 @@ import ProblemGrid from './components/ProblemGrid.vue';
 import AnswerPage from './components/AnswerPage.vue';
 import HistoryList from './components/HistoryList.vue';
 import HistoryDetail from './components/HistoryDetail.vue';
+import ToastContainer from './components/ToastContainer.vue';
 import { useProblemGenerator } from './composables/useProblemGenerator.js';
 import { usePdfExport } from './composables/usePdfExport.js';
 import { usePrint } from './composables/usePrint.js';
@@ -75,6 +77,7 @@ import { addProblemSet, getHistory, db } from './db.js';
 
 export default {
   components: {
+    ToastContainer,
     ConfigPanel,
     ActionBar,
     ProblemGrid,
