@@ -3,8 +3,9 @@ import { timeTemplate } from './time.js';
 import { comparisonTemplate } from './comparison.js';
 import { sequenceTemplate } from './sequence.js';
 import { logicTemplate } from './logic.js';
+import { chickenRabbitTemplate } from './chickenRabbit.js';
 
-export const APPLICATION_TEMPLATES = [shoppingTemplate, timeTemplate, comparisonTemplate];
+export const APPLICATION_TEMPLATES = [shoppingTemplate, timeTemplate, comparisonTemplate, chickenRabbitTemplate];
 
 export const OLYMPIAD_TEMPLATES = [sequenceTemplate, logicTemplate];
 
