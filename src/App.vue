@@ -115,6 +115,7 @@ export default {
     const generator = useProblemGenerator();
     const pdf = usePdfExport();
     const printer = usePrint();
+    const { success, error, warning, info } = useToast();
 
     function detectMobile() {
       const ua = navigator.userAgent;
@@ -159,17 +160,41 @@ export default {
     }
 
     async function exportPdf() {
-      if (!printRoot.value) return;
+      if (!printRoot.value) {
+        warning('无法导出', '请先生成题目');
+        return;
+      }
+
       const filename = pdf.buildFilename({
         grade: config.value.grade,
         semester: config.value.semester,
       });
+
       exporting.value = true;
       try {
+        info('正在导出 PDF...');
         await new Promise((resolve) => requestAnimationFrame(resolve));
         await pdf.exportPdf(printRoot.value, filename);
+        success('PDF 已保存', filename);
+      } catch (err) {
+        warning('PDF 导出失败', '正在尝试保存为图片...');
+        await fallbackToImage(printRoot.value, filename);
       } finally {
         exporting.value = false;
+      }
+    }
+
+    async function fallbackToImage(element, filename) {
+      try {
+        const html2canvas = (await import('html2canvas-pro')).default;
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = filename.replace('.pdf', '.png');
+        link.click();
+        info('图片已保存', filename.replace('.pdf', '.png'));
+      } catch (err) {
+        error('导出失败', '请尝试手动截图或刷新后重试');
       }
     }
 
@@ -182,42 +207,53 @@ export default {
     }
 
     async function downloadImage() {
-      const html2canvas = (await import('html2canvas-pro')).default;
-      if (!printRoot.value) return;
-      exporting.value = true;
       try {
+        const html2canvas = (await import('html2canvas-pro')).default;
+        if (!printRoot.value) return;
+
+        info('正在生成图片...');
+        exporting.value = true;
         await new Promise((resolve) => requestAnimationFrame(resolve));
         const canvas = await html2canvas(printRoot.value, { scale: 2, useCORS: true });
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');
         link.download = `数学练习题_${config.value.grade}年级_${today}.png`;
         link.click();
+        success('图片已下载');
+      } catch (err) {
+        error('下载失败', err.message);
       } finally {
         exporting.value = false;
       }
     }
 
     async function handleShare() {
-      const html2canvas = (await import('html2canvas-pro')).default;
-      if (!printRoot.value) return;
-      exporting.value = true;
       try {
-        await new Promise((resolve) => requestAnimationFrame(resolve));
+        const html2canvas = (await import('html2canvas-pro')).default;
+        info('正在生成分享图片...');
+
         const canvas = await html2canvas(printRoot.value, { scale: 2, useCORS: true });
         canvas.toBlob(async (blob) => {
-          if (!blob) return;
+          if (!blob) {
+            error('分享失败', '图片生成失败');
+            return;
+          }
+
           const file = new File([blob], `数学练习题_${today}.png`, { type: 'image/png' });
+
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: '数学练习题',
-            });
+            await navigator.share({ files: [file], title: '数学练习题' });
+            success('分享成功');
           } else {
-            alert('当前浏览器不支持分享，请使用下载功能');
+            warning('浏览器不支持分享', '已自动下载图片');
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `数学练习题_${today}.png`;
+            link.click();
           }
         });
-      } finally {
-        exporting.value = false;
+      } catch (err) {
+        error('分享失败', err.message);
       }
     }
 
@@ -227,8 +263,17 @@ export default {
     }
 
     async function deleteHistory(item) {
-      await db.problemSets.delete(item.id);
-      await refreshHistory();
+      if (!confirm('确定删除这份试卷吗？此操作无法撤销。')) {
+        return;
+      }
+
+      try {
+        await db.problemSets.delete(item.id);
+        await refreshHistory();
+        success('删除成功');
+      } catch (err) {
+        error('删除失败', err.message);
+      }
     }
 
     return {
