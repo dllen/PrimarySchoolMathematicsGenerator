@@ -37,7 +37,7 @@
       <ActionBar
         :problems="problems"
         :is-mobile="isMobile"
-        @generate="handleWizardComplete || generateProblems"
+        @generate="generateProblems"
         @export-pdf="exportPdf"
         @print="handlePrint"
         @share="handleShare"
@@ -126,6 +126,22 @@ export default {
     const printRoot = ref(null);
     const exporting = ref(false);
     const showPresetManager = ref(false);
+    const currentView = ref('panel'); // 'wizard' or 'panel'
+    const wizardState = ref({
+      config: {
+        grade: '3',
+        semester: '上',
+        problemCount: 20,
+        difficulty: 'medium',
+        questionTypes: ['arithmetic'],
+        operations: {
+          add: true,
+          subtract: true,
+          multiply: false,
+          divide: false,
+        },
+      },
+    });
 
     const config = ref({
       problemCount: 20,
@@ -148,6 +164,16 @@ export default {
     function applyPreset(presetConfig) {
       Object.assign(config.value, presetConfig);
       success('已应用预设配置', `题目数量: ${presetConfig.problemCount || 20} 题`);
+    }
+
+    // 向导完成处理
+    function handleWizardComplete() {
+      // 将向导配置应用到主配置
+      Object.assign(config.value, wizardState.value.config);
+      // 切换到普通视图
+      currentView.value = 'panel';
+      // 生成题目
+      generateProblems();
     }
 
     // 删除自定义预设
@@ -329,13 +355,19 @@ export default {
       today,
       isMobile,
       viewMode,
+      currentView,
       config,
       problems,
       history,
       selectedHistory,
       printRoot,
       exporting,
+      showPresetManager,
+      wizardState,
       generateProblems,
+      applyPreset,
+      handleWizardComplete,
+      handlePresetDelete,
       exportPdf,
       handlePrint,
       handleShare,
