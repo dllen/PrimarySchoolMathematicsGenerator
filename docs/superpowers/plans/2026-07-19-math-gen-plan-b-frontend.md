@@ -1153,12 +1153,26 @@ git commit -m "refactor(app): extract components, wire PDF/print/share to new co
 ## Task 13: Cypress 端到端测试 — generator 流程
 
 **Files:**
+- Modify: `cypress.config.js`
 - Create: `cypress/e2e/generator.cy.js`
 
-- [ ] **Step 1: 查看现有 cypress 配置**
+- [ ] **Step 1: 修正 cypress.config.js 的 baseUrl 与 viewport**
 
-```bash
-cat cypress.config.js
+`vite.config.js` 使用 port 5000，但 `cypress.config.js` 指向 5173。先修正：
+
+```js
+// cypress.config.js (replace whole file)
+const { defineConfig } = require('cypress');
+
+module.exports = defineConfig({
+  e2e: {
+    baseUrl: 'http://localhost:5000',
+    supportFile: false,
+    viewportWidth: 1280,
+    viewportHeight: 800,
+    setupNodeEvents(on, config) {},
+  },
+});
 ```
 
 - [ ] **Step 2: 创建 e2e/generator.cy.js**
@@ -1213,8 +1227,8 @@ Expected: 4 tests pass
 - [ ] **Step 4: Commit**
 
 ```bash
-git add cypress/e2e/generator.cy.js
-git commit -m "test(e2e): add generator flow coverage"
+git add cypress.config.js cypress/e2e/generator.cy.js
+git commit -m "test(e2e): align cypress baseUrl to vite port 5000 + generator coverage"
 ```
 
 ---
@@ -1285,23 +1299,13 @@ git commit -m "test(e2e): add history list flow coverage"
 **Files:**
 - Create: `cypress/e2e/mobile.cy.js`
 
-- [ ] **Step 1: 在 cypress.config.js 中确认 mobile viewport（如未配置则添加）**
-
-修改 `cypress.config.js`，在 defineConfig 内增加：
-
-```js
-viewportWidth: 375,
-viewportHeight: 667,
-```
-
-（如果已存在则跳过此步）
-
-- [ ] **Step 2: 创建 mobile.cy.js**
+- [ ] **Step 1: 创建 mobile.cy.js**（mobile viewport 已由 Task 13 在 cypress.config.js 中通过 cy.viewport 命令切换）
 
 ```js
 // cypress/e2e/mobile.cy.js
 describe('Mobile flow', () => {
   beforeEach(() => {
+    cy.viewport(375, 667); // iPhone SE
     cy.visit('/');
     cy.clearLocalStorage();
   });
@@ -1331,7 +1335,7 @@ Expected: 2 tests pass
 - [ ] **Step 4: Commit**
 
 ```bash
-git add cypress/e2e/mobile.cy.js cypress.config.js
+git add cypress/e2e/mobile.cy.js
 git commit -m "test(e2e): add mobile viewport and share fallback coverage"
 ```
 
