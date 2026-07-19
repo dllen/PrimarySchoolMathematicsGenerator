@@ -121,25 +121,32 @@
 
 ### 3.4 ConfigPanel 重排
 
-调整 `.config-row` 在 template 中的顺序：
+调整 `.config-row` 在 template 中的顺序。`arithmeticSelected` 计算属性（在 `<script setup>` 中）：
+
+```js
+import { computed } from 'vue';
+const arithmeticSelected = computed(() => config.questionTypes.includes('arithmetic'));
+```
+
+模板改写（按高频→低频）：
 
 ```vue
 <template>
   <div class="config-panel">
     <!-- 高频 -->
-    <div class="config-row"> <!-- 题目数量 --> </div>
-    <div class="config-row"> <!-- 年级 + 学期 --> </div>
-    <div class="config-row"> <!-- 题型 --> </div>
-    <div class="config-row"> <!-- 难度 --> </div>
-    <div class="config-row"> <!-- 答案模式 --> </div>
+    <div class="config-row">题目数量</div>
+    <div class="config-row">年级 + 学期</div>
+    <div class="config-row">题型（多选）</div>
+    <div class="config-row">难度</div>
+    <div class="config-row">答案模式</div>
 
     <!-- 算术题子配置（条件渲染） -->
-    <div v-if="arithmeticSelected" class="config-row"> <!-- 计算项个数 --> </div>
-    <div v-if="arithmeticSelected" class="config-row"> <!-- 运算类型 + 位数 --> </div>
-    <div v-if="arithmeticSelected" class="config-row"> <!-- 题目子类 --> </div>
+    <div v-if="arithmeticSelected" class="config-row">计算项个数</div>
+    <div v-if="arithmeticSelected" class="config-row">运算类型 + 位数</div>
+    <div v-if="arithmeticSelected" class="config-row">题目子类</div>
 
     <!-- 高级筛选 -->
-    <div class="config-row"> <!-- 知识点 --> </div>
+    <div class="config-row">知识点</div>
     <CompositionEditor ... />
   </div>
 </template>
@@ -147,13 +154,16 @@
 
 **注意：** 算术题 3 个子配置（项数 / 运算类型 / 子类）虽高频但在算术未选中时无意义，仍用 `v-if` 条件渲染并排在答案模式之后。
 
+**注意：** 算术题 3 个子配置（项数 / 运算类型 / 子类）虽高频但在算术未选中时无意义，仍用 `v-if` 条件渲染并排在答案模式之后。
+
 ### 3.5 ActionBar 排版
 
 桌面端（≥ 640px）：按钮横排不变。
 
-移动端（< 640px）：两行
-- 第一行：「生成题目」全宽主按钮
-- 第二行：「下载图片」「分享题目」「查看历史」三等分
+移动端（< 640px）：**视觉重排**（按钮 DOM 顺序不变，仅 CSS 改变布局）：
+- 第一行：「生成题目」全宽主按钮（`order: -1`）
+- 第二行：「下载图片」「分享题目」「查看历史」三等分按钮
+- 「导出 PDF」整按钮在移动端隐藏（加 `.desktop-only` 类，CSS `@media (max-width: 639px)` 下 `display: none`）
 
 模板改写：
 
