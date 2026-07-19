@@ -1,6 +1,7 @@
 import { createRng } from '../utils/rng.js';
 import { ProblemGeneratorFactory } from '../strategies/ProblemGeneratorFactory.js';
 import { useProblemLibrary } from './useProblemLibrary.js';
+import { usePreloadedLibrary } from './usePreloadedLibrary.js';
 
 const ARITHMETIC_DEFAULT_PROBLEM_TYPE = 'result';
 
@@ -20,7 +21,7 @@ function buildComposition(config) {
 
 let rngCounter = 0;
 
-async function generateOne(type, config) {
+async function generateOneLive(type, config) {
   const innerConfig = { ...config };
   if (type === 'arithmetic' && !innerConfig.problemType) {
     innerConfig.problemType = ARITHMETIC_DEFAULT_PROBLEM_TYPE;
@@ -31,6 +32,7 @@ async function generateOne(type, config) {
 
 export function useProblemGenerator() {
   const library = useProblemLibrary();
+  const preloaded = usePreloadedLibrary();
 
   async function generate(config) {
     const composition = buildComposition(config);
@@ -39,12 +41,45 @@ export function useProblemGenerator() {
 
     for (const [type, count] of Object.entries(composition)) {
       if (!count || count <= 0) continue;
+      let sampled = [];
+      const cached = await preloaded.get(config.grade, config.semester, type, config.difficulty);
+      if (cached && cached.length > 0) {
+        sampled = preloaded.sample(cached, count, ++rngCounter);
+      }
+
+      if (sampled.length === count) {
+        for (const s of sampled) {
+          if (seen.has(s.question)) continue;
+          seen.add(s.question);
+          results.push({
+            type,
+            subtype: type,
+            question: s.question,
+            answer: s.answer,
+            payload: {},
+          });
+        }
+        continue;
+      }
+
+      const needFromLive = count - sampled.length;
+      for (const s of sampled) {
+        if (seen.has(s.question)) continue;
+        seen.add(s.question);
+        results.push({
+          type,
+          subtype: type,
+          question: s.question,
+          answer: s.answer,
+          payload: {},
+        });
+      }
       let attempts = 0;
       let produced = 0;
-      while (produced < count && attempts < count * 5) {
+      while (produced < needFromLive && attempts < needFromLive * 5) {
         attempts++;
         try {
-          const p = await generateOne(type, config);
+          const p = await generateOneLive(type, config);
           if (seen.has(p.question)) continue;
           seen.add(p.question);
           results.push({
