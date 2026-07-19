@@ -893,8 +893,8 @@ describe('logicTemplate', () => {
 
   it('total equals sum of items', () => {
     const r = logicTemplate.generate(createRng(11), 1);
-    expect(r.payload.total).toBe(r.payload.a + r.payload.b + r.payload.c);
-    expect(r.answer).toBe(`${r.payload.total}`);
+    expect(r.payload.total).toBe(r.payload.a + r.payload.b - r.payload.c);
+    expect(r.answer).toBe(`${r.payload.total}支`);
     expect(r.subtype).toBe('logic');
     expect(r.question).toContain('一共');
   });
@@ -930,12 +930,12 @@ export const logicTemplate = {
     const a = rng.int(2, 5 + difficulty * 3);
     const b = rng.int(2, 5 + difficulty * 3);
     const c = rng.int(2, 5 + difficulty * 3);
-    const total = a + b + c;
+    const total = a + b - c;
     return {
       question: `小华有${a}支笔，又得到${b}支，后来送给同学${c}支，现在一共有几支笔？`,
-      answer: `${total - c}支`,
+      answer: `${total}支`,
       subtype: 'logic',
-      payload: { a, b, c, total: total - c },
+      payload: { a, b, c, total },
     };
   },
 };
