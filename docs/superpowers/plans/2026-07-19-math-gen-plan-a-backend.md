@@ -156,16 +156,16 @@ describe('knowledgePoints', () => {
     expect(KNOWLEDGE_POINTS_BY_GRADE['2']).toContain('表内乘法');
   });
 
-  it('grade 3 contains 分数', () => {
-    expect(KNOWLEDGE_POINTS_BY_GRADE['3']).toContain('分数');
+  it('grade 3 contains 分数初步', () => {
+    expect(KNOWLEDGE_POINTS_BY_GRADE['3']).toContain('分数初步');
   });
 
-  it('grade 4 contains 小数', () => {
-    expect(KNOWLEDGE_POINTS_BY_GRADE['4']).toContain('小数');
+  it('grade 4 contains 小数初步', () => {
+    expect(KNOWLEDGE_POINTS_BY_GRADE['4']).toContain('小数初步');
   });
 
-  it('grade 5 contains 方程', () => {
-    expect(KNOWLEDGE_POINTS_BY_GRADE['5']).toContain('方程');
+  it('grade 5 contains 简易方程', () => {
+    expect(KNOWLEDGE_POINTS_BY_GRADE['5']).toContain('简易方程');
   });
 
   it('grade 6 contains 几何图形', () => {
