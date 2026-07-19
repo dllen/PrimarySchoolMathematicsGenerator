@@ -51,7 +51,7 @@ export async function getHistory() {
 export async function addToLibrary(partial) {
   return await db.problemLibrary.add({
     createdAt: getFormattedTimestamp(),
-    ...partial,
+    ...JSON.parse(JSON.stringify(partial)),
   });
 }
 
