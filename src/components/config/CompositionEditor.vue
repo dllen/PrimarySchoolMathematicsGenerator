@@ -31,7 +31,8 @@ const total = computed(() => Object.values(props.modelValue).reduce((a, b) => a 
 
 function update(t, raw) {
   const n = Math.max(0, parseInt(raw, 10) || 0);
-  emit('update:modelValue', { ...props.modelValue, [t]: n });
+  const clamped = Math.min(maxFor(t), n);
+  emit('update:modelValue', { ...props.modelValue, [t]: clamped });
 }
 
 function maxFor(t) {
