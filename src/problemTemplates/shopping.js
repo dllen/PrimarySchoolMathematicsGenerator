@@ -1,9 +1,12 @@
-const people = ['小明', '小红', '小华', '小丽', '小强', '小芳', '小军', '小梅', '大伟', '小玲'];
+const people = ['小明', '小红', '小华', '小丽', '小强', '小芳', '小军', '小梅', '大伟', '小玲', '小雪', '小刚'];
 const items = {
-  文具: ['铅笔', '橡皮', '文具盒', '笔记本', '尺子', '圆珠笔', '书包'],
-  水果: ['苹果', '香蕉', '橙子', '梨', '葡萄', '西瓜', '桃子'],
-  零食: ['糖果', '饼干', '巧克力', '薯片', '果冻', '牛奶', '酸奶'],
-  玩具: ['积木', '玩具车', '毛绒熊', '皮球', '拼图', '风筝', '玩具枪'],
+  文具: ['铅笔', '橡皮', '文具盒', '笔记本', '尺子', '圆珠笔', '书包', '彩笔', '削笔刀', '修正带'],
+  水果: ['苹果', '香蕉', '橙子', '梨', '葡萄', '西瓜', '桃子', '草莓', '芒果', '柠檬'],
+  零食: ['饼干', '巧克力', '薯片', '果冻', '牛奶', '酸奶', '蛋糕', '面包', '爆米花', '坚果'],
+  玩具: ['积木', '玩具车', '毛绒熊', '皮球', '拼图', '风筝', '玩具枪', '芭比娃娃', '遥控车', '魔方'],
+  蔬菜: ['白菜', '萝卜', '西红柿', '黄瓜', '茄子', '辣椒', '土豆', '南瓜', '玉米', '豌豆'],
+  饮品: ['可乐', '雪碧', '果汁', '奶茶', '咖啡', '豆浆', '牛奶', '矿泉水', '茶', '酸奶'],
+  生活用品: ['牙膏', '牙刷', '毛巾', '洗发水', '肥皂', '卫生纸', '洗衣液', '洗洁精', '沐浴露', '洗手液'],
 };
 
 function pickRandom(arr, rng) {
@@ -113,6 +116,62 @@ function generateShoppingSubtemplates() {
           answer: `${share}`,
           subtype: 'shopping',
           payload: { total, share },
+        };
+      },
+    },
+    {
+      id: 'shopping-buy-multiple-categories',
+      generate(rng, difficulty) {
+        const category1 = pickRandom(Object.keys(items), rng);
+        const item1 = pickRandom(items[category1], rng);
+        const category2 = pickRandom(Object.keys(items).filter(c => c !== category1), rng);
+        const item2 = pickRandom(items[category2], rng);
+        const person = pickRandom(people, rng);
+        const price1 = rng.int(2, 10);
+        const price2 = rng.int(2, 10);
+        const quantity1 = rng.int(2, 5);
+        const quantity2 = rng.int(2, 5);
+        const total = price1 * quantity1 + price2 * quantity2;
+        return {
+          question: `${person}买了${quantity1}个${item1}（${price1}元/个）和${quantity2}个${item2}（${price2}元/个），一共花了多少钱？`,
+          answer: `${total}元`,
+          subtype: 'shopping',
+          payload: { price1, quantity1, price2, quantity2, total },
+        };
+      },
+    },
+    {
+      id: 'shopping-savings',
+      generate(rng, difficulty) {
+        const category = pickRandom(Object.keys(items), rng);
+        const item = pickRandom(items[category], rng);
+        const person = pickRandom(people, rng);
+        const dailySavings = rng.int(2, 8 + difficulty * 2);
+        const days = rng.int(5, 15 + difficulty * 5);
+        const total = dailySavings * days;
+        return {
+          question: `${person}每天存${dailySavings}元，存了${days}天，一共存了多少钱？`,
+          answer: `${total}元`,
+          subtype: 'shopping',
+          payload: { dailySavings, days, total },
+        };
+      },
+    },
+    {
+      id: 'shopping-comparison',
+      generate(rng, difficulty) {
+        const category = pickRandom(Object.keys(items), rng);
+        const item = pickRandom(items[category], rng);
+        const person1 = pickRandom(people, rng);
+        const person2 = pickRandom(people.filter(p => p !== person1), rng);
+        const price1 = rng.int(3, 10 + difficulty * 2);
+        const price2 = rng.int(2, price1 - 1);
+        const diff = price1 - price2;
+        return {
+          question: `${person1}买一个${item}花了${price1}元，${person2}买同样的${item}花了${price2}元，${person1}比${person2}多花了多少钱？`,
+          answer: `${diff}元`,
+          subtype: 'shopping',
+          payload: { price1, price2, diff },
         };
       },
     },
