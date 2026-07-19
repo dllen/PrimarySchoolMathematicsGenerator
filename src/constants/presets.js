@@ -218,6 +218,118 @@ export function updateCustomPreset(presetId, updates) {
 }
 
 /**
+ * 移动预设到新位置（用于拖拽排序）
+ */
+export function movePreset(fromIndex, toIndex) {
+  try {
+    const custom = getCustomPresets();
+
+    if (fromIndex < 0 || fromIndex >= custom.length) return false;
+    if (toIndex < 0 || toIndex >= custom.length) return false;
+
+    const [removed] = custom.splice(fromIndex, 1);
+    custom.splice(toIndex, 0, removed);
+
+    localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(custom));
+    return true;
+  } catch (err) {
+    console.error('[presets] Move preset failed:', err);
+    return false;
+  }
+}
+
+/**
+ * 导出所有自定义预设为 JSON 文件
+ */
+export function exportCustomPresets() {
+  try {
+    const custom = getCustomPresets();
+    const json = JSON.stringify(custom, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `math-presets-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    return { success: true, count: custom.length };
+  } catch (err) {
+    console.error('[presets] Export failed:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * 导入预设从 JSON 文件
+ */
+export function importCustomPresets(jsonString, options = {}) {
+  try {
+    const data = JSON.parse(jsonString);
+
+    if (!Array.isArray(data)) {
+      return { success: false, error: '格式错误：预设必须是数组' };
+    }
+
+    // 验证每个预设的结构
+    const validated = [];
+    for (const preset of data) {
+      if (!preset.id || !preset.name || !preset.config) {
+        continue; // 跳过无效预设
+      }
+      validated.push({
+        id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, // 避免 ID 冲突
+        name: preset.name,
+        description: preset.description || '',
+        icon: preset.icon || '⭐',
+        config: preset.config,
+      });
+    }
+
+    if (validated.length === 0) {
+      return { success: false, error: '没有有效的预设数据' };
+    }
+
+    // 合并到现有预设
+    const existing = getCustomPresets();
+    const merged = options.merge ? [...existing, ...validated] : validated;
+    localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(merged));
+
+    return {
+      success: true,
+      imported: validated.length,
+      total: merged.length,
+    };
+  } catch (err) {
+    console.error('[presets] Import failed:', err);
+    return { success: false, error: `导入失败：${err.message}` };
+  }
+}
+
+/**
+ * 从文件读取并导入预设
+ */
+export async function importPresetsFromFile(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const result = importCustomPresets(e.target.result);
+      resolve(result);
+    };
+
+    reader.onerror = () => {
+      resolve({ success: false, error: '文件读取失败' });
+    };
+
+    reader.readAsText(file);
+  });
+}
+
+/**
  * 根据 ID 获取预设
  * @param {string} id - 预设 ID
  * @returns {Object|null} 预设配置

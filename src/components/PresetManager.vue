@@ -47,76 +47,6 @@
           </div>
         </div>
 
-        <!-- 配置编辑区 -->
-        <div class="form-group">
-          <label>配置</label>
-          <div class="config-editor">
-            <div class="config-row">
-              <label>年级：</label>
-              <select v-model="formData.config.grade" class="form-select">
-                <option v-for="g in ['1', '2', '3', '4', '5', '6']" :key="g" :value="g">{{ g }}年级</option>
-              </select>
-            </div>
-
-            <div class="config-row">
-              <label>学期：</label>
-              <select v-model="formData.config.semester" class="form-select">
-                <option value="上">上册</option>
-                <option value="下">下册</option>
-              </select>
-            </div>
-
-            <div class="config-row">
-              <label>题目数量：</label>
-              <input
-                v-model.number="formData.config.problemCount"
-                type="number"
-                min="10"
-                max="100"
-                step="10"
-                class="form-input number-input"
-              />
-            </div>
-
-            <div class="config-row">
-              <label>难度：</label>
-              <select v-model="formData.config.difficulty" class="form-select">
-                <option value="easy">简单</option>
-                <option value="medium">中等</option>
-                <option value="hard">困难</option>
-              </select>
-            </div>
-
-            <div class="config-row">
-              <label>题型：</label>
-              <div class="checkbox-group">
-                <label v-for="type in questionTypes" :key="type.value" class="checkbox-label">
-                  <input
-                    type="checkbox"
-                    :value="type.value"
-                    v-model="formData.config.questionTypes"
-                  />
-                  <span>{{ type.label }}</span>
-                </label>
-              </div>
-            </div>
-
-            <div v-if="formData.config.questionTypes.includes('arithmetic')" class="config-row">
-              <label>运算类型：</label>
-              <div class="checkbox-group">
-                <label v-for="op in operations" :key="op.value" class="checkbox-label">
-                  <input
-                    type="checkbox"
-                    :value="op.value"
-                    v-model="formData.config.operations[op.value]"
-                  />
-                  <span>{{ op.label }}</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div class="form-actions">
           <button v-if="editingPreset" class="btn-secondary" @click="cancelEdit">
             取消
@@ -127,34 +57,64 @@
         </div>
       </div>
 
+      <!-- 导入/导出 -->
+      <div class="io-section">
+        <div class="section-header">
+          <span>数据管理</span>
+        </div>
+        <div class="io-buttons">
+          <button class="btn-io" @click="handleExport">
+            📥 导出预设
+          </button>
+          <label class="btn-io">
+            📤 导入预设
+            <input
+              type="file"
+              accept=".json"
+              @change="handleImport"
+              style="display: none"
+            />
+          </label>
+        </div>
+      </div>
+
       <!-- 自定义预设列表 -->
-      <div v-if="!editingPreset && customPresets.length > 0" class="custom-list">
-        <h4>我的预设</h4>
-        <div
-          v-for="preset in customPresets"
-          :key="preset.id"
-          class="preset-item"
-        >
-          <div class="preset-info">
-            <span class="preset-icon">{{ preset.icon || '⭐' }}</span>
-            <div class="preset-details">
+      <div v-if="customPresets.length > 0" class="custom-list">
+        <div class="list-header">
+          <h4>我的预设</h4>
+          <span class="drag-hint">拖拽可调整顺序</span>
+        </div>
+        <div class="preset-list">
+          <div
+            v-for="(preset, index) in customPresets"
+            :key="preset.id"
+            class="preset-item"
+            :draggable="true"
+            @dragstart="handleDragStart($event, index)"
+            @dragover.prevent
+            @drop="handleDrop($event, index)"
+            @dragend="handleDragEnd"
+          >
+            <div class="drag-handle">⋮⋮</div>
+            <div class="preset-icon">{{ preset.icon || '⭐' }}</div>
+            <div class="preset-info">
               <div class="preset-name">{{ preset.name }}</div>
               <div class="preset-desc">{{ preset.description }}</div>
             </div>
-          </div>
-          <div class="preset-actions">
-            <button class="btn-secondary-sm" @click="startEdit(preset)">
-              编辑
-            </button>
-            <button class="btn-danger-sm" @click="confirmDelete(preset.id)">
-              删除
-            </button>
+            <div class="preset-actions">
+              <button class="btn-secondary-sm" @click="startEdit(preset)">
+                编辑
+              </button>
+              <button class="btn-danger-sm" @click="confirmDelete(preset.id)">
+                删除
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- 空状态 -->
-      <div v-if="!editingPreset && customPresets.length === 0" class="empty-state">
+      <div v-if="customPresets.length === 0" class="empty-state">
         还没有自定义预设，点击上方"创建预设"开始
       </div>
     </div>
@@ -168,17 +128,23 @@ import {
   saveCustomPreset,
   deleteCustomPreset,
   updateCustomPreset,
+  movePreset,
+  exportCustomPresets,
+  importPresetsFromFile,
 } from '../constants/presets.js';
+import { useToast } from '../composables/useToast.js';
 
 const props = defineProps({
   visible: { type: Boolean, required: true },
 });
 
 const emit = defineEmits(['close', 'created', 'updated', 'deleted']);
+const { success, error, warning, info } = useToast();
 
 const customPresets = computed(() => getCustomPresets());
 
 const editingPreset = ref(null);
+const dragStartIndex = ref(null);
 
 const defaultFormData = {
   name: '',
@@ -200,19 +166,6 @@ const defaultFormData = {
 };
 
 const formData = reactive({ ...defaultFormData });
-
-const questionTypes = [
-  { value: 'arithmetic', label: '算术题' },
-  { value: 'application', label: '应用题' },
-  { value: 'olympiad', label: '奥数题' },
-];
-
-const operations = [
-  { value: 'add', label: '加法' },
-  { value: 'subtract', label: '减法' },
-  { value: 'multiply', label: '乘法' },
-  { value: 'divide', label: '除法' },
-];
 
 // 当对话框关闭时重置表单
 watch(() => props.visible, (newVal) => {
@@ -244,7 +197,7 @@ function cancelEdit() {
 
 function handleSubmit() {
   if (!formData.name.trim()) {
-    alert('请输入预设名称');
+    error('输入错误', '请输入预设名称');
     return;
   }
 
@@ -257,10 +210,10 @@ function handleSubmit() {
       config: formData.config,
     })) {
       emit('updated', editingPreset.value.id);
-      alert('预设更新成功！');
+      success('更新成功', formData.name);
       resetForm();
     } else {
-      alert('更新失败，请重试');
+      error('更新失败', '请重试');
     }
   } else {
     // 创建新预设
@@ -274,10 +227,10 @@ function handleSubmit() {
 
     if (saveCustomPreset(preset)) {
       emit('created', preset);
-      alert('预设创建成功！');
+      success('创建成功', preset.name);
       resetForm();
     } else {
-      alert('创建失败，请重试');
+      error('创建失败', '请重试');
     }
   }
 }
@@ -286,11 +239,69 @@ function confirmDelete(presetId) {
   if (confirm('确定删除这个预设吗？')) {
     if (deleteCustomPreset(presetId)) {
       emit('deleted', presetId);
-      alert('预设已删除');
+      success('预设已删除');
     } else {
-      alert('删除失败，请重试');
+      error('删除失败', '请重试');
     }
   }
+}
+
+function handleExport() {
+  const result = exportCustomPresets();
+  if (result.success) {
+    success('导出成功', `已导出 ${result.count} 个预设`);
+  } else {
+    error('导出失败', result.error || '未知错误');
+  }
+}
+
+async function handleImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.name.endsWith('.json')) {
+    error('格式错误', '请选择 JSON 文件');
+    return;
+  }
+
+  const result = await importPresetsFromFile(file);
+
+  if (result.success) {
+    success('导入成功', `已导入 ${result.imported} 个预设，共 ${result.total} 个`);
+    emit('created'); // 触发列表刷新
+  } else {
+    error('导入失败', result.error || '未知错误');
+  }
+
+  // 清空 input 以允许重复导入同一文件
+  event.target.value = '';
+}
+
+// 拖拽排序
+function handleDragStart(event, index) {
+  dragStartIndex.value = index;
+  event.dataTransfer.effectAllowed = 'move';
+  event.target.style.opacity = '0.5';
+}
+
+function handleDrop(event, targetIndex) {
+  const sourceIndex = dragStartIndex.value;
+
+  if (sourceIndex === null || sourceIndex === targetIndex) {
+    return;
+  }
+
+  if (movePreset(sourceIndex, targetIndex)) {
+    success('排序已保存');
+    emit('created'); // 触发列表刷新
+  } else {
+    error('排序失败', '请重试');
+  }
+}
+
+function handleDragEnd(event) {
+  event.target.style.opacity = '1';
+  dragStartIndex.value = null;
 }
 
 function handleClose() {
@@ -354,7 +365,7 @@ function handleClose() {
 }
 
 .form-section {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   padding-bottom: 24px;
   border-bottom: 1px solid #e0e0e0;
 }
@@ -432,51 +443,6 @@ function handleClose() {
   color: #666;
 }
 
-.config-editor {
-  background: #f9f9f9;
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-}
-
-.config-row {
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.config-row:last-child {
-  margin-bottom: 0;
-}
-
-.config-row label {
-  font-weight: 600;
-  color: #555;
-  min-width: 80px;
-}
-
-.checkbox-group {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  font-weight: normal;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
 .form-actions {
   display: flex;
   gap: 12px;
@@ -514,20 +480,82 @@ function handleClose() {
   background: #e0e0e0;
 }
 
-.custom-list h4 {
-  margin: 0 0 16px 0;
+/* 导入/导出 */
+.io-section {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #555;
+}
+
+.io-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-io {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: white;
+  border: 2px solid #2196f3;
+  border-radius: 6px;
+  color: #2196f3;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-io:hover {
+  background: #2196f3;
+  color: white;
+}
+
+/* 预设列表 */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.list-header h4 {
+  margin: 0;
   color: #333;
+}
+
+.drag-hint {
+  font-size: 12px;
+  color: #999;
+  font-weight: normal;
+}
+
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .preset-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px;
+  gap: 12px;
+  padding: 12px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  margin-bottom: 12px;
+  background: white;
   transition: all 0.2s;
+  cursor: move;
 }
 
 .preset-item:hover {
@@ -535,36 +563,50 @@ function handleClose() {
   background: #f5f9ff;
 }
 
-.preset-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
+.preset-item[draggable="true"]:active {
+  opacity: 0.5;
 }
 
-.preset-info .preset-icon {
-  font-size: 32px;
+.drag-handle {
+  font-size: 20px;
+  color: #ccc;
+  cursor: move;
+  user-select: none;
   line-height: 1;
 }
 
-.preset-details {
-  flex: 1;
+.preset-item:hover .drag-handle {
+  color: #2196f3;
 }
 
-.preset-details .preset-name {
+.preset-item .preset-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.preset-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.preset-name {
   font-weight: 600;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
-.preset-details .preset-desc {
-  font-size: 13px;
+.preset-desc {
+  font-size: 12px;
   color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .preset-actions {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .btn-secondary-sm {
@@ -613,23 +655,21 @@ function handleClose() {
     padding: 20px;
   }
 
-  .config-row {
+  .io-buttons {
     flex-direction: column;
-    align-items: flex-start;
   }
 
-  .config-row label {
-    margin-bottom: 5px;
+  .btn-io {
+    width: 100%;
   }
 
   .preset-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    flex-wrap: wrap;
   }
 
   .preset-actions {
     width: 100%;
+    margin-top: 10px;
   }
 
   .preset-actions button {
