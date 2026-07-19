@@ -25,7 +25,12 @@
       <div ref="printRoot" class="print-root">
         <div class="worksheet-header">
           <h3>数学练习题</h3>
-          <p>{{ config.grade }}年级{{ config.semester }}册 · {{ today }}</p>
+          <div class="info-row print-only">
+            <span>{{ config.grade }}年级{{ config.semester }}册</span>
+            <span>姓名：_____________</span>
+            <span>得分：_____________</span>
+          </div>
+          <p class="date">{{ today }}</p>
         </div>
         <ProblemGrid
           :problems="problems"
@@ -107,8 +112,15 @@ export default {
     const pdf = usePdfExport();
     const printer = usePrint();
 
+    function detectMobile() {
+      const ua = navigator.userAgent;
+      if (/Mobi|Android|iPhone/i.test(ua)) return true;
+      if (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform)) return true;
+      return false;
+    }
+
     onMounted(() => {
-      isMobile.value = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+      isMobile.value = detectMobile();
       refreshHistory();
     });
 
@@ -205,4 +217,15 @@ export default {
 .worksheet-header { text-align: center; margin-bottom: 12px; }
 .worksheet-header h3 { margin: 0; }
 .worksheet-header p { color: #666; margin: 4px 0; }
+.worksheet-header .info-row {
+  display: none;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 14px;
+}
+.worksheet-header .date {
+  color: #666;
+  font-size: 13px;
+  margin: 4px 0;
+}
 </style>
