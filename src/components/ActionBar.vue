@@ -2,7 +2,7 @@
   <div class="action-bar">
     <button class="btn btn-primary" @click="$emit('generate')">生成题目</button>
     <button
-      class="btn btn-secondary"
+      class="btn btn-secondary desktop-only"
       :disabled="!problems.length || isMobile"
       :title="isMobile ? '请在桌面端导出 PDF' : ''"
       @click="$emit('export-pdf')"

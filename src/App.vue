@@ -30,7 +30,6 @@
         <ProblemGrid
           :problems="problems"
           :show-answer="config.answerMode === 'inline'"
-          :cols="3"
         />
         <AnswerPage
           v-if="config.answerMode === 'separate'"

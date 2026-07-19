@@ -1,5 +1,5 @@
 <template>
-  <div class="problem-grid" :style="`--cols: ${cols}`">
+  <div class="problem-grid">
     <div v-for="(p, i) in problems" :key="i" class="problem-item">
       <span class="num">{{ i + 1 }}.</span>
       <span class="expr">{{ p.question }}</span>
@@ -12,16 +12,15 @@
 defineProps({
   problems: { type: Array, required: true },
   showAnswer: { type: Boolean, default: false },
-  cols: { type: Number, default: 3 },
 });
 </script>
 
 <style scoped>
 .problem-grid {
   display: grid;
-  grid-template-columns: repeat(var(--cols, 3), 1fr);
   gap: 12px 24px;
   padding: 16px 0;
+  /* grid-template-columns 由全局 style.css 响应式控制 */
 }
 .problem-item {
   display: flex;
