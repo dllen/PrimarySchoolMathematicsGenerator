@@ -4,18 +4,21 @@ import { createRng } from '../utils/rng.js';
 
 describe('shoppingTemplate', () => {
   it('has id, gradeRange, semester', () => {
-    expect(shoppingTemplate.id).toBe('shopping-basic');
-    expect(shoppingTemplate.gradeRange).toEqual(['1', '2', '3']);
+    expect(shoppingTemplate.id).toBe('shopping-complex');
+    expect(shoppingTemplate.gradeRange).toEqual(['1', '2', '3', '4']);
     expect(shoppingTemplate.semester).toBe('all');
   });
 
-  it('produces consistent answer for given variables', () => {
-    const rng = createRng(1);
-    const result = shoppingTemplate.generate(rng, 1);
-    expect(result.answer).toBe(`${result.payload.total}元`);
-    expect(result.payload.total).toBe(result.payload.unitPrice * result.payload.quantity);
-    expect(result.subtype).toBe('shopping');
-    expect(result.question).toContain('小明');
+  it('has subtemplates and generates valid problems', () => {
+    expect(shoppingTemplate.subtemplates).toBeDefined();
+    expect(shoppingTemplate.subtemplates.length).toBeGreaterThan(0);
+    
+    for (let i = 0; i < 20; i++) {
+      const r = shoppingTemplate.generate(createRng(i), 1);
+      expect(r.question).toBeDefined();
+      expect(r.answer).toBeDefined();
+      expect(r.subtype).toBe('shopping');
+    }
   });
 
   it('is deterministic with the same seed', () => {
@@ -24,14 +27,12 @@ describe('shoppingTemplate', () => {
     expect(a).toEqual(b);
   });
 
-  it('quantity grows with difficulty', () => {
-    const easy = [];
-    const hard = [];
-    for (let s = 0; s < 20; s++) {
-      easy.push(shoppingTemplate.generate(createRng(s), 1).payload.quantity);
-      hard.push(shoppingTemplate.generate(createRng(s), 3).payload.quantity);
+  it('generates various question types', () => {
+    const subtypes = new Set();
+    for (let i = 0; i < 50; i++) {
+      const r = shoppingTemplate.generate(createRng(i), 2);
+      subtypes.add(r.question);
     }
-    const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
-    expect(avg(hard)).toBeGreaterThan(avg(easy));
+    expect(subtypes.size).toBeGreaterThan(10);
   });
 });

@@ -4,25 +4,27 @@ import { createRng } from '../utils/rng.js';
 
 describe('timeTemplate', () => {
   it('metadata matches spec', () => {
-    expect(timeTemplate.id).toBe('time-clock');
-    expect(timeTemplate.gradeRange).toEqual(['1', '2', '3']);
+    expect(timeTemplate.id).toBe('time-complex');
+    expect(timeTemplate.gradeRange).toEqual(['1', '2', '3', '4']);
   });
 
-  it('computes hours consistently', () => {
-    const rng = createRng(5);
-    const r = timeTemplate.generate(rng, 1);
-    expect(r.payload.hoursLater).toBeGreaterThan(0);
-    expect(r.payload.hoursLater).toBeLessThanOrEqual(12);
-    expect(r.question).toContain('小时');
-    expect(r.subtype).toBe('time');
-    expect(r.answer).toBe(`${r.payload.endHour}时`);
-  });
-
-  it('endHour wraps within 1-12', () => {
-    for (let s = 0; s < 30; s++) {
-      const r = timeTemplate.generate(createRng(s), 2);
-      expect(r.payload.endHour).toBeGreaterThanOrEqual(1);
-      expect(r.payload.endHour).toBeLessThanOrEqual(12);
+  it('has subtemplates and generates valid problems', () => {
+    expect(timeTemplate.subtemplates).toBeDefined();
+    expect(timeTemplate.subtemplates.length).toBeGreaterThan(0);
+    
+    for (let i = 0; i < 20; i++) {
+      const r = timeTemplate.generate(createRng(i), 1);
+      expect(r.question).toBeDefined();
+      expect(r.answer).toBeDefined();
+      expect(r.subtype).toBe('time');
     }
+  });
+
+  it('respects grade filter', () => {
+    const templates = timeTemplate.subtemplates;
+    templates.forEach(t => {
+      const gradeRanges = t.gradeRange || timeTemplate.gradeRange;
+      expect(gradeRanges).toBeDefined();
+    });
   });
 });

@@ -14,6 +14,10 @@ export class OlympiadStrategy extends ProblemGeneratorStrategy {
       throw new Error(`No olympiad templates available for grade ${this.config.grade}`);
     }
     const tpl = rng.pick(this.templates);
+    if (tpl.subtemplates) {
+      const subtpl = rng.pick(tpl.subtemplates);
+      return subtpl.generate(rng, this.difficultyLevel);
+    }
     return tpl.generate(rng, this.difficultyLevel);
   }
 }

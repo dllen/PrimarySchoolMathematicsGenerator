@@ -20,8 +20,8 @@ describe('ApplicationStrategy', () => {
     });
   });
 
-  it('respects grade filter — grade 4 cannot use shopping (range 1-3) if strict', () => {
-    const s = new ApplicationStrategy({ ...config, grade: '4' });
+  it('respects grade filter — grade 5 cannot use shopping (range 1-4) if strict', () => {
+    const s = new ApplicationStrategy({ ...config, grade: '5' });
     const seen = new Set();
     for (let i = 0; i < 30; i++) {
       seen.add(s.generate(createRng(i)).subtype);
