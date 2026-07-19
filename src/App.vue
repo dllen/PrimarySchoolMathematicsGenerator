@@ -1,17 +1,22 @@
 <template>
   <div class="container">
     <ToastContainer />
-    <div class="header">
-      <h2>小学数学题生成器</h2>
-      <p style="color: red; font-weight: bolder" v-if="!isMobile">
-        配置参数，生成数学练习题
-      </p>
-      <p style="color: red; font-weight: bolder" v-else>
-        配置参数，生成数学练习题，可下载图片或分享
-      </p>
-    </div>
+    <HomePage
+      v-if="viewMode === 'home'"
+      @navigate="handleNavigation"
+    />
 
-    <div v-if="viewMode === 'generator'">
+    <div v-if="viewMode === 'generator' || viewMode === 'quick-start'">
+      <div class="header">
+        <h2>小学数学题生成器</h2>
+        <p style="color: red; font-weight: bolder" v-if="!isMobile">
+          配置参数，生成数学练习题
+        </p>
+        <p style="color: red; font-weight: bolder" v-else>
+          配置参数，生成数学练习题，可下载图片或分享
+        </p>
+      </div>
+
       <!-- 预设选择器 -->
       <PresetSelector
         @apply="applyPreset"
@@ -41,7 +46,7 @@
         @export-pdf="exportPdf"
         @print="handlePrint"
         @share="handleShare"
-        @show-history="viewMode = 'history'"
+        @show-history="handleNavigation('history')"
       />
 
       <div ref="printRoot" class="print-root" :class="{ 'export-mode': exporting }">
@@ -71,13 +76,13 @@
       :items="history"
       @open="openHistory"
       @delete="deleteHistory"
-      @back="viewMode = 'generator'"
+      @back="handleNavigation('home')"
     />
 
     <HistoryDetail
       v-else-if="viewMode === 'history-detail'"
       :item="selectedHistory"
-      @back="viewMode = 'history'"
+      @back="handleNavigation('history')"
     />
   </div>
 </template>
@@ -95,6 +100,7 @@ import ToastContainer from './components/ToastContainer.vue';
 import ConfirmDialog from './components/ConfirmDialog.vue';
 import PresetSelector from './components/PresetSelector.vue';
 import PresetManager from './components/PresetManager.vue';
+import HomePage from './components/HomePage.vue';
 import { useProblemGenerator } from './composables/useProblemGenerator.js';
 import { usePdfExport } from './composables/usePdfExport.js';
 import { usePrint } from './composables/usePrint.js';
@@ -105,6 +111,7 @@ import { deleteCustomPreset } from './constants/presets.js';
 export default {
   components: {
     ToastContainer,
+    HomePage,
     ConfigPanel,
     ConfigWizard,
     ActionBar,
@@ -119,7 +126,7 @@ export default {
   setup() {
     const today = new Date().toISOString().slice(0, 10);
     const isMobile = ref(false);
-    const viewMode = ref('generator');
+    const viewMode = ref('home');
     const problems = ref([]);
     const history = ref([]);
     const selectedHistory = ref(null);
@@ -164,6 +171,26 @@ export default {
     function applyPreset(presetConfig) {
       Object.assign(config.value, presetConfig);
       success('已应用预设配置', `题目数量: ${presetConfig.problemCount || 20} 题`);
+    }
+
+    // 导航处理
+    function handleNavigation(target) {
+      switch (target) {
+        case 'home':
+          viewMode.value = 'home';
+          break;
+        case 'generator':
+          viewMode.value = 'generator';
+          break;
+        case 'quick-start':
+          viewMode.value = 'quick-start';
+          break;
+        case 'history':
+          viewMode.value = 'history';
+          break;
+        default:
+          console.warn('Unknown navigation target:', target);
+      }
     }
 
     // 向导完成处理
@@ -366,6 +393,7 @@ export default {
       wizardState,
       generateProblems,
       applyPreset,
+      handleNavigation,
       handleWizardComplete,
       handlePresetDelete,
       exportPdf,

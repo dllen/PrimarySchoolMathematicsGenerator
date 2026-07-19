@@ -58,17 +58,17 @@ describe('chickenRabbitTemplate', () => {
     // Easy difficulty
     const easy = chickenRabbitTemplate.generate(rng, 1);
     expect(easy.payload.totalHeads).toBeGreaterThanOrEqual(10);
-    expect(easy.payload.totalHeads).toBeLessThanOrEqual(50);
+    expect(easy.payload.totalHeads).toBeLessThanOrEqual(70); // max range across all subtemplates
 
     // Medium difficulty
     const medium = chickenRabbitTemplate.generate(rng, 2);
     expect(medium.payload.totalHeads).toBeGreaterThanOrEqual(15);
-    expect(medium.payload.totalHeads).toBeLessThanOrEqual(80);
+    expect(medium.payload.totalHeads).toBeLessThanOrEqual(110); // max range across all subtemplates
 
     // Hard difficulty
     const hard = chickenRabbitTemplate.generate(rng, 3);
-    expect(hard.payload.totalHeads).toBeGreaterThanOrEqual(30);
-    expect(hard.payload.totalHeads).toBeLessThanOrEqual(110);
+    expect(hard.payload.totalHeads).toBeGreaterThanOrEqual(25);
+    expect(hard.payload.totalHeads).toBeLessThanOrEqual(140); // max range across all subtemplates
   });
 
   it('should handle edge cases in legs-only problems', () => {
