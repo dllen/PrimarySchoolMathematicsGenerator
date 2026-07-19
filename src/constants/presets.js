@@ -194,6 +194,30 @@ export function getAllPresets() {
 }
 
 /**
+ * 更新用户自定义预设
+ */
+export function updateCustomPreset(presetId, updates) {
+  try {
+    const custom = getCustomPresets();
+    const index = custom.findIndex(p => p.id === presetId);
+
+    if (index === -1) return false;
+
+    custom[index] = {
+      ...custom[index],
+      ...updates,
+      config: updates.config ? JSON.parse(JSON.stringify(updates.config)) : custom[index].config,
+    };
+
+    localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(custom));
+    return true;
+  } catch (err) {
+    console.error('[presets] Update custom preset failed:', err);
+    return false;
+  }
+}
+
+/**
  * 根据 ID 获取预设
  * @param {string} id - 预设 ID
  * @returns {Object|null} 预设配置

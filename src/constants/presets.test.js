@@ -4,6 +4,7 @@ import {
   getCustomPresets,
   saveCustomPreset,
   deleteCustomPreset,
+  updateCustomPreset,
   getAllPresets,
   getPresetById,
 } from './presets.js';
@@ -126,6 +127,52 @@ describe('presets', () => {
 
     it('should return false for non-existent preset', () => {
       expect(deleteCustomPreset('non-existent')).toBe(false);
+    });
+  });
+
+  describe('updateCustomPreset', () => {
+    it('should update preset in localStorage', () => {
+      const custom = {
+        id: 'custom-update',
+        name: '原名称',
+        description: '原描述',
+        icon: '📌',
+        config: { problemCount: 10, grade: '1' },
+      };
+      saveCustomPreset(custom);
+
+      expect(updateCustomPreset('custom-update', {
+        name: '新名称',
+        description: '新描述',
+      })).toBe(true);
+
+      const updated = getCustomPresets();
+      expect(updated[0].name).toBe('新名称');
+      expect(updated[0].description).toBe('新描述');
+      expect(updated[0].config.problemCount).toBe(10); // config 未变
+    });
+
+    it('should update preset config', () => {
+      const custom = {
+        id: 'custom-update-config',
+        name: '测试',
+        description: '描述',
+        icon: '⭐',
+        config: { problemCount: 10, grade: '1' },
+      };
+      saveCustomPreset(custom);
+
+      expect(updateCustomPreset('custom-update-config', {
+        config: { problemCount: 20, grade: '2' },
+      })).toBe(true);
+
+      const updated = getCustomPresets();
+      expect(updated[0].config.problemCount).toBe(20);
+      expect(updated[0].config.grade).toBe('2');
+    });
+
+    it('should return false for non-existent preset', () => {
+      expect(updateCustomPreset('non-existent', { name: 'test' })).toBe(false);
     });
   });
 
