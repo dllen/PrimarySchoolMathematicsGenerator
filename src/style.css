@@ -543,6 +543,13 @@ body {
   body.print-without-answer .answer-page {
     display: none !important;
   }
+  .problem-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 16px;
+  }
+  .answer-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
   .problem-item {
     break-inside: avoid;
   }
