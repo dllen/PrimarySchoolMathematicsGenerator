@@ -368,100 +368,22 @@ body {
   width: 100%;
 }
 
-/* 移动端适配 */
-@media screen and (max-width: 768px) {
+/* === Mobile-first responsive overrides (MVP+移动端) === */
+@media screen and (max-width: 639px) {
   .container {
-    padding: 10px;
-  }
-
-  .header h1 {
-    font-size: 1.8em;
+    padding: 12px;
   }
 
   .header h2 {
-    font-size: 1.5em;
+    font-size: 1.4em;
   }
 
-  .config-panel {
-    padding: 15px;
+  .header p {
+    font-size: 0.9em;
   }
 
-  .config-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  /* 保持运算符和题目类型在同一行 */
-  .config-row-inline {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .config-item {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  /* 运算符和题目类型的配置项保持横向布局 */
-  .config-item-inline {
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .config-item-inline label {
-    min-width: auto;
-    margin-bottom: 0;
-    white-space: nowrap;
-  }
-
-  .config-item label {
-    min-width: auto;
-    margin-bottom: 5px;
-  }
-
-  .config-item input,
-  .config-item select {
-    width: 100%;
-  }
-
-  .checkbox-group {
-    width: 100%;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .checkbox-item {
-    width: 100%;
-  }
-
-  /* Radio group 在移动端保持横向 */
-  .radio-group {
-    display: flex;
-    flex-direction: row;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-
-  .radio-item {
-    flex-direction: row;
-    align-items: center;
-    white-space: nowrap;
-  }
-
-  .button-group {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .btn {
-    width: 100%;
-    padding: 14px;
-  }
-
-  .problems-grid {
+  /* 问题网格：1 列 */
+  .problem-grid {
     grid-template-columns: 1fr;
     gap: 10px;
   }
@@ -471,47 +393,119 @@ body {
     padding: 12px;
   }
 
-  .history-header {
+  /* 答案网格：2 列 */
+  .answer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Sticky 底部操作栏 */
+  .action-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    background: #fff;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+    padding: 8px;
+    margin: 0 -12px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .action-bar .btn-primary {
+    width: 100%;
+    order: -1;
+  }
+
+  .action-bar .desktop-only {
+    display: none !important;
+  }
+
+  /* 触控目标 ≥ 44px */
+  .btn,
+  .checkbox-item,
+  .radio-item,
+  .chip,
+  input[type="number"],
+  select {
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* ConfigPanel 单列 */
+  .config-panel {
+    padding: 12px;
+  }
+
+  .config-row {
     flex-direction: column;
-    gap: 15px;
-    align-items: stretch;
+    align-items: flex-start;
+    gap: 12px;
   }
 
-  .history-header h2,
-  .history-header h3 {
-    text-align: center;
-    font-size: 1.3em;
+  .config-item {
+    width: 100%;
   }
 
+  .config-item input,
+  .config-item select {
+    width: 100%;
+  }
+
+  /* KnowledgePointPicker chips: 加间距、强化选中 */
+  .chip {
+    font-size: 15px;
+    padding: 6px 14px;
+  }
+
+  .chip.active {
+    font-weight: 600;
+  }
+
+  /* print-root padding 避免 sticky 遮挡 */
+  .print-root {
+    padding-bottom: 80px;
+  }
+
+  /* 历史列表 */
   .history-list li {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
+}
 
-  .history-item-config {
-    font-size: 0.85em;
+@media screen and (min-width: 640px) and (max-width: 1023px) {
+  .container {
+    padding: 16px;
+  }
+
+  .problem-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .answer-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* 针对小屏幕手机的额外优化 */
-@media screen and (max-width: 480px) {
-  .header h2 {
-    font-size: 1.3em;
+@media screen and (min-width: 1024px) {
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 16px;
   }
 
-  .header p {
-    font-size: 0.9em;
+  .problem-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  .problem-item {
-    font-size: 15px;
-    padding: 10px;
-  }
-
-  .btn {
-    font-size: 14px;
-    padding: 12px;
+  .answer-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -541,5 +535,13 @@ body {
   }
   .problem-item {
     break-inside: avoid;
+  }
+
+  .worksheet-header .info-row {
+    display: flex !important;
+    justify-content: space-between;
+    padding: 0 24px;
+    font-size: 14px;
+    margin: 8px 0;
   }
 }
