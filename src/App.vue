@@ -2,7 +2,7 @@
   <div class="container">
     <ToastContainer />
     <div class="header">
-      <h2>小学数学口算题生成器</h2>
+      <h2>小学数学题生成器</h2>
       <p style="color: red; font-weight: bolder" v-if="!isMobile">
         配置参数，生成数学练习题
       </p>
