@@ -144,10 +144,16 @@ export default {
       composition: { arithmetic: 0, application: 0, olympiad: 0 },
     });
 
+    // 应用预设配置
+    function applyPreset(presetConfig) {
+      Object.assign(config.value, presetConfig);
+      success('已应用预设配置', `题目数量: ${presetConfig.problemCount || 20} 题`);
+    }
+
     const generator = useProblemGenerator();
     const pdf = usePdfExport();
     const printer = usePrint();
-    const { success, error, warning, info } = useToast();
+    const { success, error, warning, info, showToast } = useToast();
 
     function detectMobile() {
       const ua = navigator.userAgent;
