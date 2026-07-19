@@ -1595,7 +1595,7 @@ function buildComposition(config) {
   return out;
 }
 
-async function generateOne(rng, type, config) {
+async function generateOne(type, config, rng) {
   const factory = ProblemGeneratorFactory.createStrategy;
   const innerConfig = { ...config };
   if (type === 'arithmetic' && !innerConfig.problemType) {
@@ -1610,7 +1610,7 @@ export function useProblemGenerator() {
 
   async function generate(config) {
     const composition = buildComposition(config);
-    const rng = createRng();
+    let rngCounter = 0;
     const seen = new Set();
     const results = [];
 
@@ -1620,8 +1620,11 @@ export function useProblemGenerator() {
       let produced = 0;
       while (produced < count && attempts < count * 5) {
         attempts++;
+        // Per-call unique seed: Date.now() default collides within same ms
+        const seed = Math.floor(Math.random() * 1e9) + (++rngCounter);
+        const rng = createRng(seed);
         try {
-          const p = await generateOne(rng, type, config);
+          const p = await generateOne(type, config, rng);
           if (seen.has(p.question)) continue;
           seen.add(p.question);
           results.push({
