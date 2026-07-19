@@ -92,12 +92,13 @@ import AnswerPage from './components/AnswerPage.vue';
 import HistoryList from './components/HistoryList.vue';
 import HistoryDetail from './components/HistoryDetail.vue';
 import ToastContainer from './components/ToastContainer.vue';
+import ConfirmDialog from './components/ConfirmDialog.vue';
+import PresetSelector from './components/PresetSelector.vue';
+import PresetManager from './components/PresetManager.vue';
 import { useProblemGenerator } from './composables/useProblemGenerator.js';
 import { usePdfExport } from './composables/usePdfExport.js';
 import { usePrint } from './composables/usePrint.js';
 import { addProblemSet, getHistory, db } from './db.js';
-import PresetSelector from './components/PresetSelector.vue';
-import PresetManager from './components/PresetManager.vue';
 import { deleteCustomPreset } from './constants/presets.js';
 
 export default {
