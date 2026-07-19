@@ -89,7 +89,17 @@ export function useProblemGenerator() {
 
       const needFromLive = count - produced;
       let attempts = 0;
+      const GENERATION_TIMEOUT_MS = 5000;  // 5 second timeout
+      const generationStart = Date.now();
       while (produced < needFromLive && attempts < needFromLive * 20) {
+        // Timeout check
+        if (Date.now() - generationStart > GENERATION_TIMEOUT_MS) {
+          console.warn(
+            `[useProblemGenerator] Generation timeout for ${type} after ${attempts} attempts`
+          );
+          break;
+        }
+
         attempts++;
         try {
           const p = await generateOneLive(type, config);
