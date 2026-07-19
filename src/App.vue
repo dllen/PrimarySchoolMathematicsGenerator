@@ -130,10 +130,29 @@ export default {
     }
 
     async function generateProblems() {
-      const list = await generator.generate(config.value);
-      problems.value = list;
-      await addProblemSet(list, config.value);
-      await refreshHistory();
+      const startTime = Date.now();
+
+      try {
+        const list = await generator.generate(config.value);
+        problems.value = list;
+
+        const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+        showToast({
+          type: 'success',
+          message: `已生成 ${list.length} 题`,
+          detail: `耗时 ${duration}s`,
+        });
+
+        await addProblemSet(list, config.value);
+        await refreshHistory();
+      } catch (err) {
+        showToast({
+          type: 'error',
+          message: '生成失败',
+          detail: err.message,
+        });
+        console.error(err);
+      }
     }
 
     async function exportPdf() {

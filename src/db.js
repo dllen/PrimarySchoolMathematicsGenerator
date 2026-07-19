@@ -49,10 +49,15 @@ export async function getHistory() {
 }
 
 export async function addToLibrary(partial) {
-  return await db.problemLibrary.add({
-    createdAt: getFormattedTimestamp(),
-    ...JSON.parse(JSON.stringify(partial)),
-  });
+  try {
+    return await db.problemLibrary.add({
+      createdAt: getFormattedTimestamp(),
+      ...JSON.parse(JSON.stringify(partial)),
+    });
+  } catch (err) {
+    console.error('[db] Failed to add to library:', err);
+    throw new Error('题库保存失败');
+  }
 }
 
 export async function getFromLibrary(id) {
