@@ -1258,7 +1258,7 @@ export class ArithmeticStrategy extends ProblemGeneratorStrategy {
   generate(rng) {
     const r = this.inner.generate();
     return {
-      question: r.question,
+      question: r.expression,
       answer: String(r.answer),
       subtype: `arithmetic-${this.config.problemType}`,
       payload: {},
