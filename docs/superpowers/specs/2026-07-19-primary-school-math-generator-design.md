@@ -13,7 +13,7 @@
 ### 1.2 范围内（IN）
 
 - **配置筛选**：年级、学期、题型（多选）、难度、知识点
-- **题型**：算术题（已有 + 知识点筛选）、应用题（基础 2-3 模板）、奥数题（基础 1-2 模板）
+- **题型**：算术题（已有 + 知识点筛选）、应用题（基础 3 模板）、奥数题（基础 2 模板）
 - **题量**：1-100 自定义，沿用现有
 - **答案配置**：隐藏 / 题目后 / 单独页
 - **题库**：IndexedDB（Dexie）持久化，即时生成 + 缓存入库
@@ -106,8 +106,8 @@ src/
 
 **互斥规则**：
 - `questionTypes` 包含 `arithmetic` 时，`problemType` 生效
-- `composition` 缺省时，按 `questionTypes` 顺序均分 `problemCount`
-- `grade`/`semester` 主要影响应用题与奥数题的可用模板选择
+- `composition` 缺省时，按 `questionTypes` 顺序均分 `problemCount`（余数分配给第一个选中的题型）
+- `grade`/`semester` 对算术题无效；仅影响应用题与奥数题的模板可用性
 
 ## 四、题库 Schema（Dexie）
 
@@ -149,10 +149,10 @@ db.version(2).stores({
 
 **抽题流程**：
 
-1. 按 `(grade, semester, type, difficulty?)` 在 `problemLibrary` 查询
-2. 若库中不足 → 触发即时生成 → 写入库（`source: 'generated'`）
-3. 去重：基于 `question` 字符串 hash 维护 Set
-4. 仍不足 → 放宽容错（跨年级或跨难度）
+1. 按 `(grade, semester, type, difficulty?)` 在 `problemLibrary` 查询候选
+2. 若候选不足目标数 → 触发即时生成补足 → 写入库（`source: 'generated'`）
+3. 去重：基于 `question` 字符串 hash 维护 Set，避免同一次生成内重复
+4. 三次重试后仍不足 → 放宽 `difficulty`（±1）继续查询；若仍不足则按当前已找到的数量返回并 UI 提示
 
 ## 五、策略模式扩展
 
@@ -346,7 +346,7 @@ export function usePdfExport() {
 ### 7.5 移动端行为
 
 - 保留现有"下载图片"按钮
-- 移动端 PDF 导出降级为图片（避免内存溢出），或提示用分享功能
+- 移动端 PDF 导出降级路径：检测 `isMobile === true` 时仅展示图片下载与分享入口，PDF 按钮禁用并显示 tooltip "请在桌面端导出 PDF"
 
 ## 八、测试与质量门禁
 
