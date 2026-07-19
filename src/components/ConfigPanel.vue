@@ -11,16 +11,6 @@
           @input="update('problemCount', Number($event.target.value))"
         />
       </div>
-      <div class="config-item">
-        <label>计算项个数：</label>
-        <select
-          :value="config.termCount"
-          :disabled="!config.questionTypes.includes('arithmetic')"
-          @change="update('termCount', Number($event.target.value))"
-        >
-          <option v-for="n in [2,3,4]" :key="n" :value="n">{{ n }}项</option>
-        </select>
-      </div>
     </div>
 
     <div class="config-row">
@@ -39,7 +29,33 @@
       />
     </div>
 
-    <div v-if="config.questionTypes.includes('arithmetic')" class="config-row">
+    <div class="config-row">
+      <DifficultyPicker
+        :model-value="config.difficulty"
+        @update:model-value="update('difficulty', $event)"
+      />
+    </div>
+
+    <div class="config-row">
+      <AnswerModePicker
+        :model-value="config.answerMode"
+        @update:model-value="update('answerMode', $event)"
+      />
+    </div>
+
+    <div v-if="arithmeticSelected" class="config-row">
+      <div class="config-item">
+        <label>计算项个数：</label>
+        <select
+          :value="config.termCount"
+          @change="update('termCount', Number($event.target.value))"
+        >
+          <option v-for="n in [2,3,4]" :key="n" :value="n">{{ n }}项</option>
+        </select>
+      </div>
+    </div>
+
+    <div v-if="arithmeticSelected" class="config-row">
       <div class="config-item">
         <label>运算类型：</label>
         <div class="checkbox-group">
@@ -71,24 +87,10 @@
     </div>
 
     <div class="config-row">
-      <DifficultyPicker
-        :model-value="config.difficulty"
-        @update:model-value="update('difficulty', $event)"
-      />
-    </div>
-
-    <div class="config-row">
       <KnowledgePointPicker
         :model-value="config.knowledgePoints"
         :grade="config.grade"
         @update:model-value="update('knowledgePoints', $event)"
-      />
-    </div>
-
-    <div class="config-row">
-      <AnswerModePicker
-        :model-value="config.answerMode"
-        @update:model-value="update('answerMode', $event)"
       />
     </div>
 
@@ -108,6 +110,9 @@ import DifficultyPicker from './config/DifficultyPicker.vue';
 import KnowledgePointPicker from './config/KnowledgePointPicker.vue';
 import AnswerModePicker from './config/AnswerModePicker.vue';
 import CompositionEditor from './config/CompositionEditor.vue';
+import { computed } from 'vue';
+
+const arithmeticSelected = computed(() => props.config.questionTypes.includes('arithmetic'));
 
 const props = defineProps({
   config: { type: Object, required: true },
