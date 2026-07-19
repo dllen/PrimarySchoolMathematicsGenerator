@@ -129,13 +129,19 @@ export class ProblemGeneratorContext {
    */
   getCurrentStrategyType() {
     if (!this.strategy) return null;
-    
+
     if (this.strategy instanceof ResultProblemStrategy) {
       return 'result';
     } else if (this.strategy instanceof OperandProblemStrategy) {
       return 'operand';
+    } else if (this.strategy instanceof ArithmeticStrategy) {
+      return 'arithmetic';
+    } else if (this.strategy instanceof ApplicationStrategy) {
+      return 'application';
+    } else if (this.strategy instanceof OlympiadStrategy) {
+      return 'olympiad';
     }
-    
+
     return null;
   }
 }
