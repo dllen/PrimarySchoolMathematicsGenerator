@@ -77,6 +77,9 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div v-if="arithmeticSelected" class="config-row">
       <div class="config-item">
         <label>题目子类：</label>
         <select :value="config.problemType" @change="update('problemType', $event.target.value)">
