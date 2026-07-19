@@ -509,6 +509,16 @@ body {
   }
 }
 
+.print-root.export-mode .print-only {
+  display: flex !important;
+}
+
+.worksheet-header .info-row.print-only {
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 14px;
+}
+
 /* === Print styles for MVP+扩展 === */
 @page {
   size: A4;
