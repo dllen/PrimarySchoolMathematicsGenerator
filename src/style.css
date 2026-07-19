@@ -514,3 +514,32 @@ body {
     padding: 12px;
   }
 }
+
+/* === Print styles for MVP+扩展 === */
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+  .config-panel,
+  .action-bar,
+  .header-actions,
+  .history-list,
+  .picker-row,
+  .config-row {
+    display: none !important;
+  }
+  body.print-with-answer .answer-page {
+    display: block !important;
+  }
+  body.print-without-answer .answer-page {
+    display: none !important;
+  }
+  .problem-item {
+    break-inside: avoid;
+  }
+}
