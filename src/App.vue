@@ -150,6 +150,17 @@ export default {
       success('已应用预设配置', `题目数量: ${presetConfig.problemCount || 20} 题`);
     }
 
+    // 删除自定义预设
+    function handlePresetDelete(presetId) {
+      const deleted = deleteCustomPreset(presetId);
+      if (deleted) {
+        success('删除成功', '预设已删除');
+        refreshHistory(); // 刷新历史记录以反映变化
+      } else {
+        error('删除失败', '预设不存在或无法删除');
+      }
+    }
+
     const generator = useProblemGenerator();
     const pdf = usePdfExport();
     const printer = usePrint();
