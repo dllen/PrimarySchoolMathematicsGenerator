@@ -26,8 +26,8 @@ export async function addProblemSet(problems, config) {
   try {
     await db.problemSets.add({
       timestamp: getFormattedTimestamp(),
-      config,
-      problems,
+      config: JSON.parse(JSON.stringify(config)),
+      problems: JSON.parse(JSON.stringify(problems)),
     });
     const count = await db.problemSets.count();
     if (count > 20) {
