@@ -16,6 +16,13 @@
 - **计算项个数**：2–4 项运算，支持复合运算
 - **运算类型**：加法(+) / 减法(-) / 乘法(×) / 除法(÷)，可任意组合
 
+### 🧭 配置向导（v1.1.0+）
+
+- **3步配置流程**：基础 → 题型 → 高级，降低首次使用门槛
+- **智能默认值**：预置最优配置，新手也能快速开始
+- **一键重生成**：记住上次配置，下次打开直接生成
+- **配置持久化**：自动保存到本地，刷新不丢失
+
 ### 📝 题目类型
 
 - **算术题 — 求结果**：给出完整算式，求计算结果
@@ -36,10 +43,13 @@
 
 - **答案切换**：一键显示/隐藏答案，方便教学和自测
 - **响应式设计**：适配桌面和移动设备
+- **Toast 通知**：友好的操作反馈，替代原生弹窗
 - **三种导出方式**：
   - **桌面端 PDF**：通过 html2pdf.js 一键导出 A4 试卷
   - **移动端图片**：通过 html2canvas-pro 输出高清 PNG
   - **Web Share**：移动端可分享到微信/QQ 等应用
+- **自动降级**：导出失败时自动降级（PDF → 图片），确保用户总能获取内容
+- **操作确认**：删除历史记录前有二次确认，防止误操作
 
 ### 🖨️ 打印功能
 
@@ -80,17 +90,37 @@ npm run dev
 
 ## 📖 使用指南
 
-### 基本操作
+### 快速开始（3步生成）
 
-1. **配置参数**：年级、学期、题型、难度、知识点、答案模式等
-2. **生成题目**：点击"生成题目"按钮，系统按配置生成练习题
-3. **查看答案**：
-   - 「不显示」：默认，仅题目
-   - 「题目后显示」：答案紧随每题
-   - 「单独答案页」：答案在另一页
-4. **打印 / 导出**：
-   - 桌面端：点击「打印题目」调用浏览器打印，或「导出 PDF」生成 A4 PDF
-   - 移动端：点击「下载图片」保存 PNG，或「分享题目」调用 Web Share API
+1. **基础配置**：选择年级、学期、题目数量
+2. **选择题型**：算术题/应用题/奥数题（可多选）
+3. **高级设置**：难度、答案模式等（可选，默认中等难度）
+4. 点击「生成 XX 题」即可获得练习卷
+
+### 高级功能
+
+- **一键重生成**：页面会记住上次配置，下次打开直接点击「一键生成」
+- **高级配置模式**：点击「高级配置」可切换到完整参数面板
+- **配置预设**：支持自定义配置模板（v1.2.0+）
+- **批量导出**：一次生成多份试卷（v1.2.0+）
+
+### 打印 / 导出
+
+- **桌面端**：
+  - 点击「打印题目」调用浏览器打印（自动隐藏配置面板）
+  - 点击「导出 PDF」生成 A4 格式 PDF 文件
+  - 若 PDF 导出失败，系统自动降级为 PNG 图片
+- **移动端**：
+  - 点击「下载图片」保存高清 PNG
+  - 点击「分享题目」调用系统分享功能
+  - 若浏览器不支持分享，自动降级为下载图片
+
+### 历史记录
+
+- **自动保存**：最近 20 份试卷自动保存
+- **查看详情**：点击「查看」回顾历史试卷
+- **复用配置**：一键使用历史配置生成新试卷
+- **删除试卷**：点击「删除」需二次确认
 
 ### 智能算法
 
@@ -156,9 +186,15 @@ PrimarySchoolMathematicsGenerator/
 │   │   ├── useProblemLibrary.js      #   题库 CRUD 封装
 │   │   ├── useProblemGenerator.js    #   多类型编排 + 去重 + 缓存入库
 │   │   ├── usePdfExport.js           #   html2pdf.js 封装
-│   │   └── usePrint.js               #   window.print 封装
+│   │   ├── usePrint.js               #   window.print 封装
+│   │   ├── useToast.js               #   Toast 通知系统
+│   │   ├── useConfigWizard.js        #   配置向导状态管理
+│   │   └── usePreloadedLibrary.js    #   预加载题库管理
 │   └── components/                   # Vue 组件
 │       ├── ConfigPanel.vue           #   配置面板聚合
+│       ├── ConfigWizard.vue          #   3步配置向导
+│       ├── ConfirmDialog.vue         #   确认对话框
+│       ├── ToastContainer.vue        #   Toast 通知容器
 │       ├── ActionBar.vue             #   操作按钮栏
 │       ├── ProblemGrid.vue           #   题目网格
 │       ├── AnswerPage.vue            #   答案单独页
@@ -198,6 +234,34 @@ PrimarySchoolMathematicsGenerator/
    注意：默认 `cypress.config.js` baseUrl 是 `http://localhost:5000`，可通过 `CYPRESS_baseUrl` 环境变量覆盖。
 5. **提交 & PR**：`git commit -m "feat: ..."` 后推送并创建 PR
 
+### 新增功能开发
+
+#### Toast 通知系统
+
+```javascript
+// 在组件中使用
+import { useToast } from './composables/useToast.js';
+
+const { success, error, warning, info } = useToast();
+
+// 示例
+success('操作成功', '详细信息');
+error('操作失败', '错误原因');
+warning('警告', '注意事项');
+info('提示', '一般信息');
+```
+
+#### 配置向导
+
+```javascript
+import { useConfigWizard } from './composables/useConfigWizard.js';
+
+const { state, nextStep, prevStep, saveConfig, getConfigSummary } = useConfigWizard();
+
+// state.config 包含当前配置
+// state.step 为当前步骤 (1-3)
+```
+
 ### 测试
 
 #### 单元测试（Vitest）
@@ -221,6 +285,8 @@ PrimarySchoolMathematicsGenerator/
 - **Vue 组件**：使用 `<script setup>` + scoped 样式
 - **不修改既有策略**：扩展功能时优先包装（`ArithmeticStrategy` 包装 `Result/OperandProblemStrategy`），不破坏现有契约
 - **Dexie 写入前必须 `JSON.parse(JSON.stringify(...))`**：Vue Proxy 对象无法 `structuredClone`，会被 IndexedDB 静默丢弃
+- **Toast 使用**：用户操作反馈必须通过 `useToast()`，禁止使用 `alert()`
+- **错误处理**：异步操作必须 try-catch，失败时调用 `error/toast`
 
 ### 调试技巧
 
