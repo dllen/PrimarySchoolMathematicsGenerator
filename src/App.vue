@@ -98,6 +98,7 @@ import PresetManager from './components/PresetManager.vue';
 import { useProblemGenerator } from './composables/useProblemGenerator.js';
 import { usePdfExport } from './composables/usePdfExport.js';
 import { usePrint } from './composables/usePrint.js';
+import { useToast } from './composables/useToast.js';
 import { addProblemSet, getHistory, db } from './db.js';
 import { deleteCustomPreset } from './constants/presets.js';
 
