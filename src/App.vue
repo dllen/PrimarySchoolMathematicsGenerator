@@ -231,9 +231,7 @@ export default {
 </script>
 
 <style scoped>
-.container { max-width: 960px; margin: 0 auto; padding: 16px; }
 .header { display: flex; flex-direction: column; gap: 4px; }
-.print-root { padding: 16px 0; }
 .worksheet-header { text-align: center; margin-bottom: 12px; }
 .worksheet-header h3 { margin: 0; }
 .worksheet-header p { color: #666; margin: 4px 0; }

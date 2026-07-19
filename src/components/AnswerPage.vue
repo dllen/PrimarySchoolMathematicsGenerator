@@ -28,7 +28,6 @@ defineProps({
 }
 .answer-grid {
   display: grid;
-  grid-template-columns: repeat(var(--cols, 4), 1fr);
   gap: 8px 24px;
 }
 .answer-item { display: flex; gap: 6px; font-size: 14px; }

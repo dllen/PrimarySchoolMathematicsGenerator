@@ -36,7 +36,7 @@ defineEmits(['generate', 'export-pdf', 'print', 'share', 'show-history']);
 </script>
 
 <style scoped>
-.action-bar { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.action-bar { display: flex; gap: 8px; flex-wrap: wrap; }
 .btn { padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: #fff; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-primary { background: #1976d2; color: #fff; border-color: #1976d2; }
