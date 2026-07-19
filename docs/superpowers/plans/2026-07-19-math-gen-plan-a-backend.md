@@ -156,16 +156,16 @@ describe('knowledgePoints', () => {
     expect(KNOWLEDGE_POINTS_BY_GRADE['2']).toContain('表内乘法');
   });
 
-  it('grade 3 contains 分数', () => {
-    expect(KNOWLEDGE_POINTS_BY_GRADE['3']).toContain('分数');
+  it('grade 3 contains 分数初步', () => {
+    expect(KNOWLEDGE_POINTS_BY_GRADE['3']).toContain('分数初步');
   });
 
-  it('grade 4 contains 小数', () => {
-    expect(KNOWLEDGE_POINTS_BY_GRADE['4']).toContain('小数');
+  it('grade 4 contains 小数初步', () => {
+    expect(KNOWLEDGE_POINTS_BY_GRADE['4']).toContain('小数初步');
   });
 
-  it('grade 5 contains 方程', () => {
-    expect(KNOWLEDGE_POINTS_BY_GRADE['5']).toContain('方程');
+  it('grade 5 contains 简易方程', () => {
+    expect(KNOWLEDGE_POINTS_BY_GRADE['5']).toContain('简易方程');
   });
 
   it('grade 6 contains 几何图形', () => {
@@ -893,8 +893,8 @@ describe('logicTemplate', () => {
 
   it('total equals sum of items', () => {
     const r = logicTemplate.generate(createRng(11), 1);
-    expect(r.payload.total).toBe(r.payload.a + r.payload.b + r.payload.c);
-    expect(r.answer).toBe(`${r.payload.total}`);
+    expect(r.payload.total).toBe(r.payload.a + r.payload.b - r.payload.c);
+    expect(r.answer).toBe(`${r.payload.total}支`);
     expect(r.subtype).toBe('logic');
     expect(r.question).toContain('一共');
   });
@@ -930,12 +930,12 @@ export const logicTemplate = {
     const a = rng.int(2, 5 + difficulty * 3);
     const b = rng.int(2, 5 + difficulty * 3);
     const c = rng.int(2, 5 + difficulty * 3);
-    const total = a + b + c;
+    const total = a + b - c;
     return {
       question: `小华有${a}支笔，又得到${b}支，后来送给同学${c}支，现在一共有几支笔？`,
-      answer: `${total - c}支`,
+      answer: `${total}支`,
       subtype: 'logic',
-      payload: { a, b, c, total: total - c },
+      payload: { a, b, c, total },
     };
   },
 };
@@ -1258,7 +1258,7 @@ export class ArithmeticStrategy extends ProblemGeneratorStrategy {
   generate(rng) {
     const r = this.inner.generate();
     return {
-      question: r.question,
+      question: r.expression,
       answer: String(r.answer),
       subtype: `arithmetic-${this.config.problemType}`,
       payload: {},
@@ -1595,7 +1595,7 @@ function buildComposition(config) {
   return out;
 }
 
-async function generateOne(rng, type, config) {
+async function generateOne(type, config, rng) {
   const factory = ProblemGeneratorFactory.createStrategy;
   const innerConfig = { ...config };
   if (type === 'arithmetic' && !innerConfig.problemType) {
@@ -1610,7 +1610,7 @@ export function useProblemGenerator() {
 
   async function generate(config) {
     const composition = buildComposition(config);
-    const rng = createRng();
+    let rngCounter = 0;
     const seen = new Set();
     const results = [];
 
@@ -1620,8 +1620,11 @@ export function useProblemGenerator() {
       let produced = 0;
       while (produced < count && attempts < count * 5) {
         attempts++;
+        // Per-call unique seed: Date.now() default collides within same ms
+        const seed = Math.floor(Math.random() * 1e9) + (++rngCounter);
+        const rng = createRng(seed);
         try {
-          const p = await generateOne(rng, type, config);
+          const p = await generateOne(type, config, rng);
           if (seen.has(p.question)) continue;
           seen.add(p.question);
           results.push({

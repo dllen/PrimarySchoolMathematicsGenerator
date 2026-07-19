@@ -1,5 +1,8 @@
 import { OperandProblemStrategy } from './OperandProblemStrategy.js';
 import { ResultProblemStrategy } from './ResultProblemStrategy.js';
+import { ArithmeticStrategy } from './ArithmeticStrategy.js';
+import { ApplicationStrategy } from './ApplicationStrategy.js';
+import { OlympiadStrategy } from './OlympiadStrategy.js';
 
 /**
  * 题目生成器工厂类
@@ -18,6 +21,12 @@ export class ProblemGeneratorFactory {
         return new ResultProblemStrategy(config);
       case 'operand':
         return new OperandProblemStrategy(config);
+      case 'arithmetic':
+        return new ArithmeticStrategy(config);
+      case 'application':
+        return new ApplicationStrategy(config);
+      case 'olympiad':
+        return new OlympiadStrategy(config);
       default:
         throw new Error(`不支持的题目类型: ${type}`);
     }
@@ -28,7 +37,7 @@ export class ProblemGeneratorFactory {
    * @returns {Array} 支持的题目类型数组
    */
   static getSupportedTypes() {
-    return ['result', 'operand'];
+    return ['result', 'operand', 'arithmetic', 'application', 'olympiad'];
   }
 
   /**
@@ -120,13 +129,19 @@ export class ProblemGeneratorContext {
    */
   getCurrentStrategyType() {
     if (!this.strategy) return null;
-    
+
     if (this.strategy instanceof ResultProblemStrategy) {
       return 'result';
     } else if (this.strategy instanceof OperandProblemStrategy) {
       return 'operand';
+    } else if (this.strategy instanceof ArithmeticStrategy) {
+      return 'arithmetic';
+    } else if (this.strategy instanceof ApplicationStrategy) {
+      return 'application';
+    } else if (this.strategy instanceof OlympiadStrategy) {
+      return 'olympiad';
     }
-    
+
     return null;
   }
 }

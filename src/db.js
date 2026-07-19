@@ -1,13 +1,16 @@
-
 import Dexie from 'dexie';
 
-// 1. Create and configure the database
 export const db = new Dexie('MathProblemsHistory');
+
 db.version(1).stores({
-  problemSets: '++id, timestamp', // Primary key auto-increments, index timestamp for sorting
+  problemSets: '++id, timestamp',
 });
 
-// 2. Format timestamp helper function
+db.version(2).stores({
+  problemSets: '++id, timestamp',
+  problemLibrary: '++id, [grade+semester+type], type, grade, semester, difficulty, *knowledgePoints',
+});
+
 function getFormattedTimestamp() {
   const date = new Date();
   const YYYY = date.getFullYear();
@@ -19,37 +22,60 @@ function getFormattedTimestamp() {
   return `${YYYY}-${MM}-${DD} ${HH}:${mm}:${ss}`;
 }
 
-// 3. Add a new problem set and manage history limit
 export async function addProblemSet(problems, config) {
   try {
-    // Add the new set
     await db.problemSets.add({
       timestamp: getFormattedTimestamp(),
-      config: config,
-      problems: problems,
+      config: JSON.parse(JSON.stringify(config)),
+      problems: JSON.parse(JSON.stringify(problems)),
     });
-
-    // Check the count and enforce the 20-record limit
     const count = await db.problemSets.count();
     if (count > 20) {
-      // If count is over 20, find the oldest record by timestamp and delete it
       const oldest = await db.problemSets.orderBy('timestamp').first();
-      if (oldest) {
-        await db.problemSets.delete(oldest.id);
-      }
+      if (oldest) await db.problemSets.delete(oldest.id);
     }
   } catch (error) {
-    console.error("Failed to add or prune problem sets:", error);
+    console.error('Failed to add or prune problem sets:', error);
   }
 }
 
-// 4. Retrieve all historical problem sets, sorted by newest first
 export async function getHistory() {
   try {
-    // Order by 'timestamp' in reverse to get newest first
     return await db.problemSets.orderBy('timestamp').reverse().toArray();
   } catch (error) {
-    console.error("Failed to get history:", error);
-    return []; // Return an empty array on failure
+    console.error('Failed to get history:', error);
+    return [];
   }
+}
+
+export async function addToLibrary(partial) {
+  return await db.problemLibrary.add({
+    createdAt: getFormattedTimestamp(),
+    ...JSON.parse(JSON.stringify(partial)),
+  });
+}
+
+export async function getFromLibrary(id) {
+  return await db.problemLibrary.get(id);
+}
+
+export async function queryLibrary({ grade, semester, type, difficulty, knowledgePoints }) {
+  let collection = db.problemLibrary
+    .where('[grade+semester+type]')
+    .equals([grade, semester, type]);
+
+  if (difficulty !== undefined) {
+    collection = collection.and((p) => p.difficulty === difficulty);
+  }
+  if (Array.isArray(knowledgePoints) && knowledgePoints.length > 0) {
+    collection = collection.and((p) =>
+      knowledgePoints.every((kp) => p.knowledgePoints.includes(kp))
+    );
+  }
+
+  return await collection.toArray();
+}
+
+export async function removeFromLibrary(id) {
+  return await db.problemLibrary.delete(id);
 }
