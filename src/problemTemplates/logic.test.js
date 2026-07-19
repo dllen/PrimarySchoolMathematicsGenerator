@@ -24,4 +24,12 @@ describe('logicTemplate', () => {
       expect(r.payload.c).toBeGreaterThan(0);
     }
   });
+
+  it('total is always positive (c < a+b)', () => {
+    for (let s = 0; s < 50; s++) {
+      const r = logicTemplate.generate(createRng(s), 3);
+      expect(r.payload.total).toBeGreaterThan(0);
+      expect(r.payload.c).toBeLessThan(r.payload.a + r.payload.b);
+    }
+  });
 });
