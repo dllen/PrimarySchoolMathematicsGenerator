@@ -85,6 +85,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import ConfigPanel from './components/ConfigPanel.vue';
+import ConfigWizard from './components/ConfigWizard.vue';
 import ActionBar from './components/ActionBar.vue';
 import ProblemGrid from './components/ProblemGrid.vue';
 import AnswerPage from './components/AnswerPage.vue';
