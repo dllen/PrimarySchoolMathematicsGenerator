@@ -45,12 +45,6 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install --omit=optional --include=dev --no-audit --no-fund --no-package-lock
 
-      - name: Verify installation
-        run: |
-          echo "Checking vitest..."
-          test -x node_modules/.bin/vitest && echo "✓ vitest binary exists" || echo "✗ vitest binary missing"
-          npx vitest --version
-
       - name: Run tests
         run: npx vitest run
 
