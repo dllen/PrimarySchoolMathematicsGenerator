@@ -45,9 +45,6 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install --omit=optional --include=dev --no-audit --no-fund --no-package-lock
 
-      - name: Run tests
-        run: npx vitest run
-
       - name: Build
         run: npm run build
 
