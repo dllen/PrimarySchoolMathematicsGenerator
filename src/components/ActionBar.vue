@@ -2,26 +2,11 @@
   <div class="action-bar">
     <button class="btn btn-primary" @click="$emit('generate')">生成题目</button>
     <button
-      class="btn btn-secondary desktop-only"
-      :disabled="!problems.length || isMobile"
-      :title="isMobile ? '请在桌面端导出 PDF' : ''"
-      @click="$emit('export-pdf')"
-    >
-      导出 PDF
-    </button>
-    <button
       class="btn btn-secondary"
-      :disabled="!problems.length"
-      @click="$emit('print')"
+      :disabled="!problems.length || exporting"
+      @click="$emit('export')"
     >
-      {{ isMobile ? '下载图片' : '打印题目' }}
-    </button>
-    <button
-      v-if="isMobile && problems.length"
-      class="btn btn-secondary"
-      @click="$emit('share')"
-    >
-      分享题目
+      {{ exporting ? '生成中...' : '导出' }}
     </button>
     <button class="btn btn-link" @click="$emit('show-history')">查看历史</button>
   </div>
@@ -31,8 +16,9 @@
 defineProps({
   problems: { type: Array, required: true },
   isMobile: { type: Boolean, default: false },
+  exporting: { type: Boolean, default: false }
 });
-defineEmits(['generate', 'export-pdf', 'print', 'share', 'show-history']);
+defineEmits(['generate', 'export', 'show-history']);
 </script>
 
 <style scoped>
