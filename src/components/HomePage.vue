@@ -53,20 +53,20 @@
 </template>
 
 <script setup>
-import { defineEmits } from 'vue';
+import { useRouter } from 'vue-router'
 
-const emit = defineEmits(['navigate']);
+const router = useRouter()
 
 function goToQuickStart() {
-  emit('navigate', 'quick-start');
+  router.push('/quick-start')
 }
 
 function goToGenerator() {
-  emit('navigate', 'generator');
+  router.push('/generator')
 }
 
 function goToHistory() {
-  emit('navigate', 'history');
+  router.push('/history')
 }
 </script>
 
