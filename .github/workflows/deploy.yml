@@ -25,9 +25,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Clear npm cache
-        run: npm cache clean --force
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -35,8 +32,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package.json
 
-      - name: Install dependencies (force include devDependencies)
-        run: npm install --include=dev --no-optional
+      - name: Clean install dependencies
+        run: |
+          rm -rf node_modules
+          npm install
 
       - name: List installed packages
         run: npm ls --depth=0
