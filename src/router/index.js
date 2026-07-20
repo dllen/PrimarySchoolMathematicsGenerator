@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import HomePage from '../components/HomePage.vue'
 
 // 动态导入视图组件
@@ -36,7 +36,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes,
   // 滚动行为：切换路由时滚动到顶部
   scrollBehavior(to, from, savedPosition) {
