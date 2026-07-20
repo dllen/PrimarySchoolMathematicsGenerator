@@ -43,7 +43,7 @@ jobs:
       - name: Clean install dependencies
         run: |
           rm -rf node_modules package-lock.json
-          npm install --omit=optional --include=dev --no-audit --no-fund
+          npm install --omit=optional --include=dev --no-audit --no-fund --no-package-lock
 
       - name: Verify installation
         run: |
