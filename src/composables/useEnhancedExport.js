@@ -3,9 +3,10 @@ import { usePdfExport } from './usePdfExport'
 import { usePrint } from './usePrint'
 import { useToast } from './useToast'
 import { useExportEnv } from './useExportEnv'
+import { EXPORT_ERRORS, getExportError } from '../constants/exportErrors.js'
 
 export function useEnhancedExport() {
-  const { exportPdfWithTimeout } = usePdfExport()
+  const { exportPdf, exportPdfWithTimeout } = usePdfExport()
   const { print } = usePrint()
   const { success, error, warning, info } = useToast()
   const { env } = useExportEnv()
@@ -20,12 +21,24 @@ export function useEnhancedExport() {
    * 根据环境自动选择最佳方案
    */
   async function smartExport(config) {
+    if (!config?.element) {
+      error('导出失败', '未找到要导出的内容')
+      return
+    }
+
     exporting.value = true
 
     try {
-      // 微信浏览器：直接走图片模式
+      // 微信浏览器
       if (env.value.browser === 'wechat') {
-        info('正在生成图片', '微信环境使用图片模式')
+        info('正在生成图片', '请稍候...')
+        await exportAsImage(config)
+        return
+      }
+
+      // 移动端
+      if (env.value.platform === 'mobile') {
+        info('正在生成图片', '请稍候...')
         await exportAsImage(config)
         return
       }
@@ -33,22 +46,25 @@ export function useEnhancedExport() {
       // 桌面端：优先 PDF
       if (env.value.platform === 'desktop') {
         try {
-          info('正在生成 PDF', '桌面端优先使用 PDF 模式')
+          info('正在生成 PDF', '请稍候...')
           await exportAsPdf(config)
           return
         } catch (err) {
-          warning('PDF 导出失败', '正在尝试图片模式...')
+          const errorInfo = getExportError(err)
+          warning(errorInfo.title, errorInfo.message)
+          info('正在切换到图片模式', '请稍候...')
           await exportAsImage(config)
           return
         }
       }
 
-      // 其他移动端：图片模式
-      info('正在生成图片', '移动端使用图片模式')
+      // 默认：图片模式
       await exportAsImage(config)
 
     } catch (err) {
-      error('导出失败', err.message)
+      const errorInfo = getExportError(err)
+      console.error('Export error:', err)
+      error(errorInfo.title, errorInfo.message)
     } finally {
       exporting.value = false
     }
@@ -58,19 +74,29 @@ export function useEnhancedExport() {
    * 导出为 PDF（桌面端优先）
    */
   async function exportAsPdf(config) {
-    const filename = buildFilename(config)
+    const { config: pdfConfig = {} } = config
+    const filename = buildFilename(pdfConfig)
+
+    // 超时控制
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error('PDF 生成超时，请重试'))
+      }, 30000)
+    })
+
+    const exportPromise = exportPdf(config.element, filename)
 
     try {
-      // 使用带超时控制的 PDF 导出
-      const blob = await exportPdfWithTimeout(config.element, filename, 30000)
+      const blob = await Promise.race([exportPromise, timeoutPromise])
 
-      // 成功：展示预览
       const url = URL.createObjectURL(blob)
       showPreview('pdf', { url, filename, blob })
       success('PDF 生成成功', filename)
 
     } catch (err) {
-      throw err
+      const errorInfo = getExportError(err)
+      console.error('PDF export failed:', err)
+      throw new Error(errorInfo.message)
     }
   }
 
@@ -78,45 +104,79 @@ export function useEnhancedExport() {
    * 导出为图片（移动端/微信优先）
    */
   async function exportAsImage(config) {
-    const html2canvas = (await import('html2canvas-pro')).default
-    const element = config.element
+    try {
+      const { element } = config
+      const html2canvas = (await import('html2canvas-pro')).default
 
-    // 根据环境调整 scale
-    const scale = env.value.platform === 'mobile'
-      ? window.devicePixelRatio * 2.5
-      : window.devicePixelRatio * 3
+      // 根据环境调整 scale
+      const isMobileEnv = env.value.platform === 'mobile'
+      const scale = isMobileEnv
+        ? Math.min(window.devicePixelRatio * 2.5, 3)
+        : window.devicePixelRatio * 3
 
-    // Canvas 配置
-    const canvas = await html2canvas(element, {
-      scale,
-      useCORS: true,
-      allowTaint: false,
-      logging: false,
-      width: element.scrollWidth,
-      height: element.scrollHeight,
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight
-    })
+      // Canvas 配置
+      const canvas = await html2canvas(element, {
+        scale,
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
+        width: element.scrollWidth,
+        height: element.scrollHeight,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
+      })
 
-    // 转换为 Blob
-    const blob = await new Promise(resolve => {
-      canvas.toBlob(resolve, 'image/png', 0.95)
-    })
+      // 转换为 Blob
+      const blob = await new Promise((resolve, reject) => {
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob)
+            } else {
+              reject(new Error('图片生成失败'))
+            }
+          },
+          'image/png',
+          0.95
+        )
+      })
 
-    const url = URL.createObjectURL(blob)
-    const filename = buildImageFilename(config)
+      const filename = buildImageFilename(config.config || {})
+      const url = URL.createObjectURL(blob)
 
-    // 显示预览（微信/移动端必须预览，桌面端可选）
-    if (env.value.platform === 'mobile') {
-      showPreview('image', { url, filename, blob })
-    } else {
-      // 桌面端：尝试自动下载，失败则预览
-      try {
-        downloadBlob(blob, filename)
-        success('图片已保存', filename)
-      } catch (err) {
+      // 显示预览
+      if (isMobileEnv || env.value.browser === 'wechat') {
         showPreview('image', { url, filename, blob })
+        info('图片已生成', '请长按图片保存到相册')
+      } else {
+        try {
+          downloadBlob(blob, filename)
+          success('图片已保存', filename)
+        } catch (err) {
+          showPreview('image', { url, filename, blob })
+          warning('下载失败', '请使用预览保存')
+        }
       }
+    } catch (err) {
+      // 获取错误信息
+      const errorInfo = getExportError(err)
+
+      // 内存不足检测
+      if (err.message.includes('memory') || err.code === 12) {
+        error(errorInfo.title, errorInfo.message)
+        return
+      }
+
+      // 跨域图片限制
+      if (err.message.includes('tainted') || err.message.includes('SecurityError')) {
+        error(errorInfo.title, errorInfo.message)
+        return
+      }
+
+      // 其他错误
+      console.error('Image export failed:', err)
+      error(errorInfo.title, errorInfo.message)
+      throw err
     }
   }
 
