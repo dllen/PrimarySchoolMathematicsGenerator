@@ -1,4 +1,10 @@
 
+/* CSS Variables */
+:root {
+  /* 打印布局变量 */
+  --print-columns: 3;  /* 默认 3 列 */
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -522,43 +528,167 @@ body {
 /* === Print styles for MVP+扩展 === */
 @page {
   size: A4;
-  margin: 12mm;
+  margin: 15mm;
+
+  /* 页眉页脚（仅 Firefox） */
+  @top-center {
+    content: "小学数学练习题";
+    font-size: 9pt;
+    color: #666;
+  }
+
+  @bottom-center {
+    content: "第 " counter(page) " 页，共 " counter(pages) " 页";
+    font-size: 9pt;
+    color: #666;
+  }
 }
 
 @media print {
-  body {
-    background: #fff !important;
+  /* 全局设置 */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
+
+  body {
+    background: white !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+    color: #000 !important;
+  }
+
+  /* 隐藏所有非打印元素 */
   .config-panel,
   .action-bar,
   .header-actions,
-  .history-list,
-  .picker-row,
-  .config-row {
+  .nav-header,
+  .back-btn,
+  button:not(.print-only),
+  .home-page,
+  .menu-grid,
+  .home-features {
     display: none !important;
-  }
-  body.print-with-answer .answer-page {
-    display: block !important;
-  }
-  body.print-without-answer .answer-page {
-    display: none !important;
-  }
-  .problem-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px 16px;
-  }
-  .answer-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  .problem-item {
-    break-inside: avoid;
   }
 
-  .worksheet-header .info-row {
+  /* 打印根容器 */
+  .print-root {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 题目网格 - 使用 CSS 变量控制列数 */
+  .problems-grid {
+    display: grid !important;
+    grid-template-columns: repeat(var(--print-columns, 3), 1fr) !important;
+    gap: 8px 12px !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* 题目项 */
+  .problem-item {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    border: 1px solid #333 !important;
+    padding: 6px 8px !important;
+    min-height: 50px !important;
+    font-size: 10pt !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* 答案网格 */
+  .answer-grid {
+    display: grid !important;
+    grid-template-columns: repeat(var(--print-columns, 3), 1fr) !important;
+    gap: 8px 12px !important;
+  }
+
+  .answer-item {
+    page-break-inside: avoid !important;
+  }
+
+  /* 防止孤行 */
+  p,
+  .problem-item {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* 标题不页末断行 */
+  h1, h2, h3, h4 {
+    page-break-after: avoid;
+  }
+
+  /* 工作表头部 */
+  .worksheet-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #000;
+  }
+
+  .worksheet-header h3 {
+    font-size: 18pt;
+    margin: 0 0 10px 0;
+  }
+
+  .info-row {
     display: flex !important;
     justify-content: space-between;
-    padding: 0 24px;
-    font-size: 14px;
+    padding: 0 20px;
+    font-size: 10pt;
     margin: 8px 0;
+  }
+
+  /* 图片和媒体 */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+}
+
+/* Chrome/Safari 页眉页脚模拟 */
+@media print and (prefers-color-scheme: light) {
+  body::before {
+    content: "小学数学练习题";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    text-align: center;
+    font-size: 9pt;
+    color: #666;
+  }
+
+  body::after {
+    content: "第 " counter(page) " 页";
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    text-align: center;
+    font-size: 9pt;
+    color: #666;
+  }
+}
+
+/* 高 DPI 打印优化 */
+@media print and (-webkit-min-device-pixel-ratio: 2) {
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* 墨水节省模式 */
+@media print and (prefers-color-scheme: dark) {
+  body {
+    background: white !important;
+    color: black !important;
   }
 }
