@@ -280,7 +280,7 @@ export default {
       config,
       problems,
       printRoot,
-      exporting: enhancedExport.exporting,
+      enhancedExport,
       showPresetManager,
       currentView,
       wizardState,
@@ -289,9 +289,7 @@ export default {
       handleWizardComplete,
       handlePresetDelete,
       handleExport,
-      handlePrint: enhancedExport.handlePrint,
-      handleShare,
-      ...enhancedExport
+      handleShare
     }
   },
 }
