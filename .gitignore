@@ -163,6 +163,7 @@ build/
 *.sln
 *.sw?
 
-package-lock.json
-pnpm-lock.yaml
-yarn.lock
+# Optional dependency lock files (uncomment if needed)
+# package-lock.json
+# pnpm-lock.yaml
+# yarn.lock
