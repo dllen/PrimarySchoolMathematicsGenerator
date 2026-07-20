@@ -103,6 +103,23 @@
       :problem-count="config.problemCount"
       @update:model-value="update('composition', $event)"
     />
+
+    <!-- 高级设置：打印布局 -->
+    <div class="config-row">
+      <div class="config-item">
+        <label>打印布局：</label>
+        <select
+          :value="config.export?.pdfColumns || 3"
+          @change="update('export', { ...config.export, pdfColumns: Number($event.target.value) })"
+          class="config-select"
+        >
+          <option :value="2">2 列（宽松）</option>
+          <option :value="3">3 列（标准）</option>
+          <option :value="4">4 列（紧凑）</option>
+        </select>
+        <small class="config-hint">导出 PDF 时的题目列数</small>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -153,4 +170,21 @@ function updateDigit(op, n) {
 .config-item { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .checkbox-group { display: inline-flex; gap: 8px; flex-wrap: wrap; }
 .checkbox-item { display: inline-flex; gap: 4px; align-items: center; }
+
+/* 配置选择器样式 */
+.config-select {
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  min-width: 150px;
+}
+
+.config-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #888;
+  font-weight: normal;
+}
 </style>

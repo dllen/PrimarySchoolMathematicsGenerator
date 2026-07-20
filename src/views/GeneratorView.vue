@@ -151,6 +151,12 @@ export default {
       knowledgePoints: [],
       answerMode: 'hidden',
       composition: { arithmetic: 0, application: 0, olympiad: 0 },
+
+      // 导出配置
+      export: {
+        pdfColumns: 3,  // PDF 列数：2 | 3 | 4
+        imageQuality: 'high'  // 图片质量：low | medium | high
+      }
     })
 
     // 应用预设配置
@@ -187,6 +193,10 @@ export default {
         warning('无法导出', '请先生成题目')
         return
       }
+
+      // 应用打印布局配置到 CSS 变量
+      const columns = config.value.export?.pdfColumns || 3;
+      document.documentElement.style.setProperty('--print-columns', columns);
 
       await enhancedExport.smartExport({
         element: printRoot.value,

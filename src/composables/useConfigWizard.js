@@ -17,6 +17,12 @@ const defaultConfig = {
   knowledgePoints: [],
   answerMode: 'hidden',
   composition: { arithmetic: 0, application: 0, olympiad: 0 },
+
+  // 导出配置
+  export: {
+    pdfColumns: 3,  // PDF 列数：2 | 3 | 4
+    imageQuality: 'high'  // 图片质量：low | medium | high
+  }
 };
 
 export function useConfigWizard() {

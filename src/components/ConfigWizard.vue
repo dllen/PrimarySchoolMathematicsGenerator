@@ -117,6 +117,21 @@
             <option value="separate">单独答案页</option>
           </select>
         </div>
+
+        <!-- 打印布局 -->
+        <div class="setting-item">
+          <label>打印布局：</label>
+          <select
+            :value="state.config.export?.pdfColumns || 3"
+            @change="updateConfig('export', { ...(state.config.export || {}), pdfColumns: Number($event.target.value) })"
+            class="config-select"
+          >
+            <option :value="2">2 列（宽松）</option>
+            <option :value="3">3 列（标准）</option>
+            <option :value="4">4 列（紧凑）</option>
+          </select>
+          <small class="config-hint">导出 PDF 时的题目列数</small>
+        </div>
       </div>
 
       <!-- Summary -->
@@ -465,6 +480,23 @@ function prevStep() {
 .config-summary li {
   margin-bottom: 8px;
   line-height: 1.6;
+}
+
+/* 配置选择器样式 */
+.config-select {
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  min-width: 150px;
+}
+
+.config-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #888;
+  font-weight: normal;
 }
 
 .wizard-nav {
