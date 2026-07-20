@@ -33,10 +33,10 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: package.json
 
       - name: Install dependencies (force include devDependencies)
-        run: npm ci --include=dev --no-optional
+        run: npm install --include=dev --no-optional
 
       - name: List installed packages
         run: npm ls --depth=0
