@@ -167,3 +167,6 @@ build/
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# Brainstorming scratch space (visual companion working files)
+.superpowers/
