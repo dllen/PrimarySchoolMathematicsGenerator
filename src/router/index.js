@@ -6,6 +6,7 @@ const GeneratorView = () => import('../views/GeneratorView.vue')
 const QuickStartView = () => import('../views/QuickStartView.vue')
 const HistoryView = () => import('../views/HistoryView.vue')
 const HistoryDetailView = () => import('../views/HistoryDetailView.vue')
+const AboutView = () => import('../views/AboutView.vue')
 
 const routes = [
   {
@@ -15,7 +16,11 @@ const routes = [
   },
   {
     path: '/generator',
-    name: 'Generator',
+    redirect: '/workbench'
+  },
+  {
+    path: '/workbench',
+    name: 'Workbench',
     component: GeneratorView
   },
   {
@@ -32,6 +37,16 @@ const routes = [
     path: '/history/:id',
     name: 'HistoryDetail',
     component: HistoryDetailView
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: AboutView
+  },
+  // Fallback: 未知路由重定向到首页
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
   }
 ]
 
