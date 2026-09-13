@@ -82,4 +82,85 @@ describe('usePdfExport', () => {
 
     document.body.removeChild(el);
   });
+
+  it('accepts options-bag signature with AbortSignal for cancellation', async () => {
+    const el = document.createElement('div');
+    el.textContent = '测试';
+    document.body.appendChild(el);
+
+    shouldHang = true;
+
+    const { exportPdfWithTimeout } = usePdfExport();
+    const controller = new AbortController();
+
+    vi.useFakeTimers();
+    const promise = exportPdfWithTimeout(el, 'test.pdf', {
+      timeoutMs: 10000,
+      signal: controller.signal,
+    });
+
+    // Cancel before timeout fires
+    controller.abort();
+    vi.advanceTimersByTime(0);
+
+    await expect(promise).rejects.toThrow('PDF 导出已取消');
+    vi.useRealTimers();
+
+    document.body.removeChild(el);
+  });
+
+  it('clears pending timeout on successful export (no leaked timer)', async () => {
+    const el = document.createElement('div');
+    el.textContent = '测试';
+    document.body.appendChild(el);
+
+    const { exportPdfWithTimeout } = usePdfExport();
+
+    vi.useFakeTimers();
+    try {
+      const pendingBefore = vi.getTimerCount();
+      await exportPdfWithTimeout(el, 'test.pdf', { timeoutMs: 30000 });
+      // After resolve, the 30s timeout must have been cleared.
+      // We can't get an exact delta cleanly because of microtask scheduling,
+      // but the count must be back to baseline.
+      const pendingAfter = vi.getTimerCount();
+      expect(pendingAfter).toBe(pendingBefore);
+    } finally {
+      vi.useRealTimers();
+    }
+
+    document.body.removeChild(el);
+  });
+
+  it('clears pending timeout on abort (no leaked timer)', async () => {
+    const el = document.createElement('div');
+    el.textContent = '测试';
+    document.body.appendChild(el);
+
+    shouldHang = true;
+
+    const { exportPdfWithTimeout } = usePdfExport();
+    const controller = new AbortController();
+
+    vi.useFakeTimers();
+    try {
+      const pendingBefore = vi.getTimerCount();
+      const promise = exportPdfWithTimeout(el, 'test.pdf', {
+        timeoutMs: 5000,
+        signal: controller.signal,
+      });
+
+      controller.abort();
+      vi.advanceTimersByTime(0);
+      await expect(promise).rejects.toThrow('PDF 导出已取消');
+
+      // Timer from the 5s timeout must be cleared on abort.
+      const pendingAfter = vi.getTimerCount();
+      expect(pendingAfter).toBe(pendingBefore);
+    } finally {
+      vi.useRealTimers();
+    }
+
+    document.body.removeChild(el);
+  });
 });
