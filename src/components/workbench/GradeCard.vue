@@ -3,7 +3,7 @@
     :variant="recommended ? 'ink' : 'paper'"
     interactive
     :selected="selected"
-    @click="$emit('select', grade)"
+    data-test="grade-card" @click="$emit('select', grade)"
   >
     <div class="flex items-start justify-between mb-2">
       <span

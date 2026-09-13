@@ -51,7 +51,7 @@
 
     <!-- 预览区(已选年级或已配置后显示) -->
     <section v-if="selectedGrade || showAdvanced">
-      <div ref="printRoot" class="print-root" :class="{ 'export-mode': enhancedExport.exporting }">
+      <div ref="printRoot" data-test="preview-root" class="print-root" :class="{ 'export-mode': enhancedExport.exporting }">
         <div class="worksheet-header">
           <h3>数学练习题</h3>
           <div class="info-row print-only">
@@ -75,7 +75,7 @@
       <ActionBar
         class="mt-6"
         :problems="problems"
-        :is-mobile="isMobile"
+        :isMobile="isMobile"
         :exporting="enhancedExport.exporting"
         @generate="generateProblems"
         @export="handleExport"
@@ -87,6 +87,7 @@
       :visible="enhancedExport.previewVisible"
       :type="enhancedExport.previewType"
       :preview-data="enhancedExport.previewData"
+      :isMobile="isMobile"
       :env="enhancedExport.env"
       @close="enhancedExport.closePreview"
       @save="enhancedExport.saveImage"
