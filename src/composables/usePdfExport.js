@@ -53,7 +53,9 @@ export function usePdfExport() {
 
     // 已经预先 abort,直接抛出
     if (signal?.aborted) {
-      throw new Error('PDF 导出已取消');
+      const err = new Error('PDF 导出已取消');
+      err.name = 'AbortError';
+      throw err;
     }
 
     let timeoutHandle;
@@ -79,7 +81,9 @@ export function usePdfExport() {
     const abortPromise = signal
       ? new Promise((_, reject) => {
           onAbort = () => {
-            reject(new Error('PDF 导出已取消'));
+            const err = new Error('PDF 导出已取消');
+            err.name = 'AbortError';
+            reject(err);
           };
           signal.addEventListener('abort', onAbort, { once: true });
         })

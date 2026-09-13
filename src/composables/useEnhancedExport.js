@@ -17,12 +17,34 @@ export function useEnhancedExport() {
   const previewData = ref(null)
 
   /**
-   * 主入口：智能导出
-   * 根据环境自动选择最佳方案
+   * 工具:若 AbortSignal 已 abort,直接抛错(避免发起不需要的工作)
    */
-  async function smartExport(config) {
+  function throwIfAborted(signal) {
+    if (signal?.aborted) {
+      const err = new Error('导出已取消')
+      err.name = 'AbortError'
+      throw err
+    }
+  }
+
+  /**
+   * 主入口:智能导出
+   * 根据环境自动选择最佳方案
+   *
+   * @param {object} config - { element, grade, semester, ... }
+   * @param {object} [options] - { signal?: AbortSignal, timeoutMs?: number }
+   */
+  async function smartExport(config, options = {}) {
     if (!config?.element) {
       error('导出失败', '未找到要导出的内容')
+      return
+    }
+
+    const { signal } = options
+    try {
+      throwIfAborted(signal)
+    } catch (err) {
+      // 调用前已 abort → 静默返回,不弹 toast
       return
     }
 
@@ -32,36 +54,44 @@ export function useEnhancedExport() {
       // 微信浏览器
       if (env.value.browser === 'wechat') {
         info('正在生成图片', '请稍候...')
-        await exportAsImage(config)
+        await exportAsImage(config, options)
         return
       }
 
       // 移动端
       if (env.value.platform === 'mobile') {
         info('正在生成图片', '请稍候...')
-        await exportAsImage(config)
+        await exportAsImage(config, options)
         return
       }
 
-      // 桌面端：优先 PDF
+      // 桌面端:优先 PDF
       if (env.value.platform === 'desktop') {
         try {
           info('正在生成 PDF', '请稍候...')
-          await exportAsPdf(config)
+          await exportAsPdf(config, options)
           return
         } catch (err) {
+          // 调用方主动取消 → 直接抛,不降级
+          if (err.name === 'AbortError') {
+            throw err
+          }
           const errorInfo = getExportError(err)
           warning(errorInfo.title, errorInfo.message)
           info('正在切换到图片模式', '请稍候...')
-          await exportAsImage(config)
+          await exportAsImage(config, options)
           return
         }
       }
 
-      // 默认：图片模式
-      await exportAsImage(config)
+      // 默认:图片模式
+      await exportAsImage(config, options)
 
     } catch (err) {
+      // AbortError 不弹错误 toast(用户主动取消)
+      if (err.name === 'AbortError') {
+        return
+      }
       const errorInfo = getExportError(err)
       console.error('Export error:', err)
       error(errorInfo.title, errorInfo.message)
@@ -71,29 +101,30 @@ export function useEnhancedExport() {
   }
 
   /**
-   * 导出为 PDF（桌面端优先）
+   * 导出为 PDF(桌面端优先)
+   *
+   * @param {object} config
+   * @param {object} [options] - { signal?, timeoutMs? } 透传给 exportPdfWithTimeout
    */
-  async function exportAsPdf(config) {
+  async function exportAsPdf(config, options = {}) {
     const { config: pdfConfig = {} } = config
     const filename = buildFilename(pdfConfig)
 
-    // 超时控制
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => {
-        reject(new Error('PDF 生成超时，请重试'))
-      }, 30000)
-    })
-
-    const exportPromise = exportPdf(config.element, filename)
-
     try {
-      const blob = await Promise.race([exportPromise, timeoutPromise])
+      // 复用 usePdfExport 中已加固的 exportPdfWithTimeout,
+      // 自动获得 AbortSignal 支持 + clearTimeout 防泄漏。
+      const blob = await exportPdfWithTimeout(config.element, filename, options)
 
       const url = URL.createObjectURL(blob)
       showPreview('pdf', { url, filename, blob })
       success('PDF 生成成功', filename)
+      return blob
 
     } catch (err) {
+      // AbortError 透传,不在此层包装错误信息
+      if (err.name === 'AbortError') {
+        throw err
+      }
       const errorInfo = getExportError(err)
       console.error('PDF export failed:', err)
       throw new Error(errorInfo.message)
@@ -101,10 +132,18 @@ export function useEnhancedExport() {
   }
 
   /**
-   * 导出为图片（移动端/微信优先）
+   * 导出为图片(移动端/微信优先)
+   *
+   * @param {object} config
+   * @param {object} [options] - { signal? } 用于在 html2canvas 后检查取消
+   *   (html2canvas-pro 当前不直接支持 AbortSignal,故采用开始/结束后双检查)
    */
-  async function exportAsImage(config) {
+  async function exportAsImage(config, options = {}) {
+    const { signal } = options
+
     try {
+      throwIfAborted(signal)
+
       const { element } = config
       const html2canvas = (await import('html2canvas-pro')).default
 
@@ -125,6 +164,9 @@ export function useEnhancedExport() {
         windowWidth: element.scrollWidth,
         windowHeight: element.scrollHeight
       })
+
+      // 渲染完成后再次检查 signal — 如果中途用户取消,跳过 toBlob/预览
+      throwIfAborted(signal)
 
       // 转换为 Blob
       const blob = await new Promise((resolve, reject) => {
@@ -158,6 +200,10 @@ export function useEnhancedExport() {
         }
       }
     } catch (err) {
+      if (err.name === 'AbortError') {
+        throw err
+      }
+
       // 获取错误信息
       const errorInfo = getExportError(err)
 
@@ -201,18 +247,18 @@ export function useEnhancedExport() {
   }
 
   /**
-   * 保存图片（兼容所有环境）
+   * 保存图片(兼容所有环境)
    */
   function saveImage() {
     const { url, blob, filename } = previewData.value
 
     if (env.value.browser === 'wechat' || env.value.platform === 'mobile') {
-      // 微信/移动端：无法直接下载，提示用户长按
+      // 微信/移动端:无法直接下载,提示用户长按
       warning('请长按图片保存', '长按上方图片 → 保存到相册')
       return
     }
 
-    // 桌面端：直接下载
+    // 桌面端:直接下载
     downloadBlob(blob, filename)
     success('图片已保存')
   }

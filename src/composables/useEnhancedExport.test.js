@@ -265,3 +265,107 @@ describe('useEnhancedExport', () => {
     })
   })
 })
+
+// 在 vi.mock 工厂外预先创建 mock 函数,使各测试可通过引用配置返回值
+const {
+  mockExportPdfWithTimeout,
+  mockExportPdf,
+} = vi.hoisted(() => ({
+  mockExportPdfWithTimeout: vi.fn(),
+  mockExportPdf: vi.fn(),
+}))
+
+// 覆盖文件顶部对 usePdfExport 的 mock,使 exportPdfWithTimeout / exportPdf
+// 指向各测试可独立配置的 vi.fn()
+vi.mock('./usePdfExport', () => ({
+  usePdfExport: () => ({
+    exportPdf: mockExportPdf,
+    exportPdfWithTimeout: mockExportPdfWithTimeout,
+    buildFilename: vi.fn(({ grade, semester }) =>
+      `数学练习题_${grade}年级${semester || ''}.pdf`
+    ),
+  }),
+}))
+
+describe('AbortSignal support', () => {
+  beforeEach(() => {
+    mockExportPdfWithTimeout.mockReset()
+    mockExportPdf.mockReset()
+  })
+
+  it('smartExport 接受 options 并把 signal 透传给 exportPdfWithTimeout', async () => {
+    const { useEnhancedExport } = await import('./useEnhancedExport.js')
+    const { smartExport } = useEnhancedExport()
+
+    const controller = new AbortController()
+    mockExportPdfWithTimeout.mockResolvedValue(
+      new Blob(['mock'], { type: 'application/pdf' })
+    )
+
+    await smartExport(
+      { element: document.createElement('div'), grade: 3, semester: '上' },
+      { signal: controller.signal }
+    )
+
+    expect(mockExportPdfWithTimeout).toHaveBeenCalledTimes(1)
+    const opts = mockExportPdfWithTimeout.mock.calls[0][2]
+    expect(opts.signal).toBe(controller.signal)
+  })
+
+  it('smartExport 在调用前已 abort 时直接返回,不调用 exportPdfWithTimeout', async () => {
+    const { useEnhancedExport } = await import('./useEnhancedExport.js')
+    const { smartExport, exporting } = useEnhancedExport()
+
+    const controller = new AbortController()
+    controller.abort()
+
+    await smartExport(
+      { element: document.createElement('div'), grade: 3 },
+      { signal: controller.signal }
+    )
+
+    expect(mockExportPdfWithTimeout).not.toHaveBeenCalled()
+    expect(exporting.value).toBe(false)
+  })
+
+  it('exportAsPdf 把 signal + timeoutMs 透传给 exportPdfWithTimeout', async () => {
+    const { useEnhancedExport } = await import('./useEnhancedExport.js')
+    const { exportAsPdf } = useEnhancedExport()
+
+    const controller = new AbortController()
+    mockExportPdfWithTimeout.mockResolvedValue(
+      new Blob(['mock'], { type: 'application/pdf' })
+    )
+
+    await exportAsPdf(
+      { element: document.createElement('div'), grade: 3, semester: '上' },
+      { signal: controller.signal, timeoutMs: 5000 }
+    )
+
+    expect(mockExportPdfWithTimeout).toHaveBeenCalledWith(
+      expect.any(HTMLElement),
+      expect.stringContaining('数学练习题'),
+      expect.objectContaining({ signal: controller.signal, timeoutMs: 5000 })
+    )
+  })
+
+  it('exportAsPdf 透传 abort 错误并不再触发降级', async () => {
+    const { useEnhancedExport } = await import('./useEnhancedExport.js')
+    const { exportAsPdf } = useEnhancedExport()
+
+    const controller = new AbortController()
+    const abortError = new Error('PDF 导出已取消')
+    abortError.name = 'AbortError'
+    mockExportPdfWithTimeout.mockImplementation((_el, _fn, opts) => {
+      expect(opts.signal).toBe(controller.signal)
+      return Promise.reject(abortError)
+    })
+
+    await expect(
+      exportAsPdf(
+        { element: document.createElement('div'), grade: 3 },
+        { signal: controller.signal }
+      )
+    ).rejects.toThrow('PDF 导出已取消')
+  })
+})
