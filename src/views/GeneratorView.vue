@@ -86,7 +86,8 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
+import { useBreakpoint } from '../composables/useBreakpoint.js'
 import ConfigPanel from '../components/ConfigPanel.vue'
 import ConfigWizard from '../components/ConfigWizard.vue'
 import ActionBar from '../components/ActionBar.vue'
@@ -115,7 +116,6 @@ export default {
   },
   setup() {
     const today = new Date().toISOString().slice(0, 10)
-    const isMobile = ref(false)
     const problems = ref([])
     const printRoot = ref(null)
     const showPresetManager = ref(false)
@@ -187,6 +187,18 @@ export default {
     const enhancedExport = useEnhancedExport()
     const { success, error, warning, info, showToast } = useToast()
 
+    // 替换 UA 嗅探为响应式断点(支持 SSR + 旋转屏幕 + DevTools 切换)
+    const { isMobile, isTablet, isDesktop } = useBreakpoint()
+
+    // 每次导出会创建一个新 AbortController:
+    //   - 组件卸载(onBeforeUnmount)时 abort → 取消挂起的 PDF 生成
+    //   - 用户点"导出"未完成时离开页面,不会留下泄漏的 setTimeout / worker
+    const exportController = ref(new AbortController())
+    function resetExportController() {
+      exportController.value.abort() // 旧的 abort(若有)
+      exportController.value = new AbortController()
+    }
+
     // 导出处理函数
     async function handleExport() {
       if (!printRoot.value) {
@@ -198,21 +210,24 @@ export default {
       const columns = config.value.export?.pdfColumns || 3;
       document.documentElement.style.setProperty('--print-columns', columns);
 
-      await enhancedExport.smartExport({
-        element: printRoot.value,
-        config: config.value
-      })
+      // 每次导出用新 controller;若上次还没完成,旧的会被 abort 掉
+      resetExportController()
+
+      await enhancedExport.smartExport(
+        {
+          element: printRoot.value,
+          config: config.value
+        },
+        { signal: exportController.value.signal }
+      )
     }
 
-    function detectMobile() {
-      const ua = navigator.userAgent
-      if (/Mobi|Android|iPhone/i.test(ua)) return true
-      if (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform)) return true
-      return false
-    }
-
-    onMounted(() => {
-      isMobile.value = detectMobile()
+    // 组件卸载时主动取消挂起的导出,防止:
+    //   - html2canvas 仍在跑的 worker 句柄泄漏
+    //   - setTimeout 句柄泄漏(usePdfExport 的超时定时器)
+    //   - PDF 已生成但组件已销毁,后续回调触发 "set state on unmounted component"
+    onBeforeUnmount(() => {
+      exportController.value.abort()
     })
 
     async function refreshHistory() {
@@ -277,6 +292,9 @@ export default {
     return {
       today,
       isMobile,
+      isTablet,
+      isDesktop,
+      exportController,
       config,
       problems,
       printRoot,
