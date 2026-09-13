@@ -1,47 +1,62 @@
 <template>
-  <div class="history-detail-view">
+  <div class="container-content pt-6 pb-16">
+    <!-- 加载状态 -->
+    <div v-if="loading" class="text-center py-16">
+      <p class="text-ink-faint">加载中...</p>
+    </div>
+
+    <!-- 未找到 -->
+    <div v-else-if="!item" class="text-center py-16">
+      <p class="text-ink-faint mb-4">未找到该试卷</p>
+      <BaseButton variant="ember" @click="$router.push('/history')">
+        返回历史
+      </BaseButton>
+    </div>
+
+    <!-- 试卷详情 -->
     <HistoryDetail
-      :item="selectedHistory"
+      v-else
+      :item="item"
       @back="$router.push('/history')"
+      @regenerate="handleRegenerate"
     />
   </div>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { BaseButton } from '../components/base'
 import HistoryDetail from '../components/HistoryDetail.vue'
-import { getHistory } from '../db.js'
+import { getProblemSet } from '../db.js'
 
 export default {
   name: 'HistoryDetailView',
-  components: {
-    HistoryDetail
-  },
+  components: { BaseButton, HistoryDetail },
   setup() {
     const route = useRoute()
-    const selectedHistory = ref(null)
+    const router = useRouter()
+    const item = ref(null)
+    const loading = ref(true)
 
-    async function loadHistoryDetail() {
-      const history = await getHistory()
-      selectedHistory.value = history.find(item => item.id === parseInt(route.params.id))
+    async function loadDetail() {
+      loading.value = true
+      item.value = await getProblemSet(parseInt(route.params.id))
+      loading.value = false
+    }
+
+    function handleRegenerate() {
+      // 带着原配置跳工作台重新生成
+      if (item.value?.config) {
+        router.push({ path: '/workbench', query: { fromHistory: '1' } })
+      }
     }
 
     onMounted(() => {
-      loadHistoryDetail()
+      loadDetail()
     })
 
-    return {
-      selectedHistory,
-    }
+    return { item, loading, handleRegenerate }
   },
 }
 </script>
-
-<style scoped>
-.history-detail-view {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-</style>

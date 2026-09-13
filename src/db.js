@@ -48,6 +48,15 @@ export async function getHistory() {
   }
 }
 
+export async function getProblemSet(id) {
+  try {
+    return await db.problemSets.get(id);
+  } catch (error) {
+    console.error('Failed to get problem set:', error);
+    return null;
+  }
+}
+
 export async function addToLibrary(partial) {
   try {
     return await db.problemLibrary.add({
