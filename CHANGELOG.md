@@ -1,5 +1,34 @@
 # Changelog
 
+## [3.0.0] - 2026-09-13
+
+### 视觉升级
+- 全新温暖编辑感设计系统（米白 / 深棕 / 暖橙 / Lora + 霞鹜文楷）
+- 引入 Tailwind CSS + 设计 token 基础设施
+- 7 个 Base 组件 + 完整组件库升级
+
+### 信息架构
+- 新增工作台（Hero + 6 卡片）
+- 新增关于页（/about）
+- 旧路由 /generator 与 /quick-start 重定向到 /workbench（向后兼容）
+
+### 移动端
+- 全新移动端布局（汉堡菜单 + sticky 底部按钮 + 大触控目标）
+- 单栏 / 2 列卡片网格响应式适配
+- 触控目标 ≥ 44px
+
+### 组件升级
+- ConfigPanel / ConfigWizard / PresetSelector / PresetManager 全面 Tailwind 化
+- ActionBar / ExportPreview / ConfirmDialog / ToastContainer 暖色调升级
+- HistoryView 卡片列表化
+- HistoryDetailView 元信息卡片化 + 移动端可折叠
+
+### 性能 / 可访问性
+- 字体 font-display: swap
+- Cypress E2E 测试覆盖工作台 + 移动端 sheet
+- 打印样式适配（题目网格断行控制）
+
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

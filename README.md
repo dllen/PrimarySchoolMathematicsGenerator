@@ -361,8 +361,8 @@ npm run preview
 
 - **SPA 路由**：基于 Vue Router 4 的单页应用
   - 首页：`/`
-  - 快速开始：`/quick-start`
-  - 生成题目：`/generator`
+  - 快速开始：`/workbench`（原 /quick-start 重定向）
+  - 生成题目：`/workbench`（原 /generator 重定向）
   - 历史记录：`/history`
   - 历史详情：`/history/:id`
 - **Base 路径**：非根域名部署需修改 `vite.config.js` 中的 `base`
