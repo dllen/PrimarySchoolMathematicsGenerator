@@ -2,6 +2,7 @@
   <button
     :type="type"
     :disabled="disabled"
+    :aria-disabled="String(disabled)"
     :class="buttonClasses"
     @click="$emit('click', $event)"
   >
