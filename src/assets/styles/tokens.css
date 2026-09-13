@@ -1,0 +1,78 @@
+/* ============================================
+ * Design Tokens — PrimarySchoolMathematicsGenerator
+ * Paper-warm palette + Lora / LXGW WenKai TC
+ * Source of truth: docs/superpowers/specs/2026-09-12-math-gen-ui-redesign-design.md §3
+ * ============================================ */
+
+:root {
+  /* === 颜色 === */
+  --color-bg-paper:        #FAF7F2;
+  --color-bg-card:         #FFFCF7;
+  --color-ink-deep:        #2B1F1A;
+  --color-ink-muted:       #6B5D4F;
+  --color-ink-faint:       #8A7A6A;
+  --color-rule-soft:       #E8DFD2;
+  --color-rule-softer:     #EAE0D0;
+  --color-accent-ember:    #C2410C;
+  --color-accent-ember-hover: #9A3412;
+  --color-success:         #15803D;
+  --color-warning:         #B45309;
+  --color-error:           #B91C1C;
+
+  /* === 字体 === */
+  --font-display:  'Lora', 'LXGW WenKai TC', 'Songti SC', Georgia, serif;
+  --font-body:     'Lora', 'LXGW WenKai TC', 'Songti SC', Georgia, serif;
+  --font-mono:     ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* === 字号 === */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+
+  /* === 字重 === */
+  --weight-regular: 400;
+  --weight-medium: 600;
+  --weight-bold: 700;
+
+  /* === 行高 === */
+  --leading-tight: 1.2;
+  --leading-snug: 1.4;
+  --leading-base: 1.6;
+  --leading-loose: 1.8;
+
+  /* === 间距 === */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* === 圆角 === */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-pill: 9999px;
+
+  /* === 阴影 === */
+  --shadow-soft: 0 1px 2px rgba(43, 31, 26, 0.06);
+  --shadow-medium: 0 2px 6px rgba(43, 31, 26, 0.08);
+  --shadow-large: 0 8px 24px rgba(43, 31, 26, 0.10);
+
+  /* === 容器 === */
+  --container-max: 960px;
+  --container-narrow: 720px;
+
+  /* === 断点 (用于 JS) === */
+  --bp-mobile: 640px;
+  --bp-tablet: 768px;
+  --bp-desktop: 1024px;
+}
