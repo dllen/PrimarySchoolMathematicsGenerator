@@ -1,81 +1,119 @@
 <template>
-  <div class="config-wizard">
-    <!-- Progress indicator -->
-    <div class="wizard-progress">
+  <div class="bg-paper-card border border-rule-soft rounded-lg p-5 space-y-6">
+    <!-- 步骤指示器 -->
+    <div class="flex items-center justify-between relative">
+      <div class="absolute inset-x-6 top-4 h-0.5 bg-rule-soft -z-0 hidden md:block" />
       <div
         v-for="s in [1, 2, 3]"
         :key="s"
-        :class="['step-indicator', { active: state.step >= s, current: state.step === s }]"
+        class="flex flex-col items-center gap-1.5 relative z-10"
       >
-        <span class="step-number">{{ s }}</span>
-        <span class="step-label">{{ stepNames[s] }}</span>
+        <div
+          class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200"
+          :class="state.step > s
+            ? 'bg-ember text-paper-card'
+            : state.step === s
+              ? 'bg-ember text-paper-card ring-4 ring-ember/20'
+              : 'bg-rule-soft text-ink-muted'"
+        >
+          <span v-if="state.step > s">✓</span>
+          <span v-else>{{ s }}</span>
+        </div>
+        <span
+          class="text-xs font-medium whitespace-nowrap"
+          :class="state.step >= s ? 'text-ember' : 'text-ink-faint'"
+        >
+          {{ stepNames[s] }}
+        </span>
       </div>
     </div>
 
-    <!-- Step 1: Basic Config -->
-    <div v-if="state.step === 1" class="wizard-step">
-      <h3>选择年级</h3>
-      <div class="grade-selector">
-        <button
-          v-for="g in ['1', '2', '3', '4', '5', '6']"
-          :key="g"
-          :class="['grade-btn', { active: state.config.grade === g }]"
-          @click="updateConfig('grade', g)"
-        >
-          {{ g }}年级
-        </button>
+    <!-- Step 1: 基础配置 -->
+    <div v-if="state.step === 1" class="space-y-5">
+      <div>
+        <p class="text-sm font-medium text-ink-deep mb-2.5">选择年级</p>
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="g in ['1','2','3','4','5','6']"
+            :key="g"
+            class="px-4 py-2 rounded-md text-sm font-medium border-2 transition-all duration-150"
+            :class="state.config.grade === g
+              ? 'border-ember bg-ember text-paper-card'
+              : 'border-rule-soft text-ink-muted hover:border-ember hover:text-ember'"
+            @click="updateConfig('grade', g)"
+          >
+            {{ g }}年级
+          </button>
+        </div>
       </div>
 
-      <div class="semester-selector">
-        <label>学期：</label>
-        <button
-          :class="['semester-btn', { active: state.config.semester === '上' }]"
-          @click="updateConfig('semester', '上')"
-        >
-          上册
-        </button>
-        <button
-          :class="['semester-btn', { active: state.config.semester === '下' }]"
-          @click="updateConfig('semester', '下')"
-        >
-          下册
-        </button>
+      <div>
+        <p class="text-sm font-medium text-ink-deep mb-2">学期</p>
+        <div class="flex gap-2">
+          <button
+            v-for="s in ['上', '下']"
+            :key="s"
+            class="px-4 py-2 rounded-md text-sm font-medium border-2 transition-all duration-150"
+            :class="state.config.semester === s
+              ? 'border-ember bg-ember text-paper-card'
+              : 'border-rule-soft text-ink-muted hover:border-ember hover:text-ember'"
+            @click="updateConfig('semester', s)"
+          >
+            {{ s }}册
+          </button>
+        </div>
       </div>
 
-      <div class="count-selector">
-        <label>题目数量：{{ state.config.problemCount }} 题</label>
+      <div>
+        <p class="text-sm font-medium text-ink-deep mb-2">
+          题目数量：<span class="text-ember font-semibold">{{ state.config.problemCount }}</span> 题
+        </p>
         <input
           type="range"
           :value="state.config.problemCount"
           min="10"
           max="100"
           step="10"
+          class="w-full accent-ember h-2 bg-rule-soft rounded-lg appearance-none cursor-pointer"
           @input="updateConfig('problemCount', Number($event.target.value))"
         />
+        <div class="flex justify-between text-xs text-ink-faint mt-1">
+          <span>10 题</span><span>100 题</span>
+        </div>
       </div>
     </div>
 
-    <!-- Step 2: Question Types -->
-    <div v-if="state.step === 2" class="wizard-step">
-      <h3>选择题型</h3>
-      <div class="type-selector">
-        <label v-for="type in questionTypes" :key="type.value" class="type-checkbox">
+    <!-- Step 2: 题型选择 -->
+    <div v-if="state.step === 2" class="space-y-4">
+      <p class="text-sm font-medium text-ink-deep">选择题型</p>
+      <div class="space-y-2">
+        <label
+          v-for="type in questionTypes"
+          :key="type.value"
+          class="flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all duration-150"
+          :class="state.config.questionTypes.includes(type.value)
+            ? 'border-ember bg-ember/5'
+            : 'border-rule-soft hover:border-ember/50'"
+        >
           <input
             type="checkbox"
             :value="type.value"
             :checked="state.config.questionTypes.includes(type.value)"
+            class="mt-0.5 accent-ember"
             @change="toggleQuestionType(type.value)"
           />
-          <span class="type-label">{{ type.label }}</span>
-          <span class="type-desc">{{ type.description }}</span>
+          <div>
+            <p class="text-sm font-medium text-ink-deep">{{ type.label }}</p>
+            <p class="text-xs text-ink-muted mt-0.5">{{ type.description }}</p>
+          </div>
         </label>
       </div>
 
-      <!-- Arithmetic subtype -->
-      <div v-if="arithmeticSelected" class="subtype-selector">
-        <label>算术题类型：</label>
+      <div v-if="arithmeticSelected" class="p-4 bg-rule-softer rounded-lg">
+        <p class="text-sm font-medium text-ink-deep mb-2">算术题类型</p>
         <select
           :value="state.config.problemType"
+          class="w-full bg-paper-card border border-rule-soft rounded-md px-3 py-2.5 text-base text-ink-deep focus:border-ember focus:outline-none min-h-[44px]"
           @change="updateConfig('problemType', $event.target.value)"
         >
           <option value="result">求结果（如 25 + 37 = ?）</option>
@@ -84,21 +122,27 @@
       </div>
     </div>
 
-    <!-- Step 3: Advanced Config (collapsible) -->
-    <div v-if="state.step === 3" class="wizard-step">
-      <div class="section-header" @click="advancedExpanded = !advancedExpanded">
-        <h3>高级设置</h3>
-        <span class="toggle-icon">{{ advancedExpanded ? '▼' : '▶' }}</span>
-      </div>
+    <!-- Step 3: 高级设置 -->
+    <div v-if="state.step === 3" class="space-y-5">
+      <button
+        class="flex items-center justify-between w-full text-left"
+        @click="advancedExpanded = !advancedExpanded"
+      >
+        <p class="text-sm font-medium text-ink-deep">高级设置</p>
+        <span class="text-ink-faint text-xs">{{ advancedExpanded ? '收起 ∧' : '展开 ∨' }}</span>
+      </button>
 
-      <div v-show="advancedExpanded" class="advanced-settings">
-        <div class="setting-item">
-          <label>难度：</label>
-          <div class="difficulty-btns">
+      <div v-show="advancedExpanded" class="space-y-5">
+        <div>
+          <p class="text-sm font-medium text-ink-deep mb-2">难度</p>
+          <div class="flex gap-2">
             <button
               v-for="d in difficulties"
               :key="d.value"
-              :class="['diff-btn', { active: state.config.difficulty === d.value }]"
+              class="px-4 py-2 rounded-md text-sm font-medium border-2 transition-all duration-150"
+              :class="state.config.difficulty === d.value
+                ? 'border-ember bg-ember text-paper-card'
+                : 'border-rule-soft text-ink-muted hover:border-ember hover:text-ember'"
               @click="updateConfig('difficulty', d.value)"
             >
               {{ d.label }}
@@ -106,10 +150,11 @@
           </div>
         </div>
 
-        <div class="setting-item">
-          <label>答案模式：</label>
+        <div>
+          <p class="text-sm font-medium text-ink-deep mb-2">答案模式</p>
           <select
             :value="state.config.answerMode"
+            class="w-full bg-paper-card border border-rule-soft rounded-md px-3 py-2.5 text-base text-ink-deep focus:border-ember focus:outline-none min-h-[44px]"
             @change="updateConfig('answerMode', $event.target.value)"
           >
             <option value="hidden">不显示</option>
@@ -118,449 +163,164 @@
           </select>
         </div>
 
-        <!-- 打印布局 -->
-        <div class="setting-item">
-          <label>打印布局：</label>
+        <div>
+          <p class="text-sm font-medium text-ink-deep mb-2">打印布局</p>
           <select
             :value="state.config.export?.pdfColumns || 3"
+            class="w-full bg-paper-card border border-rule-soft rounded-md px-3 py-2.5 text-base text-ink-deep focus:border-ember focus:outline-none min-h-[44px]"
             @change="updateConfig('export', { ...(state.config.export || {}), pdfColumns: Number($event.target.value) })"
-            class="config-select"
           >
             <option :value="2">2 列（宽松）</option>
             <option :value="3">3 列（标准）</option>
             <option :value="4">4 列（紧凑）</option>
           </select>
-          <small class="config-hint">导出 PDF 时的题目列数</small>
         </div>
       </div>
 
-      <!-- Summary -->
-      <div class="config-summary">
-        <h4>配置摘要</h4>
-        <ul>
-          <li><strong>年级：</strong>{{ getConfigSummary().grade }}</li>
-          <li><strong>题型：</strong>{{ getConfigSummary().type }}</li>
-          <li><strong>数量：</strong>{{ getConfigSummary().count }}</li>
-          <li><strong>难度：</strong>{{ getConfigSummary().difficulty }}</li>
-        </ul>
+      <!-- 配置摘要 -->
+      <div class="p-4 bg-ember/5 border border-ember/20 rounded-lg space-y-1.5">
+        <p class="text-sm font-semibold text-ember mb-2">配置摘要</p>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-1">
+          <p v-for="(val, key) in getConfigSummary()" :key="key" class="text-sm text-ink-muted">
+            <span class="text-ink-deep font-medium">{{ val.label }}：</span>{{ val.value }}
+          </p>
+        </div>
       </div>
     </div>
 
-    <!-- Navigation -->
-    <div class="wizard-nav">
-      <button v-if="state.step > 1" class="btn-secondary" @click="prevStep">
-        上一步
-      </button>
-      <button v-if="state.step < state.totalSteps" class="btn-primary" @click="nextStep">
-        下一步
-      </button>
-      <button v-if="state.step === state.totalSteps" class="btn-primary" @click="$emit('complete')">
-        生成 {{ state.config.problemCount }} 题
-      </button>
+    <!-- 导航按钮 -->
+    <div class="flex justify-between items-center pt-2 border-t border-rule-soft">
+      <BaseButton
+        v-if="state.step > 1"
+        variant="ghost"
+        size="sm"
+        @click="prevStep"
+      >
+        ← 上一步
+      </BaseButton>
+      <div v-else />
+      <BaseButton
+        v-if="state.step < state.totalSteps"
+        variant="ember"
+        size="sm"
+        @click="nextStep"
+      >
+        下一步 →
+      </BaseButton>
+      <BaseButton
+        v-else
+        variant="ember"
+        size="sm"
+        @click="handleFinish"
+      >
+        完成并生成 →
+      </BaseButton>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { useConfigWizard } from '../composables/useConfigWizard.js';
-
-const props = defineProps({
-  modelValue: { type: Object, required: true },
-});
-
-const emit = defineEmits(['update:modelValue', 'complete']);
-
-const {
-  state,
-  arithmeticSelected,
-  nextStep: wizardNextStep,
-  prevStep: wizardPrevStep,
-  saveConfig,
-  getConfigSummary,
-} = useConfigWizard();
-
-const advancedExpanded = ref(false);
+<script>
+import { ref, computed, reactive } from 'vue'
+import { BaseButton } from './base'
 
 const questionTypes = [
-  { value: 'arithmetic', label: '算术题', description: '加减乘除' },
-  { value: 'application', label: '应用题', description: '购物/时间/比较' },
-  { value: 'olympiad', label: '奥数题', description: '逻辑思维' },
-];
+  { value: 'arithmetic', label: '算术', description: '基础四则混合运算' },
+  { value: 'application', label: '应用题', description: '文字描述的实际问题' },
+  { value: 'olympiad', label: '奥数', description: '拓展思维题' },
+]
 
 const difficulties = [
   { value: 'easy', label: '简单' },
   { value: 'medium', label: '中等' },
   { value: 'hard', label: '困难' },
-];
+]
 
-const stepNames = {
-  1: '基础',
-  2: '题型',
-  3: '高级',
-};
+export default {
+  name: 'ConfigWizard',
+  components: { BaseButton },
+  emits: ['apply'],
+  setup(props, { emit }) {
+    const state = reactive({
+      step: 1,
+      totalSteps: 3,
+      config: {
+        grade: '3',
+        semester: '上',
+        problemCount: 20,
+        difficulty: 'medium',
+        questionTypes: ['arithmetic'],
+        operations: { add: true, subtract: true, multiply: false, divide: false },
+        answerMode: 'hidden',
+        problemType: 'result',
+        export: { pdfColumns: 3 },
+      },
+    })
+    const advancedExpanded = ref(false)
+    const stepNames = { 1: '基础', 2: '题型', 3: '高级' }
 
-function updateConfig(key, value) {
-  state.config[key] = value;
-  emit('update:modelValue', { ...state.config });
-}
+    const arithmeticSelected = computed(() =>
+      state.config.questionTypes.includes('arithmetic')
+    )
 
-function toggleQuestionType(type) {
-  const current = state.config.questionTypes;
-  const index = current.indexOf(type);
+    function updateConfig(key, value) {
+      state.config[key] = value
+    }
 
-  if (index === -1) {
-    current.push(type);
-  } else {
-    current.splice(index, 1);
-  }
+    function toggleQuestionType(type) {
+      const idx = state.config.questionTypes.indexOf(type)
+      if (idx >= 0) {
+        state.config.questionTypes.splice(idx, 1)
+      } else {
+        state.config.questionTypes.push(type)
+      }
+      if (!state.config.questionTypes.includes('arithmetic')) {
+        state.config.operations = { add: false, subtract: false, multiply: false, divide: false }
+      } else if (
+        !state.config.operations.add &&
+        !state.config.operations.subtract &&
+        !state.config.operations.multiply &&
+        !state.config.operations.divide
+      ) {
+        state.config.operations = { add: true, subtract: true, multiply: false, divide: false }
+      }
+    }
 
-  emit('update:modelValue', { ...state.config });
-}
+    function getConfigSummary() {
+      const gradeMap = { 1: '一年级', 2: '二年级', 3: '三年级', 4: '四年级', 5: '五年级', 6: '六年级' }
+      return {
+        grade: { label: '年级', value: `${gradeMap[state.config.grade] || state.config.grade} ${state.config.semester}册` },
+        count: { label: '题数', value: `${state.config.problemCount} 题` },
+        types: { label: '题型', value: state.config.questionTypes.map(t => questionTypes.find(q => q.value === t)?.label || t).join('、') || '—' },
+        difficulty: { label: '难度', value: difficulties.find(d => d.value === state.config.difficulty)?.label || '—' },
+      }
+    }
 
-function getTypeLabel(type) {
-  const found = questionTypes.find(t => t.value === type);
-  return found ? found.label : type;
-}
+    function nextStep() {
+      if (state.step < state.totalSteps) state.step++
+    }
 
-function nextStep() {
-  if (state.step < state.totalSteps) {
-    state.step++;
-    saveConfig();
-  }
-}
+    function prevStep() {
+      if (state.step > 1) state.step--
+    }
 
-function prevStep() {
-  if (state.step > 1) {
-    state.step--;
-  }
+    function handleFinish() {
+      emit('apply', { ...state.config })
+    }
+
+    return {
+      state,
+      advancedExpanded,
+      stepNames,
+      questionTypes,
+      difficulties,
+      arithmeticSelected,
+      updateConfig,
+      toggleQuestionType,
+      getConfigSummary,
+      nextStep,
+      prevStep,
+      handleFinish,
+    }
+  },
 }
 </script>
-
-<style scoped>
-.config-wizard {
-  background: white;
-  border-radius: 10px;
-  padding: 24px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.wizard-progress {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 32px;
-  position: relative;
-}
-
-.wizard-progress::before {
-  content: '';
-  position: absolute;
-  top: 16px;
-  left: 40px;
-  right: 40px;
-  height: 2px;
-  background: #e0e0e0;
-  z-index: 0;
-}
-
-.step-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  z-index: 1;
-  position: relative;
-}
-
-.step-number {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #e0e0e0;
-  color: #666;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  transition: all 0.3s;
-}
-
-.step-indicator.active .step-number {
-  background: #2196f3;
-  color: white;
-}
-
-.step-indicator.current .step-number {
-  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.2);
-}
-
-.step-label {
-  font-size: 12px;
-  color: #666;
-}
-
-.step-indicator.active .step-label {
-  color: #2196f3;
-  font-weight: 600;
-}
-
-.wizard-step h3 {
-  margin: 0 0 20px 0;
-  color: #333;
-}
-
-.grade-selector,
-.semester-selector {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.grade-btn,
-.semester-btn {
-  padding: 10px 20px;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.grade-btn:hover,
-.semester-btn:hover {
-  border-color: #2196f3;
-}
-
-.grade-btn.active,
-.semester-btn.active {
-  border-color: #2196f3;
-  background: #2196f3;
-  color: white;
-}
-
-.count-selector {
-  margin-bottom: 20px;
-}
-
-.count-selector label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-.count-selector input[type="range"] {
-  width: 100%;
-}
-
-.type-selector {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.type-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: border-color 0.2s;
-}
-
-.type-checkbox:hover {
-  border-color: #2196f3;
-}
-
-.type-checkbox:has(input:checked) {
-  border-color: #2196f3;
-  background: #f5f9ff;
-}
-
-.type-label {
-  font-weight: 600;
-  min-width: 80px;
-}
-
-.type-desc {
-  color: #666;
-  font-size: 14px;
-}
-
-.subtype-selector {
-  margin: 20px 0;
-  padding: 16px;
-  background: #f5f5f5;
-  border-radius: 6px;
-}
-
-.subtype-selector label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-.subtype-selector select {
-  width: 100%;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  margin-bottom: 16px;
-}
-
-.section-header h3 {
-  margin: 0;
-}
-
-.toggle-icon {
-  font-size: 12px;
-  color: #666;
-}
-
-.advanced-settings {
-  margin-bottom: 20px;
-}
-
-.setting-item {
-  margin-bottom: 16px;
-}
-
-.setting-item label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-.difficulty-btns {
-  display: flex;
-  gap: 10px;
-}
-
-.diff-btn {
-  padding: 8px 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  background: white;
-  cursor: pointer;
-}
-
-.diff-btn.active {
-  border-color: #2196f3;
-  background: #2196f3;
-  color: white;
-}
-
-.config-summary {
-  padding: 16px;
-  background: #f5f9ff;
-  border-radius: 6px;
-  border: 1px solid #e3f2fd;
-}
-
-.config-summary h4 {
-  margin: 0 0 12px 0;
-  color: #2196f3;
-}
-
-.config-summary ul {
-  margin: 0;
-  padding-left: 20px;
-}
-
-.config-summary li {
-  margin-bottom: 8px;
-  line-height: 1.6;
-}
-
-/* 配置选择器样式 */
-.config-select {
-  padding: 8px 12px;
-  border: 2px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
-  min-width: 150px;
-}
-
-.config-hint {
-  display: block;
-  margin-top: 4px;
-  font-size: 12px;
-  color: #888;
-  font-weight: normal;
-}
-
-.wizard-nav {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 32px;
-  padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
-}
-
-.btn-primary {
-  padding: 12px 24px;
-  background: #2196f3;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-primary:hover {
-  background: #1976d2;
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-secondary {
-  padding: 12px 24px;
-  background: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.btn-secondary:hover {
-  background: #e0e0e0;
-}
-
-/* Mobile responsive */
-@media (max-width: 639px) {
-  .config-wizard {
-    padding: 16px;
-  }
-
-  .wizard-progress::before {
-    left: 20px;
-    right: 20px;
-  }
-
-  .step-label {
-    font-size: 10px;
-  }
-
-  .grade-btn,
-  .semester-btn {
-    padding: 8px 12px;
-    font-size: 14px;
-  }
-}
-</style>

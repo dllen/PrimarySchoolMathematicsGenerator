@@ -1,19 +1,22 @@
 <template>
-  <div class="config-panel">
-    <div class="config-row">
-      <div class="config-item">
-        <label>题目数量：</label>
-        <input
-          type="number"
-          :value="config.problemCount"
-          min="1"
-          max="100"
-          @input="update('problemCount', Number($event.target.value))"
-        />
-      </div>
+  <div class="bg-paper-card border border-rule-soft rounded-lg p-5 space-y-4">
+    <!-- 题目数量 -->
+    <div class="flex flex-wrap gap-4 items-center">
+      <label class="font-medium text-ink-deep min-w-[80px] text-sm">题目数量</label>
+      <BaseInput
+        type="number"
+        :model-value="config.problemCount"
+        min="1"
+        max="100"
+        class="w-24"
+        @update:model-value="update('problemCount', Number($event))"
+      />
+      <span class="text-xs text-ink-faint">1–100 题</span>
     </div>
 
-    <div class="config-row">
+    <!-- 年级/学期 -->
+    <div class="flex flex-wrap gap-4 items-center">
+      <label class="font-medium text-ink-deep min-w-[80px] text-sm">年级学期</label>
       <GradeSemesterPicker
         :grade="config.grade"
         :semester="config.semester"
@@ -22,74 +25,86 @@
       />
     </div>
 
-    <div class="config-row">
+    <!-- 题型 -->
+    <div class="flex flex-wrap gap-4 items-start">
+      <label class="font-medium text-ink-deep min-w-[80px] text-sm pt-1">题型</label>
       <QuestionTypePicker
         :model-value="config.questionTypes"
         @update:model-value="update('questionTypes', $event)"
       />
     </div>
 
-    <div class="config-row">
+    <!-- 难度 -->
+    <div class="flex flex-wrap gap-4 items-center">
+      <label class="font-medium text-ink-deep min-w-[80px] text-sm">难度</label>
       <DifficultyPicker
         :model-value="config.difficulty"
         @update:model-value="update('difficulty', $event)"
       />
     </div>
 
-    <div class="config-row">
+    <!-- 答案模式 -->
+    <div class="flex flex-wrap gap-4 items-center">
+      <label class="font-medium text-ink-deep min-w-[80px] text-sm">答案模式</label>
       <AnswerModePicker
         :model-value="config.answerMode"
         @update:model-value="update('answerMode', $event)"
       />
     </div>
 
-    <div v-if="arithmeticSelected" class="config-row">
-      <div class="config-item">
-        <label>计算项个数：</label>
-        <select
-          :value="config.termCount"
-          @change="update('termCount', Number($event.target.value))"
-        >
-          <option v-for="n in [2,3,4]" :key="n" :value="n">{{ n }}项</option>
-        </select>
-      </div>
+    <!-- 计算项个数 (仅算术题显示) -->
+    <div v-if="arithmeticSelected" class="flex flex-wrap gap-4 items-center">
+      <label class="font-medium text-ink-deep min-w-[80px] text-sm">算式项数</label>
+      <BaseSelect
+        :model-value="config.termCount"
+        class="w-24"
+        @update:model-value="update('termCount', Number($event))"
+      >
+        <option v-for="n in [2, 3, 4]" :key="n" :value="n">{{ n }}项</option>
+      </BaseSelect>
     </div>
 
-    <div v-if="arithmeticSelected" class="config-row">
-      <div class="config-item">
-        <label>运算类型：</label>
-        <div class="checkbox-group">
-          <div v-for="op in ['add','subtract','multiply','divide']" :key="op" class="checkbox-item">
-            <input
-              type="checkbox"
-              :id="op"
-              :checked="config.operations[op]"
-              @change="updateOp(op, $event.target.checked)"
-            />
-            <label :for="op">{{ opLabels[op] }}</label>
-            <select
-              v-if="config.operations[op]"
-              :value="config.digits[op]"
-              @change="updateDigit(op, Number($event.target.value))"
-            >
-              <option v-for="n in digitsRange(op)" :key="n" :value="n">{{ n }}位数</option>
-            </select>
-          </div>
+    <!-- 运算类型 (仅算术题显示) -->
+    <div v-if="arithmeticSelected" class="flex flex-wrap gap-3 items-start">
+      <label class="font-medium text-ink-deep min-w-[80px] text-sm pt-1">运算类型</label>
+      <div class="flex flex-wrap gap-3">
+        <div v-for="op in ['add', 'subtract', 'multiply', 'divide']" :key="op" class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            :id="`op-${op}`"
+            :checked="config.operations[op]"
+            class="accent-ember"
+            @change="updateOp(op, $event.target.checked)"
+          />
+          <label :for="`op-${op}`" class="text-sm text-ink-muted cursor-pointer select-none">{{ opLabels[op] }}</label>
+          <BaseSelect
+            v-if="config.operations[op]"
+            :model-value="config.digits[op]"
+            class="w-24 text-xs"
+            @update:model-value="updateDigit(op, Number($event))"
+          >
+            <option v-for="n in digitsRange(op)" :key="n" :value="n">{{ n }}位数</option>
+          </BaseSelect>
         </div>
       </div>
     </div>
 
-    <div v-if="arithmeticSelected" class="config-row">
-      <div class="config-item">
-        <label>题目子类：</label>
-        <select :value="config.problemType" @change="update('problemType', $event.target.value)">
-          <option value="result">求结果</option>
-          <option value="operand">求运算项</option>
-        </select>
-      </div>
+    <!-- 题目子类 (仅算术题显示) -->
+    <div v-if="arithmeticSelected" class="flex flex-wrap gap-4 items-center">
+      <label class="font-medium text-ink-deep min-w-[80px] text-sm">算式类型</label>
+      <BaseSelect
+        :model-value="config.problemType"
+        class="w-40"
+        @update:model-value="update('problemType', $event)"
+      >
+        <option value="result">求结果（如 25 + 37 = ?）</option>
+        <option value="operand">求运算项（如 ? + 37 = 62）</option>
+      </BaseSelect>
     </div>
 
-    <div class="config-row">
+    <!-- 知识点 -->
+    <div class="flex flex-wrap gap-4 items-start">
+      <label class="font-medium text-ink-deep min-w-[80px] text-sm pt-1">知识点</label>
       <KnowledgePointPicker
         :model-value="config.knowledgePoints"
         :grade="config.grade"
@@ -97,6 +112,7 @@
       />
     </div>
 
+    <!-- 题型组合 -->
     <CompositionEditor
       :model-value="config.composition"
       :question-types="config.questionTypes"
@@ -104,87 +120,60 @@
       @update:model-value="update('composition', $event)"
     />
 
-    <!-- 高级设置：打印布局 -->
-    <div class="config-row">
-      <div class="config-item">
-        <label>打印布局：</label>
-        <select
-          :value="config.export?.pdfColumns || 3"
-          @change="update('export', { ...config.export, pdfColumns: Number($event.target.value) })"
-          class="config-select"
-        >
-          <option :value="2">2 列（宽松）</option>
-          <option :value="3">3 列（标准）</option>
-          <option :value="4">4 列（紧凑）</option>
-        </select>
-        <small class="config-hint">导出 PDF 时的题目列数</small>
-      </div>
+    <!-- 打印布局 -->
+    <div class="flex flex-wrap gap-4 items-center">
+      <label class="font-medium text-ink-deep min-w-[80px] text-sm">打印布局</label>
+      <BaseSelect
+        :model-value="config.export?.pdfColumns || 3"
+        class="w-36"
+        @update:model-value="update('export', { ...config.export, pdfColumns: Number($event) })"
+      >
+        <option :value="2">2 列（宽松）</option>
+        <option :value="3">3 列（标准）</option>
+        <option :value="4">4 列（紧凑）</option>
+      </BaseSelect>
+      <span class="text-xs text-ink-faint">PDF 列数</span>
     </div>
   </div>
 </template>
 
 <script setup>
-import GradeSemesterPicker from './config/GradeSemesterPicker.vue';
-import QuestionTypePicker from './config/QuestionTypePicker.vue';
-import DifficultyPicker from './config/DifficultyPicker.vue';
-import KnowledgePointPicker from './config/KnowledgePointPicker.vue';
-import AnswerModePicker from './config/AnswerModePicker.vue';
-import CompositionEditor from './config/CompositionEditor.vue';
-import { computed } from 'vue';
-
-const arithmeticSelected = computed(() => props.config.questionTypes.includes('arithmetic'));
+import { computed } from 'vue'
+import { BaseInput, BaseSelect } from './base'
+import GradeSemesterPicker from './config/GradeSemesterPicker.vue'
+import QuestionTypePicker from './config/QuestionTypePicker.vue'
+import DifficultyPicker from './config/DifficultyPicker.vue'
+import KnowledgePointPicker from './config/KnowledgePointPicker.vue'
+import AnswerModePicker from './config/AnswerModePicker.vue'
+import CompositionEditor from './config/CompositionEditor.vue'
 
 const props = defineProps({
   config: { type: Object, required: true },
-});
-const emit = defineEmits(['update:config']);
+})
+const emit = defineEmits(['update:config'])
 
-const opLabels = { add: '加法 (+)', subtract: '减法 (-)', multiply: '乘法 (×)', divide: '除法 (÷)' };
+const arithmeticSelected = computed(() => props.config.questionTypes?.includes('arithmetic'))
+const opLabels = { add: '加', subtract: '减', multiply: '乘', divide: '除' }
 
 function digitsRange(op) {
-  return op === 'multiply' ? [1, 2] : [1, 2, 3];
+  return op === 'multiply' ? [1, 2] : [1, 2, 3]
 }
 
 function update(key, value) {
-  emit('update:config', { ...props.config, [key]: value });
+  emit('update:config', { ...props.config, [key]: value })
 }
 
 function updateOp(op, checked) {
   emit('update:config', {
     ...props.config,
     operations: { ...props.config.operations, [op]: checked },
-  });
+  })
 }
 
 function updateDigit(op, n) {
   emit('update:config', {
     ...props.config,
     digits: { ...props.config.digits, [op]: n },
-  });
+  })
 }
 </script>
-
-<style scoped>
-.config-panel { display: flex; flex-direction: column; gap: 12px; }
-.config-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
-.config-item { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.checkbox-group { display: inline-flex; gap: 8px; flex-wrap: wrap; }
-.checkbox-item { display: inline-flex; gap: 4px; align-items: center; }
-
-/* 配置选择器样式 */
-.config-select {
-  padding: 8px 12px;
-  border: 2px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
-  min-width: 150px;
-}
-
-.config-hint {
-  display: block;
-  margin-top: 4px;
-  font-size: 12px;
-  color: #888;
-  font-weight: normal;
-}
-</style>
