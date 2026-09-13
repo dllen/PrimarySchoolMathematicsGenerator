@@ -1,74 +1,88 @@
 <template>
-  <div class="generator-view">
-    <div class="nav-header">
-      <button class="back-btn" @click="$router.push('/')">
-        ← 返回首页
-      </button>
-    </div>
-
-    <div class="header">
-      <h2>小学数学题生成器</h2>
-      <p style="color: red; font-weight: bolder" v-if="!isMobile">
-        配置参数，生成数学练习题
-      </p>
-      <p style="color: red; font-weight: bolder" v-else>
-        配置参数，生成数学练习题，可下载图片或分享
-      </p>
-    </div>
-
-    <!-- 预设选择器 -->
-    <PresetSelector
-      @apply="applyPreset"
-      @edit="showPresetManager = true"
-      @create="showPresetManager = true"
-      @delete="handlePresetDelete"
-    />
-
-    <!-- 配置向导/高级配置 -->
-    <ConfigWizard
-      v-if="currentView === 'wizard'"
-      :model-value="wizardState.config"
-      @update:model-value="wizardState.config = $event"
-      @complete="handleWizardComplete"
-    />
-
-    <ConfigPanel
-      v-else
-      :config="config"
-      @update:config="config = $event"
-    />
-
-    <ActionBar
-      :problems="problems"
-      :is-mobile="isMobile"
-      :exporting="enhancedExport.exporting"
-      @generate="generateProblems"
-      @export="handleExport"
-      @show-history="$router.push('/history')"
-    />
-
-    <div ref="printRoot" class="print-root" :class="{ 'export-mode': enhancedExport.exporting }">
-      <div class="worksheet-header">
-        <h3>数学练习题</h3>
-        <div class="info-row print-only">
-          <span>{{ config.grade }}年级{{ config.semester }}册</span>
-          <span>姓名：_____________</span>
-          <span>得分：_____________</span>
-        </div>
-        <p class="date">{{ today }}</p>
+  <div class="container-content pt-6 pb-16">
+    <!-- 工作台默认视图: Hero + 6 个年级卡片 -->
+    <section v-if="!selectedGrade && !showAdvanced">
+      <WorkbenchHero />
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
+        <GradeCard
+          v-for="preset in gradePresets"
+          :key="preset.grade"
+          v-bind="preset"
+          :selected="selectedGrade === preset.grade"
+          @select="handleGradeSelect"
+        />
       </div>
-      <ProblemGrid
-        :problems="problems"
-        :show-answer="config.answerMode === 'inline'"
-      />
-      <AnswerPage
-        v-if="config.answerMode === 'separate'"
-        :problems="problems"
-        :cols="4"
-      />
-    </div>
+      <div class="text-center">
+        <BaseButton variant="ghost" @click="showAdvanced = true">
+          自定义全部配置 →
+        </BaseButton>
+      </div>
+    </section>
 
-    <!-- 导出预览组件 -->
+    <!-- 高级配置 Tab -->
+    <section v-if="showAdvanced">
+      <BaseTabs
+        v-model="activeTab"
+        :tabs="[
+          { value: 'custom', label: '自定义配置' },
+          { value: 'presets', label: '预设' },
+        ]"
+      />
+      <div class="py-6">
+        <ConfigPanel
+          v-show="activeTab === 'custom'"
+          :config="config"
+          @update:config="config = $event"
+        />
+        <PresetSelector
+          v-show="activeTab === 'presets'"
+          @apply="applyPreset"
+          @edit="showPresetManager = true"
+          @create="showPresetManager = true"
+          @delete="handlePresetDelete"
+        />
+      </div>
+      <div class="text-center">
+        <BaseButton variant="ghost" @click="showAdvanced = false">
+          ← 返回年级卡片
+        </BaseButton>
+      </div>
+    </section>
+
+    <!-- 预览区(已选年级或已配置后显示) -->
+    <section v-if="selectedGrade || showAdvanced">
+      <div ref="printRoot" class="print-root" :class="{ 'export-mode': enhancedExport.exporting }">
+        <div class="worksheet-header">
+          <h3>数学练习题</h3>
+          <div class="info-row print-only">
+            <span>{{ config.grade }}年级{{ config.semester }}</span>
+            <span>姓名：_____________</span>
+            <span>得分：_____________</span>
+          </div>
+          <p class="date">{{ today }}</p>
+        </div>
+        <ProblemGrid
+          :problems="problems"
+          :show-answer="config.answerMode === 'inline'"
+        />
+        <AnswerPage
+          v-if="config.answerMode === 'separate'"
+          :problems="problems"
+          :cols="4"
+        />
+      </div>
+
+      <ActionBar
+        class="mt-6"
+        :problems="problems"
+        :is-mobile="isMobile"
+        :exporting="enhancedExport.exporting"
+        @generate="generateProblems"
+        @export="handleExport"
+        @show-history="$router.push('/history')"
+      />
+    </section>
+
     <ExportPreview
       :visible="enhancedExport.previewVisible"
       :type="enhancedExport.previewType"
@@ -87,7 +101,9 @@
 
 <script>
 import { ref, onBeforeUnmount } from 'vue'
-import { useBreakpoint } from '../composables/useBreakpoint.js'
+import { BaseButton, BaseTabs } from '../components/base'
+import GradeCard from '../components/workbench/GradeCard.vue'
+import WorkbenchHero from '../components/workbench/WorkbenchHero.vue'
 import ConfigPanel from '../components/ConfigPanel.vue'
 import ConfigWizard from '../components/ConfigWizard.vue'
 import ActionBar from '../components/ActionBar.vue'
@@ -98,45 +114,35 @@ import PresetManager from '../components/PresetManager.vue'
 import ExportPreview from '../components/ExportPreview.vue'
 import { useProblemGenerator } from '../composables/useProblemGenerator.js'
 import { useEnhancedExport } from '../composables/useEnhancedExport.js'
+import { useBreakpoint } from '../composables/useBreakpoint.js'
 import { useToast } from '../composables/useToast.js'
-import { addProblemSet, getHistory, db } from '../db.js'
+import { addProblemSet } from '../db.js'
 import { deleteCustomPreset } from '../constants/presets.js'
 
 export default {
   name: 'GeneratorView',
   components: {
-    ConfigPanel,
-    ConfigWizard,
-    ActionBar,
-    ProblemGrid,
-    AnswerPage,
-    PresetSelector,
-    PresetManager,
-    ExportPreview
+    BaseButton, BaseTabs,
+    GradeCard, WorkbenchHero,
+    ConfigPanel, ConfigWizard,
+    ActionBar, ProblemGrid, AnswerPage,
+    PresetSelector, PresetManager, ExportPreview,
   },
   setup() {
     const today = new Date().toISOString().slice(0, 10)
     const problems = ref([])
     const printRoot = ref(null)
-    const showPresetManager = ref(false)
-    const currentView = ref('panel') // 'wizard' or 'panel'
-    const wizardState = ref({
-      config: {
-        grade: '3',
-        semester: '上',
-        problemCount: 20,
-        difficulty: 'medium',
-        questionTypes: ['arithmetic'],
-        operations: {
-          add: true,
-          subtract: true,
-          multiply: false,
-          divide: false,
-        },
-      },
-    })
 
+    // 工作台状态
+    const showAdvanced = ref(false)
+    const activeTab = ref('custom')
+    const selectedGrade = ref(null)
+    const showPresetManager = ref(false)
+
+    // 默认配置
     const config = ref({
+      grade: '3',
+      semester: '上',
       problemCount: 20,
       termCount: 2,
       operations: { add: true, subtract: true, multiply: false, divide: false },
@@ -144,110 +150,79 @@ export default {
       problemType: 'result',
       useBrackets: false,
       allowRepeatOperators: true,
-      grade: '3',
-      semester: '上',
+      difficulty: 'medium',
       questionTypes: ['arithmetic'],
-      difficulty: 'easy',
       knowledgePoints: [],
       answerMode: 'hidden',
       composition: { arithmetic: 0, application: 0, olympiad: 0 },
-
       // 导出配置
       export: {
-        pdfColumns: 3,  // PDF 列数：2 | 3 | 4
-        imageQuality: 'high'  // 图片质量：low | medium | high
-      }
+        pdfColumns: 3,
+        imageQuality: 'high',
+      },
     })
 
-    // 应用预设配置
+    // 6 个年级预设(三年级标记为推荐)
+    const gradePresets = [
+      { grade: 1, topic: '20 以内加减', difficulty: '简单', duration: 5 },
+      { grade: 2, topic: '表内乘法', difficulty: '中等', duration: 8 },
+      { grade: 3, topic: '混合四则运算', difficulty: '中等', duration: 10, recommended: true },
+      { grade: 4, topic: '多位数乘除', difficulty: '中等', duration: 12 },
+      { grade: 5, topic: '小数与分数', difficulty: '困难', duration: 15 },
+      { grade: 6, topic: '方程与比例', difficulty: '困难', duration: 18 },
+    ]
+
+    const generator = useProblemGenerator()
+    const enhancedExport = useEnhancedExport()
+    const toast = useToast()
+    const { success, error, warning, info, showToast } = toast
+
+    // 响应式断点(替换 UA 嗅探)
+    const { isMobile, isTablet, isDesktop } = useBreakpoint()
+
+    // 每导出独立 AbortController;unmount 时自动取消挂起的导出
+    const exportController = ref(new AbortController())
+    function resetExportController() {
+      exportController.value.abort()
+      exportController.value = new AbortController()
+    }
+
+    // 选择年级卡片
+    function handleGradeSelect(grade) {
+      selectedGrade.value = grade
+      config.value.grade = String(grade)
+      config.value.difficulty = grade <= 2 ? 'easy' : grade <= 4 ? 'medium' : 'hard'
+      generateProblems()
+    }
+
+    // 应用预设
     function applyPreset(presetConfig) {
       Object.assign(config.value, presetConfig)
       success('已应用预设配置', `题目数量: ${presetConfig.problemCount || 20} 题`)
     }
 
-    // 向导完成处理
-    function handleWizardComplete() {
-      Object.assign(config.value, wizardState.value.config)
-      currentView.value = 'panel'
-      generateProblems()
-    }
-
-    // 删除自定义预设
+    // 删除预设
     function handlePresetDelete(presetId) {
       const deleted = deleteCustomPreset(presetId)
       if (deleted) {
         success('删除成功', '预设已删除')
-        refreshHistory()
       } else {
         error('删除失败', '预设不存在或无法删除')
       }
     }
 
-    const generator = useProblemGenerator()
-    const enhancedExport = useEnhancedExport()
-    const { success, error, warning, info, showToast } = useToast()
-
-    // 替换 UA 嗅探为响应式断点(支持 SSR + 旋转屏幕 + DevTools 切换)
-    const { isMobile, isTablet, isDesktop } = useBreakpoint()
-
-    // 每次导出会创建一个新 AbortController:
-    //   - 组件卸载(onBeforeUnmount)时 abort → 取消挂起的 PDF 生成
-    //   - 用户点"导出"未完成时离开页面,不会留下泄漏的 setTimeout / worker
-    const exportController = ref(new AbortController())
-    function resetExportController() {
-      exportController.value.abort() // 旧的 abort(若有)
-      exportController.value = new AbortController()
-    }
-
-    // 导出处理函数
-    async function handleExport() {
-      if (!printRoot.value) {
-        warning('无法导出', '请先生成题目')
-        return
-      }
-
-      // 应用打印布局配置到 CSS 变量
-      const columns = config.value.export?.pdfColumns || 3;
-      document.documentElement.style.setProperty('--print-columns', columns);
-
-      // 每次导出用新 controller;若上次还没完成,旧的会被 abort 掉
-      resetExportController()
-
-      await enhancedExport.smartExport(
-        {
-          element: printRoot.value,
-          config: config.value
-        },
-        { signal: exportController.value.signal }
-      )
-    }
-
-    // 组件卸载时主动取消挂起的导出,防止:
-    //   - html2canvas 仍在跑的 worker 句柄泄漏
-    //   - setTimeout 句柄泄漏(usePdfExport 的超时定时器)
-    //   - PDF 已生成但组件已销毁,后续回调触发 "set state on unmounted component"
-    onBeforeUnmount(() => {
-      exportController.value.abort()
-    })
-
-    async function refreshHistory() {
-      // 仅在需要时刷新历史记录
-    }
-
+    // 生成题目
     async function generateProblems() {
       const startTime = Date.now()
-
       try {
         const list = await generator.generate(config.value)
         problems.value = list
-
         const duration = ((Date.now() - startTime) / 1000).toFixed(1)
         showToast({
           type: 'success',
           message: `已生成 ${list.length} 题`,
           detail: `耗时 ${duration}s`,
         })
-
         await addProblemSet(list, config.value)
       } catch (err) {
         showToast({
@@ -259,20 +234,33 @@ export default {
       }
     }
 
+    // 导出
+    async function handleExport() {
+      if (!printRoot.value) {
+        warning('无法导出', '请先生成题目')
+        return
+      }
+      const columns = config.value.export?.pdfColumns || 3
+      document.documentElement.style.setProperty('--print-columns', columns)
+      resetExportController()
+      await enhancedExport.smartExport(
+        { element: printRoot.value, config: config.value },
+        { signal: exportController.value.signal }
+      )
+    }
+
+    // 分享
     async function handleShare() {
       try {
         const html2canvas = (await import('html2canvas-pro')).default
         info('正在生成分享图片...')
-
         const canvas = await html2canvas(printRoot.value, { scale: 2, useCORS: true })
         canvas.toBlob(async (blob) => {
           if (!blob) {
             error('分享失败', '图片生成失败')
             return
           }
-
           const file = new File([blob], `数学练习题_${today}.png`, { type: 'image/png' })
-
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({ files: [file], title: '数学练习题' })
             success('分享成功')
@@ -289,65 +277,33 @@ export default {
       }
     }
 
+    // 卸载时取消挂起的导出
+    onBeforeUnmount(() => {
+      exportController.value.abort()
+    })
+
     return {
       today,
       isMobile,
       isTablet,
       isDesktop,
       exportController,
-      config,
       problems,
       printRoot,
+      config,
+      gradePresets,
       enhancedExport,
+      showAdvanced,
+      activeTab,
+      selectedGrade,
       showPresetManager,
-      currentView,
-      wizardState,
-      generateProblems,
+      handleGradeSelect,
       applyPreset,
-      handleWizardComplete,
       handlePresetDelete,
+      generateProblems,
       handleExport,
-      handleShare
+      handleShare,
     }
   },
 }
 </script>
-
-<style scoped>
-.generator-view {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.nav-header {
-  margin-bottom: 20px;
-}
-.back-btn {
-  padding: 8px 16px;
-  background: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #333;
-  transition: all 0.3s ease;
-}
-.back-btn:hover {
-  background: #e8e8e8;
-  border-color: #999;
-}
-.header { display: flex; flex-direction: column; gap: 4px; margin-bottom: 20px; }
-.worksheet-header { text-align: center; margin-bottom: 12px; }
-.worksheet-header h3 { margin: 0; }
-.worksheet-header .info-row {
-  display: none;
-  justify-content: space-between;
-  padding: 0 8px;
-  font-size: 14px;
-}
-.worksheet-header .date {
-  color: #666;
-  font-size: 13px;
-  margin: 4px 0;
-}
-</style>

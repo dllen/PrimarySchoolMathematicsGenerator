@@ -99,12 +99,21 @@ describe('GeneratorView', () => {
     expect(wrapper.vm.isDesktop).toBe(true)
   })
 
-  it('isMobile=true 时模板显示"图片或分享"文案', () => {
+  it('isMobile=true 时 useBreakpoint.isMobile 为 true', () => {
     bpState.width = 500
     const wrapper = mount(GeneratorView, {
       global: { mocks: { $router: { push: vi.fn() } } },
     })
-    expect(wrapper.html()).toContain('可下载图片或分享')
+    expect(wrapper.vm.isMobile).toBe(true)
+    expect(wrapper.vm.isDesktop).toBe(false)
+  })
+
+  it('isMobile=true 时年级卡片网格使用 2 列(grid-cols-2)', () => {
+    bpState.width = 500
+    const wrapper = mount(GeneratorView, {
+      global: { mocks: { $router: { push: vi.fn() } } },
+    })
+    expect(wrapper.html()).toMatch(/grid-cols-2/)
   })
 
   it('handleExport 调用 smartExport 并传入 AbortSignal options', async () => {
