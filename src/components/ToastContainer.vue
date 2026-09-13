@@ -1,18 +1,22 @@
 <template>
-  <div class="toast-container" role="alert" aria-live="polite">
+  <div class="fixed top-5 right-5 z-[10000] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none" role="alert" aria-live="polite">
     <TransitionGroup name="toast">
       <div
         v-for="toast in toasts"
         :key="toast.id"
-        :class="['toast', `toast-${toast.type}`]"
+        :class="['toast-card pointer-events-auto flex items-start gap-3 rounded-lg px-4 py-3 shadow-medium cursor-pointer', toastClass(toast.type)]"
         @click="removeToast(toast.id)"
       >
-        <span class="toast-icon">{{ iconMap[toast.type] }}</span>
-        <div class="toast-content">
-          <div class="toast-message">{{ toast.message }}</div>
-          <div v-if="toast.detail" class="toast-detail">{{ toast.detail }}</div>
+        <span class="text-base flex-shrink-0 mt-0.5">{{ iconMap[toast.type] }}</span>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium text-sm">{{ toast.message }}</p>
+          <p v-if="toast.detail" class="text-xs mt-0.5 opacity-80">{{ toast.detail }}</p>
         </div>
-        <button class="toast-close" @click.stop="removeToast(toast.id)" aria-label="关闭">
+        <button
+          class="text-lg leading-none flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+          @click.stop="removeToast(toast.id)"
+          aria-label="关闭"
+        >
           ×
         </button>
       </div>
@@ -21,94 +25,37 @@
 </template>
 
 <script setup>
-import { useToast } from '../composables/useToast.js';
+import { useToast } from '../composables/useToast.js'
 
-const { toasts, removeToast } = useToast();
+const { toasts, removeToast } = useToast()
 
 const iconMap = {
   success: '✅',
   error: '❌',
   warning: '⚠️',
-  info: 'ℹ️',
-};
+  info: '💡',
+}
+
+function toastClass(type) {
+  const map = {
+    success: 'bg-success/10 border-l-4 border-success text-success',
+    error:   'bg-error/10   border-l-4 border-error   text-error',
+    warning: 'bg-warning/10 border-l-4 border-warning text-warning',
+    info:    'bg-paper-card border border-rule-soft text-ink-deep',
+  }
+  return map[type] || map.info
+}
 </script>
 
 <style scoped>
-.toast-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 10000;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-width: 400px;
-}
-
-.toast {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 8px;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.toast-success { border-left: 4px solid #4caf50; }
-.toast-error { border-left: 4px solid #f44336; }
-.toast-warning { border-left: 4px solid #ff9800; }
-.toast-info { border-left: 4px solid #2196f3; }
-
-.toast-icon {
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.toast-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.toast-message {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-.toast-detail {
-  font-size: 13px;
-  color: #666;
-  word-wrap: break-word;
-}
-
-.toast-close {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: #999;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.toast-close:hover {
-  color: #333;
-}
-
 .toast-enter-active,
 .toast-leave-active {
   transition: all 0.3s ease;
 }
-
 .toast-enter-from {
   opacity: 0;
   transform: translateX(100%);
 }
-
 .toast-leave-to {
   opacity: 0;
   transform: translateX(100%);

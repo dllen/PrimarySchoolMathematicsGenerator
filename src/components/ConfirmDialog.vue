@@ -1,85 +1,47 @@
 <template>
-  <div v-if="visible" class="confirm-overlay" @click.self="$emit('cancel')">
-    <div class="confirm-dialog" role="dialog" aria-modal="true">
-      <h3>{{ title }}</h3>
-      <p>{{ message }}</p>
-      <div class="confirm-actions">
-        <button class="btn-secondary" @click="$emit('cancel')">取消</button>
-        <button class="btn-danger" @click="$emit('confirm')">{{ confirmText }}</button>
+  <Teleport to="body">
+    <Transition name="fade">
+      <div
+        v-if="visible"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-ink-deep/40 p-4"
+        @click.self="$emit('cancel')"
+      >
+        <BaseCard class="max-w-sm w-full" variant="paper">
+          <h3 class="font-serif font-semibold text-lg text-ink-deep mb-2">{{ title }}</h3>
+          <p class="text-sm text-ink-muted mb-6 leading-relaxed">{{ message }}</p>
+          <div class="flex justify-end gap-3">
+            <BaseButton variant="ghost" size="sm" @click="$emit('cancel')">取消</BaseButton>
+            <BaseButton variant="ember" size="sm" @click="$emit('confirm')">{{ confirmText }}</BaseButton>
+          </div>
+        </BaseCard>
       </div>
-    </div>
-  </div>
+    </Transition>
+  </Teleport>
 </template>
 
-<script setup>
-defineProps({
-  visible: { type: Boolean, required: true },
-  title: { type: String, default: '确认' },
-  message: { type: String, required: true },
-  confirmText: { type: String, default: '确认' },
-});
+<script>
+import { BaseCard, BaseButton } from './base'
 
-defineEmits(['confirm', 'cancel']);
+export default {
+  name: 'ConfirmDialog',
+  components: { BaseCard, BaseButton },
+  props: {
+    visible: { type: Boolean, default: false },
+    title: { type: String, default: '确认' },
+    message: { type: String, required: true },
+    confirmText: { type: String, default: '确认' },
+  },
+  emits: ['confirm', 'cancel'],
+}
 </script>
 
 <style scoped>
-.confirm-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
 }
-
-.confirm-dialog {
-  background: white;
-  padding: 24px;
-  border-radius: 8px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.confirm-dialog h3 {
-  margin: 0 0 12px 0;
-  color: #333;
-}
-
-.confirm-dialog p {
-  margin: 0 0 20px 0;
-  color: #666;
-  line-height: 1.5;
-}
-
-.confirm-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
-.btn-secondary {
-  padding: 8px 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-}
-
-.btn-danger {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  background: #f44336;
-  color: white;
-  cursor: pointer;
-}
-
-.btn-danger:hover {
-  background: #d32f2f;
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
