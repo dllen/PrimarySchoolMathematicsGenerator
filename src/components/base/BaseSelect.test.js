@@ -38,4 +38,31 @@ describe('BaseSelect', () => {
     })
     expect(wrapper.attributes('disabled')).toBeDefined()
   })
+
+  it('未传 options 时回落到默认 slot 中的 <option>', () => {
+    const wrapper = mount(BaseSelect, {
+      props: { modelValue: 2 },
+      slots: {
+        default: `
+          <option value="2">2项</option>
+          <option value="3">3项</option>
+          <option value="4">4项</option>
+        `,
+      },
+    })
+    const options = wrapper.findAll('option')
+    expect(options).toHaveLength(3)
+    expect(options[1].text()).toBe('3项')
+    expect(options[1].attributes('value')).toBe('3')
+  })
+
+  it(':options 数组优先于 slot 内容(配置驱动)', () => {
+    const wrapper = mount(BaseSelect, {
+      props: { options: [{ value: 'a', label: 'From Prop' }] },
+      slots: { default: '<option value="b">From Slot</option>' },
+    })
+    const options = wrapper.findAll('option')
+    expect(options).toHaveLength(1)
+    expect(options[0].text()).toBe('From Prop')
+  })
 })
