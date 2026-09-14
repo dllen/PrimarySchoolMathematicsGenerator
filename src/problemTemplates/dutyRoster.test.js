@@ -30,4 +30,16 @@ describe('dutyRosterTemplate', () => {
       expect(result.answer.length).toBeGreaterThan(0);
     });
   }
+
+  it('never renders the literal "undefined" in question or answer', () => {
+    // Regression: hard band used pickNumberByBand(0..4), which scales to 0..7
+    // and indexed past the 7-element WEEKDAYS array.
+    for (let level = 1; level <= 3; level++) {
+      for (let i = 0; i < 500; i++) {
+        const result = dutyRosterTemplate.generate(createRng(i * 7 + level * 13), level);
+        expect(result.question, `seed=${i} level=${level}`).not.toContain('undefined');
+        expect(result.answer, `seed=${i} level=${level}`).not.toContain('undefined');
+      }
+    }
+  });
 });

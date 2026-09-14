@@ -42,8 +42,10 @@ function generateDutySubtemplates() {
       id: 'duty-last',
       band: 'hard',
       generate(rng) {
-        const today = pickNumberByBand(rng, 'hard', { min: 0, max: 4 });
-        const later = pickNumberByBand(rng, 'hard', { min: 1, max: 14 });
+        // Hard band scales min/max by 1.8, so pickNumberByBand(0..4) can yield 7,
+        // which overruns the 7-element WEEKDAYS. Draw both values directly.
+        const today = rng.int(0, 6);
+        const later = rng.int(8, 30);
         const target = (today + later) % 7;
         return {
           question: `今天是星期${WEEKDAYS[today]},小华要在${later}天后的值日,那天是星期几?`,

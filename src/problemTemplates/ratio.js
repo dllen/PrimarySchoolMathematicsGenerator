@@ -8,15 +8,19 @@ function generateRatioSubtemplates() {
       generate(rng) {
         const person = pickPerson(rng);
         const { a, b } = pickRatio(rng, 'easy');
-        const total = pickNumberByBand(rng, 'easy', { min: 6, max: 30 });
         const sum = a + b;
-        const partA = Math.floor(total * a / sum);
-        const partB = total - partA;
+        // Choose the total as a multiple of the ratio sum so the split is exact.
+        // Picking total independently would make partA:partB != a:b whenever
+        // total % sum !== 0 (e.g. 9 candies at 1:1 cannot be split evenly).
+        const k = rng.int(2, 6);
+        const total = sum * k;
+        const partA = a * k;
+        const partB = b * k;
         return {
           question: `${person}有${total}个糖,按${a}:${b}分给甲乙两人,甲得几个?`,
           answer: `${partA}个`,
           subtype: 'ratio',
-          payload: { a, b, total, sum, partA, partB },
+          payload: { a, b, total, sum, k, partA, partB },
         };
       },
     },

@@ -45,4 +45,15 @@ describe('advancedLogicTemplate', () => {
     const { n, arrangements } = result.payload;
     expect(arrangements).toBe(n * (n - 1) * (n - 2));
   });
+
+  it('easy deduction never asks about the same person twice', () => {
+    // Regression: two bare pickPerson(rng) calls could return the same name.
+    for (let i = 0; i < 500; i++) {
+      const result = advancedLogicTemplate.generate(createRng(i), 1);
+      if (result.payload.x === undefined) continue;
+      const m = result.question.match(/^(.+?)有\d+个苹果,(.+?)有\d+个苹果/);
+      expect(m, `seed=${i} question=${result.question}`).toBeTruthy();
+      expect(m[1], `seed=${i} question=${result.question}`).not.toBe(m[2]);
+    }
+  });
 });

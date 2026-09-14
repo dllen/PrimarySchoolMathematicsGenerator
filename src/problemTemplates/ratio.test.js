@@ -38,4 +38,15 @@ describe('ratioTemplate', () => {
     const { share1, share2, profit } = result.payload;
     expect(share1 + share2).toBe(profit);
   });
+
+  it('ratio-distribute splits exactly in the stated ratio', () => {
+    // Regression: total was drawn independently of the ratio sum, so
+    // partA:partB != a:b whenever total % sum !== 0 (9 candies at 1:1 -> 4/5).
+    for (let i = 0; i < 500; i++) {
+      const result = ratioTemplate.generate(createRng(i), 1);
+      const { a, b, partA, partB } = result.payload;
+      if (partA === undefined) continue;
+      expect(partA * b, `seed=${i} ${a}:${b} split ${partA}:${partB}`).toBe(partB * a);
+    }
+  });
 });

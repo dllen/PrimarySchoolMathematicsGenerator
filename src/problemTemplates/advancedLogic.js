@@ -1,4 +1,4 @@
-import { levelToBand, pickPerson } from './helpers.js';
+import { levelToBand, pickPerson, pickTwoPeople } from './helpers.js';
 
 function pickThreePeople(rng) {
   const seen = new Set();
@@ -21,7 +21,7 @@ function generateAdvancedLogicSubtemplates() {
       id: 'logic-simple-deduction',
       band: 'easy',
       generate(rng) {
-        const [a, b] = [pickPerson(rng), pickPerson(rng)];
+        const [a, b] = pickTwoPeople(rng);
         const x = rng.int(1, 6);
         let y = rng.int(1, 6);
         while (y === x) y = rng.int(1, 6);
