@@ -111,7 +111,7 @@ export const QUESTION_TYPES = [
 | `comb-ball` | hard | 5–6 | 摸球问题（不放回组合）|
 
 **约束**:
-- n ≤ 10（避免阶乘溢出）
+- n ≤ 6（factorial 内部约束，6!=720）
 - 排列/组合结果 ≤ 1000
 
 ### 3.3 概率初步 (`probability.js`)
