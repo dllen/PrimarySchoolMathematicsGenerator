@@ -92,14 +92,21 @@ export function factorial(n) {
   return n <= 1 ? 1 : n * factorial(n - 1);
 }
 
-/** 排列数 A(n,r) = n! / (n-r)! */
+/** 排列数 A(n,r) = n * (n-1) * ... * (n-r+1)。用乘法循环避免阶乘溢出。 */
 export function perm(n, r) {
-  return factorial(n) / factorial(n - r);
+  let result = 1;
+  for (let i = 0; i < r; i++) result *= (n - i);
+  return result;
 }
 
-/** 组合数 C(n,r) = n! / (r! * (n-r)!) */
+/** 组合数 C(n,r),用对称化简 + 乘法循环,避免中间阶乘溢出。 */
 export function comb(n, r) {
-  return factorial(n) / (factorial(r) * factorial(n - r));
+  const k = Math.min(r, n - r);
+  let result = 1;
+  for (let i = 1; i <= k; i++) {
+    result = result * (n - k + i) / i;
+  }
+  return Math.round(result);
 }
 
 /** 最小公倍数 lcm(a,b) = |a*b| / gcd(a,b) */
