@@ -1,4 +1,4 @@
-import { levelToBand, comb } from './helpers.js';
+import { comb, pickForBand } from './helpers.js';
 
 function generateGeometrySubtemplates() {
   return [
@@ -72,8 +72,6 @@ export const geometryCountTemplate = {
   semester: 'all',
   subtemplates: generateGeometrySubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

@@ -1,4 +1,4 @@
-import { levelToBand } from './helpers.js';
+import { pickForBand } from './helpers.js';
 
 function generateProbabilitySubtemplates() {
   return [
@@ -85,8 +85,6 @@ export const probabilityTemplate = {
   semester: 'all',
   subtemplates: generateProbabilitySubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

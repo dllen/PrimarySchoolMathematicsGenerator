@@ -1,19 +1,4 @@
-import { levelToBand, pickPerson, pickTwoPeople } from './helpers.js';
-
-function pickThreePeople(rng) {
-  const seen = new Set();
-  const out = [];
-  let guard = 0;
-  while (out.length < 3 && guard < 100) {
-    const p = pickPerson(rng);
-    if (!seen.has(p)) {
-      seen.add(p);
-      out.push(p);
-    }
-    guard++;
-  }
-  return out;
-}
+import { pickForBand, pickPerson, pickTwoPeople, pickPeople } from './helpers.js';
 
 function generateAdvancedLogicSubtemplates() {
   return [
@@ -39,7 +24,7 @@ function generateAdvancedLogicSubtemplates() {
       id: 'logic-truth-teller',
       band: 'medium',
       generate(rng) {
-        const [p1, p2, p3] = pickThreePeople(rng);
+        const [p1, p2, p3] = pickPeople(rng, 3);
         // Exactly one statement is true only when p1 is the culprit.
         return {
           question: `${p1}、${p2}、${p3}三人中有一人拿了书。${p1}说："不是我"，${p2}说："是${p3}"，${p3}说："${p2}在说谎"。已知只有一人说真话，谁拿了书?`,
@@ -100,8 +85,6 @@ export const advancedLogicTemplate = {
   semester: 'all',
   subtemplates: generateAdvancedLogicSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

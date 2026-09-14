@@ -1,4 +1,4 @@
-import { pickNumberByBand, pickPerson, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand, pickPerson } from './helpers.js';
 
 function generateShareSubtemplates() {
   return [
@@ -62,8 +62,6 @@ export const shareCandyTemplate = {
   semester: 'all',
   subtemplates: generateShareSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

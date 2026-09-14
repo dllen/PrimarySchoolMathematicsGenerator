@@ -1,4 +1,4 @@
-import { pickNumberByBand, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand } from './helpers.js';
 
 function generateStatisticsSubtemplates() {
   return [
@@ -79,8 +79,6 @@ export const statisticsTemplate = {
   semester: 'all',
   subtemplates: generateStatisticsSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

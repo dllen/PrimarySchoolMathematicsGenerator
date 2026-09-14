@@ -1,4 +1,4 @@
-import { pickNumberByBand, pickPerson, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand, pickPerson } from './helpers.js';
 
 /**
  * 鸡兔同笼问题模板
@@ -311,8 +311,6 @@ export const chickenRabbitTemplate = {
   semester: 'all',
   subtemplates: generateChickenRabbitSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

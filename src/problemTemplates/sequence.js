@@ -1,4 +1,4 @@
-import { pickNumberByBand, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand } from './helpers.js';
 
 function generateSequenceSubtemplates() {
   return [
@@ -162,8 +162,6 @@ export const sequenceTemplate = {
   semester: 'all',
   subtemplates: generateSequenceSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

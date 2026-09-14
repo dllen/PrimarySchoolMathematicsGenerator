@@ -58,13 +58,38 @@ export function pickPerson(rng) {
   return rng.pick(PERSON_POOL);
 }
 
-/** 生成两个不重复的中文人名(来自 PERSON_POOL)。 */
-export function pickTwoPeople(rng) {
-  const a = rng.pick(PERSON_POOL);
-  const pool = PERSON_POOL.filter(p => p !== a);
-  return [a, rng.pick(pool)];
+/** 从 PERSON_POOL 中不放回地抽取 n 个不重复的中文人名。 */
+export function pickPeople(rng, n) {
+  const pool = [...PERSON_POOL];
+  const out = [];
+  const count = Math.min(n, pool.length);
+  for (let i = 0; i < count; i++) {
+    const idx = rng.int(0, pool.length - 1);
+    out.push(pool[idx]);
+    pool.splice(idx, 1);
+  }
+  return out;
 }
 
+/** 生成两个不重复的中文人名(来自 PERSON_POOL)。 */
+export function pickTwoPeople(rng) {
+  return pickPeople(rng, 2);
+}
+
+
+/**
+ * 按难度等级从模板的 subtemplates 中选出并生成一题。
+ * 集中所有模板共用的「level -> band -> 过滤 -> 随机挑一个」流程,
+ * 并让"该 band 没有子模板"只在一个地方报错,而不是每个模板各自抛。
+ */
+export function pickForBand(template, difficultyLevel, rng) {
+  const band = levelToBand(difficultyLevel);
+  const pool = template.subtemplates.filter(t => t.band === band);
+  if (pool.length === 0) {
+    throw new Error(`No subtemplates for band=${band} in template=${template.id}`);
+  }
+  return rng.pick(pool).generate(rng);
+}
 
 /** 欧几里得算法求最大公约数。 */
 export function gcd(a, b) {
@@ -123,14 +148,4 @@ export function isPrime(n) {
     if (n % i === 0) return false;
   }
   return true;
-}
-
-/**
- * 调试/测试用范围断言;value 必须在 [lo, hi],否则抛出含 label 的明确错误。
- * 模板 generate 末尾可用,数字出 band 时立即报警。
- */
-export function assertInRange(value, lo, hi, label = 'value') {
-  if (value < lo || value > hi) {
-    throw new Error(`assertInRange: ${label}=${value} not in [${lo}, ${hi}]`);
-  }
 }

@@ -1,4 +1,4 @@
-import { pickNumberByBand, pickTwoSpeeds, pickPerson, pickTwoPeople, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand, pickPerson, pickTwoPeople, pickTwoSpeeds } from './helpers.js';
 
 function generateDistanceSubtemplates() {
   return [
@@ -93,8 +93,6 @@ export const distanceTemplate = {
   semester: 'all',
   subtemplates: generateDistanceSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

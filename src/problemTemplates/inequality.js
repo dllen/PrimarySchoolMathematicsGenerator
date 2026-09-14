@@ -1,4 +1,4 @@
-import { pickNumberByBand, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand } from './helpers.js';
 
 function generateInequalitySubtemplates() {
   return [
@@ -94,8 +94,6 @@ export const inequalityTemplate = {
   semester: 'all',
   subtemplates: generateInequalitySubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

@@ -1,4 +1,4 @@
-import { pickNumberByBand, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand } from './helpers.js';
 
 function generateHarvestSubtemplates() {
   return [
@@ -61,8 +61,6 @@ export const harvestFieldTemplate = {
   semester: 'all',
   subtemplates: generateHarvestSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

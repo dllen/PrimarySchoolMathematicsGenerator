@@ -1,4 +1,4 @@
-import { pickNumberByBand, pickPerson, pickTwoPeople, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand, pickPerson, pickTwoPeople } from './helpers.js';
 
 function generateBoatSubtemplates() {
   return [
@@ -66,8 +66,6 @@ export const boatCrossingTemplate = {
   semester: 'all',
   subtemplates: generateBoatSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

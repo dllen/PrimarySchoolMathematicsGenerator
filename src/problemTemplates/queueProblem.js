@@ -1,4 +1,4 @@
-import { pickNumberByBand, pickPerson, pickTwoPeople, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand, pickPerson, pickTwoPeople } from './helpers.js';
 
 function generateQueueSubtemplates() {
   return [
@@ -63,8 +63,6 @@ export const queueProblemTemplate = {
   semester: 'all',
   subtemplates: generateQueueSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

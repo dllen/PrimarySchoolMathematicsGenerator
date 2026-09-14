@@ -1,4 +1,4 @@
-import { pickNumberByBand, pickPerson, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand, pickPerson } from './helpers.js';
 
 const activities = ['起床', '上学', '吃午饭', '放学', '吃晚饭', '睡觉', '做作业', '看电视', '看书', '锻炼'];
 
@@ -139,8 +139,6 @@ export const timeTemplate = {
   semester: 'all',
   subtemplates: generateTimeSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

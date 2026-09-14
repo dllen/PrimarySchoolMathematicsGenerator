@@ -1,4 +1,4 @@
-import { pickNumberByBand, pickPerson, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand, pickPerson } from './helpers.js';
 
 const PEOPLE_POOL = ['小华', '小明', '小红', '小丽', '小强', '小军', '小芳', '小梅', '大伟', '小玲'];
 
@@ -214,8 +214,6 @@ export const logicTemplate = {
   semester: 'all',
   subtemplates: generateLogicSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

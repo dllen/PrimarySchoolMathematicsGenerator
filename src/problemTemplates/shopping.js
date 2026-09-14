@@ -1,4 +1,4 @@
-import { pickNumberByBand, pickPerson, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand, pickPerson } from './helpers.js';
 
 const items = {
   文具: ['铅笔', '橡皮', '文具盒', '笔记本', '尺子', '圆珠笔', '书包', '彩笔', '削笔刀', '修正带'],
@@ -215,8 +215,6 @@ export const shoppingTemplate = {
   semester: 'all',
   subtemplates: generateShoppingSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

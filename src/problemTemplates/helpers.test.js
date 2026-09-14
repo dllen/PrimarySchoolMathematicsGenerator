@@ -6,7 +6,9 @@ import {
   pickNumberByBand,
   pickPairByBand,
   pickPerson,
+  pickPeople,
   pickTwoPeople,
+  pickForBand,
   gcd,
   pickTwoSpeeds,
   pickRatio,
@@ -15,7 +17,6 @@ import {
   comb,
   lcm,
   isPrime,
-  assertInRange,
 } from './helpers.js';
 
 describe('BANDS', () => {
@@ -106,6 +107,46 @@ describe('pickTwoPeople', () => {
   });
 });
 
+describe('pickPeople', () => {
+  it('draws n distinct names without replacement', () => {
+    const rng = createRng(42);
+    for (let i = 0; i < 50; i++) {
+      const names = pickPeople(rng, 3);
+      expect(names).toHaveLength(3);
+      expect(new Set(names).size).toBe(3);
+    }
+  });
+  it('caps at the pool size', () => {
+    const rng = createRng(7);
+    expect(pickPeople(rng, 99)).toHaveLength(12);
+  });
+});
+
+describe('pickForBand', () => {
+  it('selects a subtemplate whose band matches the difficulty level', () => {
+    const template = {
+      id: 'fake',
+      subtemplates: [
+        { band: 'easy', generate: () => ({ tag: 'easy' }) },
+        { band: 'medium', generate: () => ({ tag: 'medium' }) },
+        { band: 'hard', generate: () => ({ tag: 'hard' }) },
+      ],
+    };
+    expect(pickForBand(template, 1, createRng(1)).tag).toBe('easy');
+    expect(pickForBand(template, 2, createRng(2)).tag).toBe('medium');
+    expect(pickForBand(template, 3, createRng(3)).tag).toBe('hard');
+  });
+  it('throws a named error when a band has no subtemplates', () => {
+    const template = {
+      id: 'holey',
+      subtemplates: [{ band: 'easy', generate: () => ({}) }],
+    };
+    expect(() => pickForBand(template, 3, createRng(1))).toThrow(
+      /No subtemplates for band=hard in template=holey/
+    );
+  });
+});
+
 describe('gcd', () => {
   it('computes gcd correctly', () => {
     expect(gcd(12, 8)).toBe(4);
@@ -189,14 +230,3 @@ describe('isPrime', () => {
   });
 });
 
-describe('assertInRange', () => {
-  it('passes silently when value is in [lo, hi]', () => {
-    expect(() => assertInRange(5, 1, 10, 'test')).not.toThrow();
-  });
-  it('throws when value is below lo', () => {
-    expect(() => assertInRange(0, 1, 10, 'n')).toThrow(/n.*0.*1.*10/);
-  });
-  it('throws when value is above hi', () => {
-    expect(() => assertInRange(11, 1, 10, 'n')).toThrow(/n.*11.*1.*10/);
-  });
-});

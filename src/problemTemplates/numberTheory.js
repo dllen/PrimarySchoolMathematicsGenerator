@@ -1,4 +1,4 @@
-import { pickNumberByBand, levelToBand, gcd, lcm, isPrime } from './helpers.js';
+import { gcd, isPrime, lcm, pickForBand, pickNumberByBand } from './helpers.js';
 
 function generateNumberTheorySubtemplates() {
   return [
@@ -105,8 +105,6 @@ export const numberTheoryTemplate = {
   semester: 'all',
   subtemplates: generateNumberTheorySubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

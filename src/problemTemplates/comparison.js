@@ -1,4 +1,4 @@
-import { pickNumberByBand, pickPerson, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand, pickPerson } from './helpers.js';
 
 const items = {
   零食: ['饼干', '巧克力', '薯片', '果冻', '蛋糕', '面包', '爆米花', '坚果'],
@@ -240,8 +240,6 @@ export const comparisonTemplate = {
   semester: 'all',
   subtemplates: generateComparisonSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

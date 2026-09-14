@@ -1,4 +1,4 @@
-import { pickNumberByBand, pickRatio, pickPerson, pickTwoPeople, gcd, levelToBand } from './helpers.js';
+import { gcd, pickForBand, pickNumberByBand, pickPerson, pickRatio, pickTwoPeople } from './helpers.js';
 
 function generateRatioSubtemplates() {
   return [
@@ -89,8 +89,6 @@ export const ratioTemplate = {
   semester: 'all',
   subtemplates: generateRatioSubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };

@@ -1,4 +1,4 @@
-import { pickNumberByBand, levelToBand } from './helpers.js';
+import { pickForBand, pickNumberByBand } from './helpers.js';
 
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'];
 
@@ -64,8 +64,6 @@ export const dutyRosterTemplate = {
   semester: 'all',
   subtemplates: generateDutySubtemplates(),
   generate(rng, difficultyLevel) {
-    const band = levelToBand(difficultyLevel);
-    const pool = this.subtemplates.filter(t => t.band === band);
-    return rng.pick(pool).generate(rng);
+    return pickForBand(this, difficultyLevel, rng);
   },
 };
