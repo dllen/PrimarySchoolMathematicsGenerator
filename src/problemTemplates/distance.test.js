@@ -30,10 +30,10 @@ describe('distanceTemplate', () => {
     const { speed1, speed2, time, distance } = result.payload;
     expect(distance).toBe((speed1 + speed2) * time);
   });
-  it('hard (round): distance = (s1+s2) * laps * track', () => {
-    const result = findWith(3, p => p.laps !== undefined);
-    const { speed1, speed2, laps, track, distance } = result.payload;
-    expect(distance).toBe((speed1 + speed2) * laps * track);
+  it('hard (round): distance = (s1+s2) * time', () => {
+    const result = findWith(3, p => p.time !== undefined && p.speed1 !== undefined && p.interval === undefined);
+    const { speed1, speed2, time, distance } = result.payload;
+    expect(distance).toBe((speed1 + speed2) * time);
   });
   it('hard (bus): total = interval * buses', () => {
     const result = findWith(3, p => p.interval !== undefined);

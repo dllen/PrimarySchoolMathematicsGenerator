@@ -6,6 +6,9 @@ export const QUESTION_TYPES = [
   'boat-crossing', 'share-candy', 'library',
   'queue', 'red-packet', 'sports-score',
   'harvest', 'duty-roster',
+  // Plan B:
+  'engineering', 'concentration', 'distance',
+  'ratio', 'statistics',
 ];
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ANSWER_MODES = ['hidden', 'inline', 'separate'];

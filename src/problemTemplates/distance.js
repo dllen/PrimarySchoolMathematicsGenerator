@@ -59,15 +59,13 @@ function generateDistanceSubtemplates() {
       generate(rng) {
         const [p1, p2] = pickTwoPeople(rng);
         const { speed1, speed2 } = pickTwoSpeeds(rng, 'hard', { min: 80, max: 200 });
-        // pick laps and track directly so the math holds
-        const laps = rng.int(2, 5);
-        const track = rng.int(200, 400);
-        const distance = (speed1 + speed2) * laps * track;
+        const time = rng.int(3, 10);
+        const distance = (speed1 + speed2) * time;
         return {
-          question: `${track}米环形跑道,${p1}速度${speed1}米/分钟,${p2}速度${speed2}米/分钟,两人相向而行${laps}圈后相遇,相遇时一共走了多少米?`,
+          question: `${p1}速度${speed1}米/分钟,${p2}速度${speed2}米/分钟,两人从同一点反向沿环形跑道出发,${time}分钟后一共跑了多少米?`,
           answer: `${distance}米`,
           subtype: 'distance',
-          payload: { speed1, speed2, laps, track, distance },
+          payload: { speed1, speed2, time, distance },
         };
       },
     },

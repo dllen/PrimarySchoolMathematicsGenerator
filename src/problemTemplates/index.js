@@ -12,6 +12,11 @@ import { redPacketTemplate } from './redPacket.js';
 import { sportsScoreTemplate } from './sportsScore.js';
 import { harvestFieldTemplate } from './harvestField.js';
 import { dutyRosterTemplate } from './dutyRoster.js';
+import { engineeringTemplate } from './engineering.js';
+import { concentrationTemplate } from './concentration.js';
+import { distanceTemplate } from './distance.js';
+import { ratioTemplate } from './ratio.js';
+import { statisticsTemplate } from './statistics.js';
 
 export const APPLICATION_TEMPLATES = [
   shoppingTemplate, timeTemplate, comparisonTemplate, chickenRabbitTemplate,
@@ -19,6 +24,9 @@ export const APPLICATION_TEMPLATES = [
   boatCrossingTemplate, shareCandyTemplate, libraryCornerTemplate,
   queueProblemTemplate, redPacketTemplate, sportsScoreTemplate,
   harvestFieldTemplate, dutyRosterTemplate,
+  // Plan B: 5 more application templates
+  engineeringTemplate, concentrationTemplate, distanceTemplate,
+  ratioTemplate, statisticsTemplate,
 ];
 
 export const OLYMPIAD_TEMPLATES = [sequenceTemplate, logicTemplate];
