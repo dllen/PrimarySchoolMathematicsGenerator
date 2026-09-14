@@ -51,7 +51,9 @@ vi.mock('./usePrint', () => ({
 vi.mock('./usePdfExport', () => ({
   usePdfExport: () => ({
     exportPdf: vi.fn(),
-    exportPdfWithTimeout: vi.fn(),
+    exportPdfWithTimeout: vi.fn(() =>
+      Promise.resolve(new Blob(['mock'], { type: 'application/pdf' }))
+    ),
     buildFilename: vi.fn((config) => {
       const today = new Date()
       const yyyy = today.getFullYear()

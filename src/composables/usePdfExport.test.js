@@ -4,14 +4,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 let shouldHang = false;
 
 vi.mock('html2pdf.js', () => {
-  const saveFn = vi.fn(() => {
+  const outputPdfFn = vi.fn((type) => {
     if (shouldHang) {
       // Return a promise that never resolves for timeout tests
       return new Promise(() => {});
     }
+    // 模拟生成一个 1-byte 的 Blob,代表真实的 PDF 输出
+    if (type === 'blob') return Promise.resolve(new Blob(['x'], { type: 'application/pdf' }));
     return Promise.resolve();
   });
-  const fromFn = vi.fn(() => ({ save: saveFn }));
+  const fromFn = vi.fn(() => ({ outputPdf: outputPdfFn }));
   const setFn = vi.fn(() => ({ from: fromFn }));
   const html2pdf = vi.fn(() => ({ set: setFn }));
   return { default: html2pdf };

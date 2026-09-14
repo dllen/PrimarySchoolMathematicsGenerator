@@ -115,6 +115,13 @@ export function useEnhancedExport() {
       // 自动获得 AbortSignal 支持 + clearTimeout 防泄漏。
       const blob = await exportPdfWithTimeout(config.element, filename, options)
 
+      // 防御:若底层实现返回空值(取消 / 超时误返回 / 旧版 .save() 返回 undefined),
+      // 立即抛错而不是把 undefined 传给 createObjectURL(浏览器会抛
+      // "Overload resolution failed",且这条错误容易误导调试)。
+      if (!(blob instanceof Blob)) {
+        throw new Error('PDF 生成失败:未获取到文件数据')
+      }
+
       const url = URL.createObjectURL(blob)
       showPreview('pdf', { url, filename, blob })
       success('PDF 生成成功', filename)

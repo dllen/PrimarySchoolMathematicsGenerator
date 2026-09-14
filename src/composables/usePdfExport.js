@@ -10,7 +10,10 @@ export function usePdfExport() {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['css', 'legacy'] },
     };
-    return html2pdf().set(opt).from(element).save();
+    // 使用 outputPdf('blob') 而不是 save():
+    //   - .save() 触发浏览器下载,返回 undefined
+    //   - .outputPdf('blob') 返回 PDF 的 Blob,便于生成预览 / 自定义下载
+    return html2pdf().set(opt).from(element).outputPdf('blob');
   }
 
   function buildFilename({ grade, semester }) {
