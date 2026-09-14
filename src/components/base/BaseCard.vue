@@ -18,11 +18,15 @@ export default {
   },
   computed: {
     cardClasses() {
-      const base = 'rounded-lg transition-all duration-150'
+      // flex flex-col:卡片根作为纵向 flex 容器,方便使用 mt-auto 锚定底部元素,
+      // 从而在 grid 中不同内容长度的卡片仍能基线对齐。
+      const base = 'rounded-lg transition-all duration-150 flex flex-col'
       const variants = {
-        paper: 'bg-paper-card border border-rule-soft shadow-soft',
-        ink: 'bg-ink-deep text-paper',
-        outline: 'bg-transparent border border-rule-soft',
+        // 默认 p-4:所有卡片都自带内容内边距,使用方不必重复写,
+        // 同时保证 grid 中相邻卡片的内文有统一的视觉间距。
+        paper: 'bg-paper-card border border-rule-soft shadow-soft p-4',
+        ink: 'bg-ink-deep text-paper p-4',
+        outline: 'bg-transparent border border-rule-soft p-4',
       }
       const interactive = this.interactive
         ? 'cursor-pointer hover:shadow-medium hover:-translate-y-0.5'

@@ -3,9 +3,10 @@
     :variant="recommended ? 'ink' : 'paper'"
     interactive
     :selected="selected"
+    class="h-full"
     data-test="grade-card" @click="$emit('select', grade)"
   >
-    <div class="flex items-start justify-between mb-2">
+    <div class="flex items-start justify-between gap-2 mb-3">
       <span
         class="text-eyebrow"
         :class="recommended ? 'text-rule-soft' : 'text-ink-faint'"
@@ -15,16 +16,18 @@
       <BaseBadge v-if="recommended" variant="ember">推荐</BaseBadge>
     </div>
     <h3
-      class="font-serif text-base font-semibold mb-1"
+      class="font-serif text-lg font-semibold mb-2 leading-snug"
       :class="recommended ? 'text-paper-card' : 'text-ink-deep'"
     >
       {{ topic }}
     </h3>
     <p
-      class="text-xs"
+      class="text-xs mt-auto pt-2"
       :class="recommended ? 'text-rule-softer' : 'text-ink-muted'"
     >
-      {{ difficulty }} · {{ duration }} 分钟
+      <span>{{ difficulty }}</span>
+      <span aria-hidden="true" class="mx-1 opacity-60">·</span>
+      <span>{{ duration }} 分钟</span>
     </p>
   </BaseCard>
 </template>

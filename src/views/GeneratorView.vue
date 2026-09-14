@@ -3,7 +3,7 @@
     <!-- 工作台默认视图: Hero + 6 个年级卡片 -->
     <section v-if="!selectedGrade && !showAdvanced">
       <WorkbenchHero />
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         <GradeCard
           v-for="preset in gradePresets"
           :key="preset.grade"

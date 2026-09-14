@@ -180,11 +180,13 @@
       <!-- 配置摘要 -->
       <div class="p-4 bg-ember/5 border border-ember/20 rounded-lg space-y-1.5">
         <p class="text-sm font-semibold text-ember mb-2">配置摘要</p>
-        <div class="grid grid-cols-2 gap-x-6 gap-y-1">
-          <p v-for="(val, key) in getConfigSummary()" :key="key" class="text-sm text-ink-muted">
-            <span class="text-ink-deep font-medium">{{ val.label }}：</span>{{ val.value }}
-          </p>
-        </div>
+        <!-- 配置摘要:label/value 同行,auto+1fr 列让标签右对齐时视觉齐整 -->
+        <dl class="grid grid-cols-[auto_1fr] sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+          <template v-for="(val, key) in getConfigSummary()" :key="key">
+            <dt class="text-ink-deep font-medium">{{ val.label }}</dt>
+            <dd class="text-ink-muted truncate">{{ val.value }}</dd>
+          </template>
+        </dl>
       </div>
     </div>
 

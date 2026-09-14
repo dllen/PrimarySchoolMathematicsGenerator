@@ -11,20 +11,19 @@
       </button>
     </div>
 
-    <!-- 预设卡片网格 -->
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+    <!-- 预设卡片网格:h-full 保证同行卡片等高,line-clamp-2 防描述溢出 -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
       <BaseCard
         v-for="preset in presets"
         :key="preset.id"
         variant="paper"
         interactive
+        class="h-full items-center text-center"
         @click="$emit('apply', preset.config)"
       >
-        <div class="text-center">
-          <p class="text-3xl mb-2">{{ preset.icon }}</p>
-          <p class="font-serif font-semibold text-ink-deep text-sm mb-1">{{ preset.name }}</p>
-          <p class="text-xs text-ink-muted leading-snug">{{ preset.description }}</p>
-        </div>
+        <p class="text-4xl mb-2 leading-none" aria-hidden="true">{{ preset.icon }}</p>
+        <p class="font-serif font-semibold text-ink-deep text-sm mb-1">{{ preset.name }}</p>
+        <p class="text-xs text-ink-muted leading-snug line-clamp-2">{{ preset.description }}</p>
       </BaseCard>
     </div>
 
@@ -44,23 +43,22 @@
         <p class="text-sm text-ink-faint">还没有自定义预设</p>
       </div>
 
-      <div v-else class="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div v-else class="grid grid-cols-2 md:grid-cols-3 gap-4">
         <BaseCard
           v-for="preset in customPresets"
           :key="preset.id"
           variant="paper"
           interactive
-          class="relative group"
+          class="relative group h-full items-center text-center"
           @click="$emit('apply', preset.config)"
         >
-          <div class="text-center">
-            <p class="text-3xl mb-2">{{ preset.icon || '⭐' }}</p>
-            <p class="font-serif font-semibold text-ink-deep text-sm mb-1">{{ preset.name }}</p>
-            <p class="text-xs text-ink-muted leading-snug">{{ preset.description }}</p>
-          </div>
-          <!-- 删除按钮（hover 显示） -->
+          <p class="text-4xl mb-2 leading-none" aria-hidden="true">{{ preset.icon || '⭐' }}</p>
+          <p class="font-serif font-semibold text-ink-deep text-sm mb-1">{{ preset.name }}</p>
+          <p class="text-xs text-ink-muted leading-snug line-clamp-2">{{ preset.description }}</p>
+          <!-- 删除按钮（hover 显示,需避开 BaseCard 自带的 p-4 → 移到内边距内） -->
           <button
-            class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-red-500/80 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            class="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500/85 text-white text-sm flex items-center justify-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+            aria-label="删除预设 {{ preset.name }}"
             @click.stop="$emit('delete', preset.id)"
           >
             ×
