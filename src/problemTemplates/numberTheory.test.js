@@ -52,4 +52,18 @@ describe('numberTheoryTemplate', () => {
     expect(x % n1).toBe(r1);
     expect(x % n2).toBe(r2);
   });
+
+  it('hard (puzzle): moduli differ so a solution always exists', () => {
+    // Regression: n1 and n2 could both be 5 with conflicting remainders,
+    // which made the problem unsatisfiable and returned the 1000 sentinel.
+    for (let i = 0; i < 500; i++) {
+      const r = numberTheoryTemplate.generate(createRng(i * 31 + 3 * 977), 3);
+      const p = r.payload;
+      if (p.n1 === undefined) continue;
+      expect(p.n1, r.question).not.toBe(p.n2);
+      expect(p.x, r.question).toBeLessThan(1000);
+      expect(p.x % p.n1).toBe(p.r1);
+      expect(p.x % p.n2).toBe(p.r2);
+    }
+  });
 });

@@ -29,6 +29,8 @@ export function pickNumberByBand(rng, band, { min, max }) {
   let lo = Math.floor(min * scale);
   let hi = Math.floor(max * scale);
   if (band === 'easy') lo = Math.max(1, lo);
+  // Guard: the easy clamp can push lo above hi (e.g. {min:0,max:0} -> lo=1, hi=0).
+  if (hi < lo) hi = lo;
   return rng.int(lo, hi);
 }
 
@@ -44,6 +46,11 @@ export function pickPairByBand(rng, band, { min, max }) {
     b = pickNumberByBand(rng, band, { min, max });
     tries++;
   } while (b === a && tries < 10);
+  if (b === a) {
+    // The band-scaled range collapsed to a single value; two distinct draws
+    // are impossible. Fail loudly rather than silently returning [a, a].
+    throw new Error(`pickPairByBand: cannot draw two distinct values in band=${band} range [${min}, ${max}]`);
+  }
   return [a, b];
 }
 

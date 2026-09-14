@@ -68,9 +68,12 @@ function generateLogicSubtemplates() {
       id: 'logic-plant-trees',
       band: 'medium',
       generate(rng) {
-        const length = pickNumberByBand(rng, 'medium', { min: 10, max: 40 });
-        const interval = pickNumberByBand(rng, 'medium', { min: 2, max: 5 });
-        const trees = Math.floor(length / interval) + 1;
+        const interval = rng.int(2, 5);
+        const segments = rng.int(3, 9);
+        // '两端都种' requires the road length to be an exact multiple of the
+        // spacing; otherwise the last tree does not land on the far end.
+        const length = interval * segments;
+        const trees = segments + 1;
         return {
           question: `一条${length}米长的路，每隔${interval}米种一棵树（两端都种），一共种多少棵树？`,
           answer: `${trees}`,
@@ -150,7 +153,9 @@ function generateLogicSubtemplates() {
         const peopleCount = pickNumberByBand(rng, 'hard', { min: 5, max: 12 });
         // Use rng.int for computed max to keep groupCount ≤ peopleCount/2
         const groupCount = rng.int(2, Math.floor(peopleCount / 2));
-        const answer = Math.floor(peopleCount / groupCount) + 1;
+        // Pigeonhole bound is ceil(N/G). floor(N/G)+1 overstates by one
+        // whenever G divides N (10 books, 5 shelves -> 2, not 3).
+        const answer = Math.ceil(peopleCount / groupCount);
         return {
           question: `把${peopleCount}本书放进${groupCount}个书架，至少有一个书架有几本书？`,
           answer: `${answer}`,

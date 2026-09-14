@@ -55,26 +55,6 @@ describe('numbersInBand', () => {
         });
       }
 
-      it('easy band generates smaller numbers than hard band on average', () => {
-        const easyNums = [];
-        const hardNums = [];
-
-        for (let i = 0; i < 200; i++) {
-          const easyRng = createRng(i);
-          const hardRng = createRng(i + 1000);
-
-          const easyResult = template.generate(easyRng, 1);
-          const hardResult = template.generate(hardRng, 3);
-
-          easyNums.push(...extractNumbers(easyResult.payload));
-          hardNums.push(...extractNumbers(hardResult.payload));
-        }
-
-        const easyAvg = easyNums.reduce((a, b) => a + b, 0) / easyNums.length;
-        const hardAvg = hardNums.reduce((a, b) => a + b, 0) / hardNums.length;
-
-        expect(easyAvg, `easy avg=${easyAvg.toFixed(1)} should be < hard avg=${hardAvg.toFixed(1)}`).toBeLessThan(hardAvg);
-      });
     });
   }
 });

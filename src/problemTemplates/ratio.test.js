@@ -49,4 +49,36 @@ describe('ratioTemplate', () => {
       expect(partA * b, `seed=${i} ${a}:${b} split ${partA}:${partB}`).toBe(partB * a);
     }
   });
+
+  it('ratio-scale and ratio-partnership split exactly in the stated ratio', () => {
+    // Regression: partB was round(partA * b / a) and share1 was
+    // round(profit * a / sum), so the shown split broke the stated ratio
+    // in 13% and 81% of cases respectively.
+    for (let level of [2, 3]) {
+      for (let i = 0; i < 500; i++) {
+        const r = ratioTemplate.generate(createRng(i * 31 + level * 977), level);
+        const p = r.payload;
+        if (p.partA !== undefined && p.partB !== undefined) {
+          expect(p.partA * p.b, `${r.question} => ${r.answer}`).toBe(p.partB * p.a);
+        }
+        if (p.share1 !== undefined && p.share2 !== undefined) {
+          expect(p.share1 * p.b, `${r.question} => ${r.answer}`).toBe(p.share2 * p.a);
+          expect(p.share1 + p.share2).toBe(p.profit);
+        }
+      }
+    }
+  });
+
+  it('medium (combine): the question states how much was shared each round', () => {
+    // Regression: without per-round totals the merged ratio was undetermined.
+    for (let i = 0; i < 400; i++) {
+      const r = ratioTemplate.generate(createRng(i), 2);
+      const p = r.payload;
+      if (p.round1Total === undefined) continue;
+      expect(r.question).toContain(`${p.round1Total}颗糖`);
+      expect(r.question).toContain(`${p.round2Total}颗糖`);
+      // the stated ratio must match the stated totals
+      expect(p.round1Total * p.a1).toBe((p.a1 + p.b1) * p.a1 * (p.round1Total / (p.a1 + p.b1)));
+    }
+  });
 });

@@ -35,4 +35,35 @@ describe('ApplicationStrategy', () => {
     const b = s.generate(createRng(42));
     expect(a).toEqual(b);
   });
+
+  it('respects difficulty: easy never yields a hard-band subtemplate', () => {
+    // Regression: the strategy used to rng.pick(tpl.subtemplates) directly,
+    // bypassing tpl.generate() and so ignoring the band entirely. The
+    // red-packet hard variant is identifiable by asking for the unknown packet.
+    const HARD_SIGNATURE = /另一个多少元的红包/;
+    const easy = new ApplicationStrategy({ ...config, grade: '3', difficulty: 'easy' });
+    const hard = new ApplicationStrategy({ ...config, grade: '3', difficulty: 'hard' });
+
+    let easyHard = 0;
+    for (let i = 0; i < 3000; i++) {
+      if (HARD_SIGNATURE.test(easy.generate(createRng(i)).question)) easyHard++;
+    }
+    expect(easyHard, 'easy band leaked a hard-band problem').toBe(0);
+
+    let hardHard = 0;
+    for (let i = 0; i < 3000; i++) {
+      if (HARD_SIGNATURE.test(hard.generate(createRng(i)).question)) hardHard++;
+    }
+    expect(hardHard, 'hard band never produced its own subtemplate').toBeGreaterThan(0);
+  });
+
+  it('every generated problem carries a known application subtype', () => {
+    const s2 = new ApplicationStrategy({ ...config, grade: '4', difficulty: 'medium' });
+    for (let i = 0; i < 500; i++) {
+      const r = s2.generate(createRng(i));
+      expect(typeof r.subtype).toBe('string');
+      expect(r.subtype.length).toBeGreaterThan(0);
+      expect(r.question).not.toMatch(/\{[a-zA-Z0-9_]+\}/);
+    }
+  });
 });

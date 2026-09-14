@@ -6,14 +6,16 @@ function generateConcentrationSubtemplates() {
       id: 'concentration-basic',
       band: 'easy',
       generate(rng) {
-        const solute = pickNumberByBand(rng, 'easy', { min: 5, max: 15 });
-        const solution = pickNumberByBand(rng, 'easy', { min: 30, max: 80 });
+        const solute = rng.int(5, 15);
+        const water = rng.int(30, 90);
+        // 浓度 = 溶质 / 溶液, and 溶液 = 溶质 + 水.
+        const solution = solute + water;
         const percent = Math.round(solute / solution * 100);
         return {
-          question: `把${solute}克糖溶解在${solution}克水中,糖水浓度是多少(百分数)?`,
+          question: `把${solute}克糖溶解在${water}克水中,糖水浓度是多少(百分数,四舍五入取整数)?`,
           answer: `${percent}%`,
           subtype: 'concentration',
-          payload: { solute, solution, percent },
+          payload: { solute, water, solution, percent },
         };
       },
     },
@@ -36,17 +38,16 @@ function generateConcentrationSubtemplates() {
       id: 'concentration-dilute',
       band: 'medium',
       generate(rng) {
-        const solute = pickNumberByBand(rng, 'medium', { min: 10, max: 30 });
-        const solution = pickNumberByBand(rng, 'medium', { min: 50, max: 100 });
-        // hard band scales max; pick addedWater directly to stay below constraints
+        const solute = rng.int(10, 30);
+        const water = rng.int(50, 100);
         const addedWater = rng.int(20, 50);
-        const newSolution = solution + addedWater;
+        const newSolution = solute + water + addedWater;
         const newPercent = Math.round(solute / newSolution * 100);
         return {
-          question: `原有${solute}克糖溶在${solution}克水中,又加了${addedWater}克水,新浓度是多少?`,
+          question: `原有${solute}克糖溶在${water}克水中,又加了${addedWater}克水,新浓度是多少(百分数,取整数)?`,
           answer: `${newPercent}%`,
           subtype: 'concentration',
-          payload: { solute, solution, addedWater, newSolution, newPercent },
+          payload: { solute, water, addedWater, newSolution, newPercent },
         };
       },
     },
@@ -73,18 +74,17 @@ function generateConcentrationSubtemplates() {
       id: 'concentration-evaporate',
       band: 'hard',
       generate(rng) {
-        const solute = pickNumberByBand(rng, 'hard', { min: 15, max: 35 });
-        const solution = pickNumberByBand(rng, 'hard', { min: 60, max: 120 });
-        // pick evaporated directly so solution-evaporated > 0
-        const maxEvap = Math.max(1, solution - 1);
-        const evaporated = rng.int(10, Math.min(30, maxEvap));
-        const newSolution = solution - evaporated;
+        const solute = rng.int(15, 35);
+        const water = rng.int(60, 120);
+        // Evaporating water must leave some water behind (newSolution > solute).
+        const evaporated = rng.int(10, Math.max(10, water - 5));
+        const newSolution = solute + water - evaporated;
         const newPercent = Math.round(solute / newSolution * 100);
         return {
-          question: `${solute}克糖溶在${solution}克水中,蒸发掉${evaporated}克水,新浓度是多少?`,
+          question: `${solute}克糖溶在${water}克水中,蒸发掉${evaporated}克水,新浓度是多少(百分数,取整数)?`,
           answer: `${newPercent}%`,
           subtype: 'concentration',
-          payload: { solute, solution, evaporated, newSolution, newPercent },
+          payload: { solute, water, evaporated, newSolution, newPercent },
         };
       },
     },

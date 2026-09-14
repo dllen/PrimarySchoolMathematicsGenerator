@@ -14,10 +14,9 @@ export class OlympiadStrategy extends ProblemGeneratorStrategy {
       throw new Error(`No olympiad templates available for grade ${this.config.grade}`);
     }
     const tpl = rng.pick(this.templates);
-    if (tpl.subtemplates) {
-      const subtpl = rng.pick(tpl.subtemplates);
-      return subtpl.generate(rng, this.difficultyLevel);
-    }
+    // Delegate to the template: its generate() maps the difficulty level to a
+    // band and filters subtemplates. Picking a subtemplate here directly
+    // bypassed that filter, making every `band` label inert.
     return tpl.generate(rng, this.difficultyLevel);
   }
 }

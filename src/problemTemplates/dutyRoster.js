@@ -29,7 +29,8 @@ function generateDutySubtemplates() {
       generate(rng) {
         const K = pickNumberByBand(rng, 'medium', { min: 3, max: 8 });
         const cycle = 5;
-        const dayIndex = K % cycle;
+        // K is 1-based ('第 K 个值日'), so the first duty lands on index 0.
+        const dayIndex = (K - 1) % cycle;
         return {
           question: `班级值日按周一至周五循环,小明了第${K}个值日,那天是星期几?`,
           answer: `星期${WEEKDAYS[dayIndex]}`,

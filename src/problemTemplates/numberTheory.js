@@ -82,12 +82,17 @@ function generateNumberTheorySubtemplates() {
       id: 'nt-puzzle',
       band: 'hard',
       generate(rng) {
+        // n1 and n2 must differ (and be coprime) or the two congruences can
+        // contradict each other and no solution exists below the sentinel.
         const n1 = rng.pick([3, 5]);
-        const n2 = rng.pick([5, 7]);
+        const n2 = rng.pick([5, 7].filter(n => n !== n1));
         const r1 = rng.int(1, n1 - 1);
         const r2 = rng.int(1, n2 - 1);
         let x = 1;
         while (!(x % n1 === r1 && x % n2 === r2) && x < 1000) x++;
+        if (!(x % n1 === r1 && x % n2 === r2)) {
+          throw new Error(`nt-puzzle: no solution for n1=${n1} r1=${r1} n2=${n2} r2=${r2}`);
+        }
         return {
           question: `一个数除以${n1}余${r1},除以${n2}余${r2},这个数最小是多少?`,
           answer: `${x}`,

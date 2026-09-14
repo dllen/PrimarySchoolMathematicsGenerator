@@ -42,16 +42,29 @@ describe('shareCandyTemplate', () => {
     expect(total).toBe(each * people + remain);
     expect(result.question).toMatch(/几位小朋友/);
   });
-  it('hard: inverse half-back formula', () => {
-    const rng = createRng(3);
-    let result;
-    for (let i = 0; i < 50; i++) {
-      result = shareCandyTemplate.generate(rng, 3);
-      if (result.payload.steps !== undefined) break;
+  it('hard: answer survives the stated forward operation', () => {
+    // Verify by APPLYING the question's own rule ('每次拿走一半多1颗',
+    // i.e. remaining = x/2 - 1) rather than restating the inverse formula.
+    for (let i = 0; i < 300; i++) {
+      const result = shareCandyTemplate.generate(createRng(i * 31 + 3 * 977), 3);
+      const { steps, final, original } = result.payload;
+      if (steps === undefined) continue;
+      let x = original;
+      for (let k = 0; k < steps; k++) {
+        expect(x % 2, `original=${original} not divisible at step ${k}`).toBe(0);
+        x = x / 2 - 1;
+      }
+      expect(x, `original=${original} final=${final}`).toBe(final);
     }
-    const { steps, final, original } = result.payload;
-    let cur = final;
-    for (let i = 0; i < steps; i++) cur = cur * 2 + 1;
-    expect(cur).toBe(original);
+  });
+
+  it('share-apple keeps 余数 < 除数', () => {
+    // Regression: 每人分到3个，还剩3个 is not a valid remainder.
+    for (let i = 0; i < 500; i++) {
+      const r = shareCandyTemplate.generate(createRng(i), 2);
+      const p = r.payload;
+      if (p.remain === undefined || p.each === undefined) continue;
+      expect(p.remain, `${r.question} => ${r.answer}`).toBeLessThan(p.each);
+    }
   });
 });

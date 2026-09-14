@@ -228,5 +228,20 @@ describe('isPrime', () => {
     expect(isPrime(8)).toBe(false);
     expect(isPrime(15)).toBe(false);
   });
+
+describe('band helpers: degenerate ranges', () => {
+  it('pickNumberByBand never returns a value above hi', () => {
+    const rng = createRng(1);
+    for (let i = 0; i < 20; i++) {
+      expect(pickNumberByBand(rng, 'easy', { min: 0, max: 0 })).toBe(1);
+    }
+  });
+  it('pickPairByBand throws instead of silently returning equal values', () => {
+    const rng = createRng(1);
+    expect(() => pickPairByBand(rng, 'easy', { min: 1, max: 1 })).toThrow(
+      /cannot draw two distinct values/
+    );
+  });
+});
 });
 

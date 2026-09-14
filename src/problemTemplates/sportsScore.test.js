@@ -37,4 +37,15 @@ describe('sportsScoreTemplate', () => {
     const { t1, t2, t3, total } = result.payload;
     expect(total).toBe(t1 + t2 + t3);
   });
+
+  it('medium (rank): the ranking names the teams', () => {
+    // Regression: '前三名是谁' had no answer because teams were unnamed.
+    for (let i = 0; i < 300; i++) {
+      const r = sportsScoreTemplate.generate(createRng(i), 2);
+      if (r.payload.firstIdx === undefined) continue;
+      expect(r.question).toContain('红队');
+      expect(r.answer).toContain('红队');
+      expect(r.answer).toMatch(/第1名/);
+    }
+  });
 });

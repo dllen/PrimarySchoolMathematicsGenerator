@@ -69,6 +69,19 @@ describe('concentrationTemplate', () => {
     const { totalSolute, totalSolution, percent } = result.payload;
     expect(percent).toBe(Math.round(totalSolute / totalSolution * 100));
   });
+
+  it('basic/dilute/evaporate divide by solute + water, not by the water alone', () => {
+    // Regression: the text said 'N克水' but the code divided by N as if it were
+    // the total solution, overstating every concentration.
+    for (let i = 0; i < 400; i++) {
+      const r = concentrationTemplate.generate(createRng(i), 1);
+      const p = r.payload;
+      if (p.water === undefined || p.solution === undefined) continue;
+      expect(p.solution, r.question).toBe(p.solute + p.water);
+      expect(p.percent, r.question).toBe(Math.round(p.solute / p.solution * 100));
+      expect(r.question).toContain(`${p.water}克水`);
+    }
+  });
 });
 
 // Helper used in basic test

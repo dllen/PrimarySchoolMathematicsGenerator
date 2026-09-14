@@ -58,12 +58,12 @@ function generateChickenRabbitSubtemplates() {
 
         const questionTemplate = pickRandom(questions, rng);
         const question = questionTemplate
-          .replace('{animal1}', animal1)
-          .replace('{animal2}', animal2)
-          .replace('{totalHeads}', totalHeads.toString())
-          .replace('{totalLegs}', totalLegs.toString())
-          .replace('{leg1}', leg1.toString())
-          .replace('{leg2}', leg2.toString());
+          .replaceAll('{animal1}', animal1)
+          .replaceAll('{animal2}', animal2)
+          .replaceAll('{totalHeads}', totalHeads.toString())
+          .replaceAll('{totalLegs}', totalLegs.toString())
+          .replaceAll('{leg1}', leg1.toString())
+          .replaceAll('{leg2}', leg2.toString());
 
         return {
           question,
@@ -84,12 +84,12 @@ function generateChickenRabbitSubtemplates() {
 
         const questionTemplate = pickRandom(questions, rng);
         const question = questionTemplate
-          .replace('{animal1}', '鸡')
-          .replace('{animal2}', '兔')
-          .replace('{totalHeads}', totalHeads.toString())
-          .replace('{totalLegs}', totalLegs.toString())
-          .replace('{leg1}', '2')
-          .replace('{leg2}', '4');
+          .replaceAll('{animal1}', '鸡')
+          .replaceAll('{animal2}', '兔')
+          .replaceAll('{totalHeads}', totalHeads.toString())
+          .replaceAll('{totalLegs}', totalLegs.toString())
+          .replaceAll('{leg1}', '2')
+          .replaceAll('{leg2}', '4');
 
         return {
           question,
@@ -166,13 +166,13 @@ function generateChickenRabbitSubtemplates() {
 
         const questionTemplate = pickRandom(questionsWithDifference, rng);
         const question = questionTemplate
-          .replace('{animal1}', animal1)
-          .replace('{animal2}', animal2)
-          .replace('{totalHeads}', totalHeads.toString())
-          .replace('{totalLegs}', totalLegs.toString())
-          .replace('{leg1}', leg1.toString())
-          .replace('{leg2}', leg2.toString())
-          .replace('{diff}', diff.toString());
+          .replaceAll('{animal1}', animal1)
+          .replaceAll('{animal2}', animal2)
+          .replaceAll('{totalHeads}', totalHeads.toString())
+          .replaceAll('{totalLegs}', totalLegs.toString())
+          .replaceAll('{leg1}', leg1.toString())
+          .replaceAll('{leg2}', leg2.toString())
+          .replaceAll('{diff}', diff.toString());
 
         return {
           question,
@@ -196,14 +196,14 @@ function generateChickenRabbitSubtemplates() {
 
         const questionTemplate = pickRandom(questionsBuying, rng);
         const question = questionTemplate
-          .replace('{person}', pickPerson(rng))
-          .replace('{animal1}', '鸡')
-          .replace('{animal2}', '兔')
-          .replace('{totalHeads}', totalHeads.toString())
-          .replace('{price1}', price1.toString())
-          .replace('{price2}', price2.toString())
-          .replace('{totalPrice}', totalPrice.toString())
-          .replace('{diff}', diff.toString());
+          .replaceAll('{person}', pickPerson(rng))
+          .replaceAll('{animal1}', '鸡')
+          .replaceAll('{animal2}', '兔')
+          .replaceAll('{totalHeads}', totalHeads.toString())
+          .replaceAll('{price1}', price1.toString())
+          .replaceAll('{price2}', price2.toString())
+          .replaceAll('{totalPrice}', totalPrice.toString())
+          .replaceAll('{diff}', diff.toString());
 
         return {
           question,
@@ -241,12 +241,12 @@ function generateChickenRabbitSubtemplates() {
 
         const questionTemplate = pickRandom(questionsMove, rng);
         const question = questionTemplate
-          .replace('{animal1}', animal1)
-          .replace('{animal2}', animal2)
-          .replace('{action}', action)
-          .replace('{moved}', `${movedCount}只${moveLeg1 === leg1 ? animal1 : animal2}`)
-          .replace('{resultHeads}', resultHeads.toString())
-          .replace('{resultLegs}', resultLegs.toString());
+          .replaceAll('{animal1}', animal1)
+          .replaceAll('{animal2}', animal2)
+          .replaceAll('{action}', action)
+          .replaceAll('{moved}', `${movedCount}只${moveLeg1 === leg1 ? animal1 : animal2}`)
+          .replaceAll('{resultHeads}', resultHeads.toString())
+          .replaceAll('{resultLegs}', resultLegs.toString());
 
         return {
           question,
@@ -260,19 +260,22 @@ function generateChickenRabbitSubtemplates() {
       id: 'chicken-rabbit-multiple',
       band: 'hard',
       generate(rng) {
-        const totalHeads = pickNumberByBand(rng, 'hard', { min: 15, max: 40 });
-        const multiplier = pickNumberByBand(rng, 'hard', { min: 2, max: 4 });
-        const animal2Count = Math.floor(totalHeads / (multiplier + 1));
-        const animal1Count = totalHeads - animal2Count;
-        const totalLegs = animal1Count * 2 + animal2Count * 4;
+        // Build from the chicken count outward so '兔 is multiplier x 鸡' is
+        // always true. Deriving the heads from a fixed total and dividing by
+        // (multiplier + 1) left a remainder, so the stated multiple never held.
+        const multiplier = rng.int(2, 4);
+        const chicken = rng.int(5, 20);
+        const rabbit = chicken * multiplier;
+        const totalHeads = chicken + rabbit;
+        const totalLegs = chicken * 2 + rabbit * 4;
 
         const question = `笼子里有鸡和兔，兔的数量是鸡的${multiplier}倍，共有${totalHeads}个头，${totalLegs}条腿，鸡和兔各有多少只？`;
 
         return {
           question,
-          answer: `鸡${animal1Count}只，兔${animal2Count}只`,
+          answer: `鸡${chicken}只，兔${rabbit}只`,
           subtype: 'chicken-rabbit',
-          payload: { totalHeads, totalLegs, multiplier, chicken: animal1Count, rabbit: animal2Count },
+          payload: { totalHeads, totalLegs, multiplier, chicken, rabbit },
         };
       },
     },

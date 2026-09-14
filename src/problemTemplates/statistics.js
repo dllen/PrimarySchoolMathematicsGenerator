@@ -56,7 +56,14 @@ function generateStatisticsSubtemplates() {
       generate(rng) {
         // Spec §3.5: 从给定数据读条形图,说出最高/最低.
         const labels = ['一班', '二班', '三班', '四班'];
-        const data = labels.map(() => rng.int(10, 50));
+        // Draw distinct values so the 最多/最少 answers are unambiguous.
+        const data = [];
+        let guard = 0;
+        while (data.length < labels.length && guard < 500) {
+          const v = rng.int(10, 50);
+          if (!data.includes(v)) data.push(v);
+          guard++;
+        }
         const max = Math.max(...data);
         const min = Math.min(...data);
         const maxClass = labels[data.indexOf(max)];
@@ -80,10 +87,10 @@ function generateStatisticsSubtemplates() {
         const m1 = Math.round(d1.reduce((a, b) => a + b, 0) / n1 * 10) / 10;
         const m2 = Math.round(d2.reduce((a, b) => a + b, 0) / n2 * 10) / 10;
         const diff = Math.round(Math.abs(m1 - m2) * 10) / 10;
-        const better = m1 > m2 ? '第一组' : '第二组';
+        const tied = m1 === m2;
         return {
           question: `第一组平均数${m1},第二组平均数${m2},哪组平均数高?差多少?`,
-          answer: `${better}高${diff}`,
+          answer: tied ? '两组一样高' : `${m1 > m2 ? '第一组' : '第二组'}高${diff}`,
           subtype: 'statistics',
           payload: { d1, d2, n1, n2, m1, m2, diff },
         };

@@ -31,4 +31,20 @@ describe('OlympiadStrategy', () => {
     expect(easy.difficultyLevel).toBe(1);
     expect(hard.difficultyLevel).toBe(3);
   });
+
+  it('respects difficulty: easy never yields a hard-band subtemplate', () => {
+    // Same integration defect as ApplicationStrategy: the band was inert.
+    const easy = new OlympiadStrategy({ ...config, grade: '5', difficulty: 'easy' });
+    const seen = new Set();
+    for (let i = 0; i < 2000; i++) {
+      seen.add(easy.generate(createRng(i)).subtype);
+    }
+    // 'number-theory' easy subtemplates are divisibility/remainder; the hard
+    // ones are congruence/puzzle. Assert we never see the puzzle phrasing.
+    for (let i = 0; i < 2000; i++) {
+      const q = easy.generate(createRng(i)).question;
+      expect(q).not.toMatch(/这个数最小是多少/);
+    }
+    expect(seen.size).toBeGreaterThan(0);
+  });
 });

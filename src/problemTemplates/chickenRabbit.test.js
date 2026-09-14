@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { chickenRabbitTemplate } from './chickenRabbit.js';
+import { createRng } from '../utils/rng.js';
 import { levelToBand, BANDS } from './helpers.js';
 
 describe('chickenRabbitTemplate', () => {
@@ -76,6 +77,32 @@ describe('chickenRabbitTemplate', () => {
       const result = chickenRabbitTemplate.generate(rng, 2);
       expect(result.answer).toBeTruthy();
       expect(result.question).toBeTruthy();
+    }
+  });
+
+  it('never leaks a raw {placeholder} into the rendered question', () => {
+    // Regression: chained .replace() only substituted the FIRST occurrence,
+    // so templates that name an animal twice rendered '{animal1}和{animal2}'
+    // literally in 56% of chicken-rabbit-complex problems.
+    for (let level = 1; level <= 3; level++) {
+      for (let i = 0; i < 400; i++) {
+        const r = chickenRabbitTemplate.generate(createRng(i * 31 + level * 977), level);
+        expect(r.question, `seed=${i} level=${level}`).not.toMatch(/\{[a-zA-Z0-9_]+\}/);
+        expect(r.answer, `seed=${i} level=${level}`).not.toMatch(/\{[a-zA-Z0-9_]+\}/);
+      }
+    }
+  });
+
+  it('chicken-rabbit-multiple honours its own "兔 is Nx 鸡" premise', () => {
+    // Regression: rabbit was floor(heads/(m+1)) with chicken taking the
+    // remainder, so the stated multiple never held (100% of the time).
+    for (let i = 0; i < 300; i++) {
+      const r = chickenRabbitTemplate.generate(createRng(i), 3);
+      const p = r.payload;
+      if (p.multiplier === undefined) continue;
+      expect(p.rabbit, r.question).toBe(p.multiplier * p.chicken);
+      expect(p.chicken + p.rabbit).toBe(p.totalHeads);
+      expect(p.chicken * 2 + p.rabbit * 4).toBe(p.totalLegs);
     }
   });
 });

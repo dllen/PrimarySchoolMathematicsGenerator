@@ -35,14 +35,20 @@ function generateSportsSubtemplates() {
       id: 'sports-rank',
       band: 'medium',
       generate(rng) {
-        const a = pickNumberByBand(rng, 'medium', { min: 5, max: 15 });
-        const b = pickNumberByBand(rng, 'medium', { min: 3, max: a - 1 });
-        const c = pickNumberByBand(rng, 'medium', { min: 1, max: b - 1 });
+        // Name the teams, otherwise '前三名是谁' has no answer.
+        const names = ['红队', '蓝队', '黄队'];
+        const a = rng.int(5, 15);
+        const b = rng.int(3, a - 1);
+        const c = rng.int(1, b - 1);
+        const scores = [a, b, c];
+        const order = [0, 1, 2].sort((i, j) => scores[j] - scores[i]);
         return {
-          question: `三支球队积分分别是${a}分、${b}分、${c}分,前三名是谁?`,
-          answer: `第一名${a}分,第二名${b}分,第三名${c}分`,
+          question: `红队、蓝队、黄队的积分分别是${a}分、${b}分、${c}分,请按积分从高到低排名。`,
+          answer: order
+            .map((idx, rank) => `第${rank + 1}名${names[idx]}(${scores[idx]}分)`)
+            .join(','),
           subtype: 'sports-score',
-          payload: { a, b, c },
+          payload: { a, b, c, firstIdx: order[0], secondIdx: order[1], thirdIdx: order[2] },
         };
       },
     },

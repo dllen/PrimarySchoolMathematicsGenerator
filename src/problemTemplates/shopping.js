@@ -118,8 +118,10 @@ function generateShoppingSubtemplates() {
         const item = pickRandom(items[category], rng);
         const person1 = pickPerson(rng);
         const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
-        const total = pickNumberByBand(rng, 'medium', { min: 10, max: 50 });
-        const share = total / 2;
+        // Draw the per-person share first and double it, so the total is always
+        // even. An odd total makes '平均每人分到几个' answer 9.5.
+        const share = pickNumberByBand(rng, 'medium', { min: 5, max: 25 });
+        const total = share * 2;
         return {
           question: `${person1}和${person2}一起买了${total}个${item}，平均每人分到几个？`,
           answer: `${share}`,

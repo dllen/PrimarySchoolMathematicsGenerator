@@ -48,4 +48,35 @@ describe('statisticsTemplate', () => {
     const { m1, m2, diff } = result.payload;
     expect(diff).toBe(Math.round(Math.abs(m1 - m2) * 10) / 10);
   });
+
+  it('hard (compare): ties say "两组一样高", never "高0"', () => {
+    // Regression: the answer used m1 > m2 ? '第一组' : '第二组' with no tie
+    // branch, so equal averages rendered as '第二组高0'.
+    let sawTie = false;
+    for (let i = 0; i < 2000; i++) {
+      const r = statisticsTemplate.generate(createRng(i * 31 + 3 * 977), 3);
+      const { m1, m2 } = r.payload;
+      if (m1 === undefined) continue;
+      if (m1 === m2) {
+        sawTie = true;
+        expect(r.answer, r.question).toBe('两组一样高');
+      } else {
+        expect(r.answer, r.question).not.toMatch(/高0$/);
+      }
+    }
+    expect(sawTie, 'expected at least one tie in 2000 samples').toBe(true);
+  });
+
+  it('medium (chart-read): max and min are unique so 最多/最少 is unambiguous', () => {
+    // Regression: tied values made '哪个班最多' have two correct answers.
+    for (let i = 0; i < 400; i++) {
+      const r = statisticsTemplate.generate(createRng(i), 2);
+      const p = r.payload;
+      if (p.data === undefined || p.maxClassIdx === undefined) continue;
+      const maxCount = p.data.filter(v => v === Math.max(...p.data)).length;
+      const minCount = p.data.filter(v => v === Math.min(...p.data)).length;
+      expect(maxCount, r.question).toBe(1);
+      expect(minCount, r.question).toBe(1);
+    }
+  });
 });

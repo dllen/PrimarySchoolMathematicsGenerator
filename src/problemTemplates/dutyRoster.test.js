@@ -12,15 +12,14 @@ describe('dutyRosterTemplate', () => {
       expect((today + later) % 7).toBe(target);
     });
   }
-  it('medium: K % 5 = dayIndex', () => {
-    const rng = createRng(2);
-    let result;
-    for (let i = 0; i < 50; i++) {
-      result = dutyRosterTemplate.generate(rng, 2);
-      if (result.payload.K !== undefined) break;
+  it('medium: the K-th duty day maps to (K-1) % cycle', () => {
+    // K is 1-based ('第 K 个值日'), so the 1st duty lands on Monday (index 0).
+    for (let i = 0; i < 300; i++) {
+      const result = dutyRosterTemplate.generate(createRng(i), 2);
+      const { K, cycle, dayIndex } = result.payload;
+      if (K === undefined) continue;
+      expect(dayIndex, `K=${K}`).toBe((K - 1) % cycle);
     }
-    const { K, cycle, dayIndex } = result.payload;
-    expect(K % cycle).toBe(dayIndex);
   });
   for (const [band, level] of [['easy', 1], ['medium', 2], ['hard', 3]]) {
     it(`${band}: answer is non-empty`, () => {
