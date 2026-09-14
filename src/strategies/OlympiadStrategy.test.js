@@ -12,7 +12,12 @@ describe('OlympiadStrategy', () => {
   it('returns olympiad-shape problem', () => {
     const s = new OlympiadStrategy(config);
     const r = s.generate(createRng(3));
-    expect(r.subtype).toMatch(/sequence|logic/);
+    // Plan C expanded the olympiad pool beyond sequence/logic.
+    const knownSubtypes = [
+      'sequence', 'logic', 'number-theory', 'combinatorics',
+      'probability', 'inequality', 'geometry-count', 'logic-advanced',
+    ];
+    expect(knownSubtypes).toContain(r.subtype);
   });
 
   it('grade 2 cannot use olympiad templates (range starts at 3)', () => {
