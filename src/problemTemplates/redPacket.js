@@ -36,10 +36,11 @@ function generateRedPacketSubtemplates() {
       id: 'redpacket-balance',
       band: 'hard',
       generate(rng) {
+        // Hard band scales max by 1.8; pick s1/s2 directly so they stay below incomes.
         const i1 = pickNumberByBand(rng, 'hard', { min: 20, max: 50 });
         const i2 = pickNumberByBand(rng, 'hard', { min: 10, max: 40 });
-        const s1 = pickNumberByBand(rng, 'hard', { min: 5, max: i1 - 5 });
-        const s2 = pickNumberByBand(rng, 'hard', { min: 3, max: i2 - 3 });
+        const s1 = rng.int(5, Math.max(5, i1 - 5));
+        const s2 = rng.int(3, Math.max(3, i2 - 3));
         const final = i1 + i2 - s1 - s2;
         return {
           question: `小华收到两个红包${i1}元和${i2}元,买书花了${s1}元,买文具花了${s2}元。还剩多少元?`,

@@ -39,8 +39,10 @@ function generateQueueSubtemplates() {
       band: 'hard',
       generate(rng) {
         const person = pickPerson(rng);
+        // Hard band multiplies min/max by 1.8; pick pos directly so it stays < total.
         const total = pickNumberByBand(rng, 'hard', { min: 10, max: 30 });
-        const pos = pickNumberByBand(rng, 'hard', { min: 2, max: total - 1 });
+        const maxPos = Math.max(2, total - 1);
+        const pos = rng.int(2, maxPos);
         const skip = pickNumberByBand(rng, 'hard', { min: 1, max: 5 });
         const ahead = total - pos;
         const wait = ahead * skip;
