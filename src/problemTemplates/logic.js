@@ -1,4 +1,6 @@
-const people = ['小华', '小明', '小红', '小丽', '小强', '小军', '小芳', '小梅', '大伟', '小玲'];
+import { pickNumberByBand, pickPerson, levelToBand } from './helpers.js';
+
+const PEOPLE_POOL = ['小华', '小明', '小红', '小丽', '小强', '小军', '小芳', '小梅', '大伟', '小玲'];
 
 function pickRandom(arr, rng) {
   return arr[rng.int(0, arr.length - 1)];
@@ -8,11 +10,13 @@ function generateLogicSubtemplates() {
   return [
     {
       id: 'logic-give-receive',
-      generate(rng, difficulty) {
-        const person = pickRandom(people, rng);
-        const a = rng.int(5, 15 + difficulty * 5);
-        const b = rng.int(3, 10 + difficulty * 3);
-        const c = rng.int(2, Math.min(a + b - 1, 8 + difficulty * 3));
+      band: 'easy',
+      generate(rng) {
+        const person = pickPerson(rng);
+        const a = pickNumberByBand(rng, 'easy', { min: 5, max: 20 });
+        const b = pickNumberByBand(rng, 'easy', { min: 3, max: 13 });
+        // Use rng.int for computed max to keep constraint c ≤ a+b-1
+        const c = rng.int(2, Math.min(a + b - 1, 11));
         const total = a + b - c;
         return {
           question: `${person}有${a}支笔，妈妈又买了${b}支，后来送给了同学${c}支，现在有多少支？`,
@@ -24,10 +28,12 @@ function generateLogicSubtemplates() {
     },
     {
       id: 'logic-age-sum',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
-        const age1 = rng.int(8, 14 + difficulty);
+      band: 'easy',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
+        const age1 = pickNumberByBand(rng, 'easy', { min: 8, max: 15 });
+        // Use rng.int for computed max to keep age2 < age1
         const age2 = rng.int(6, age1 - 2);
         const sum = age1 + age2;
         return {
@@ -40,12 +46,14 @@ function generateLogicSubtemplates() {
     },
     {
       id: 'logic-age-future',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
-        const age1 = rng.int(10, 14);
+      band: 'medium',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
+        const age1 = pickNumberByBand(rng, 'medium', { min: 10, max: 14 });
+        // Use rng.int for computed max to keep age2 < age1
         const age2 = rng.int(6, age1 - 3);
-        const years = rng.int(3, 6);
+        const years = pickNumberByBand(rng, 'medium', { min: 3, max: 6 });
         const future1 = age1 + years;
         const future2 = age2 + years;
         return {
@@ -58,9 +66,10 @@ function generateLogicSubtemplates() {
     },
     {
       id: 'logic-plant-trees',
-      generate(rng, difficulty) {
-        const length = rng.int(10, 30 + difficulty * 10);
-        const interval = rng.int(2, 5);
+      band: 'medium',
+      generate(rng) {
+        const length = pickNumberByBand(rng, 'medium', { min: 10, max: 40 });
+        const interval = pickNumberByBand(rng, 'medium', { min: 2, max: 5 });
         const trees = Math.floor(length / interval) + 1;
         return {
           question: `一条${length}米长的路，每隔${interval}米种一棵树（两端都种），一共种多少棵树？`,
@@ -72,9 +81,10 @@ function generateLogicSubtemplates() {
     },
     {
       id: 'logic-clock-chimes',
-      generate(rng, difficulty) {
-        const hour = rng.int(3, 10);
-        const interval = rng.int(1, 3);
+      band: 'hard',
+      generate(rng) {
+        const hour = pickNumberByBand(rng, 'hard', { min: 3, max: 10 });
+        const interval = pickNumberByBand(rng, 'hard', { min: 1, max: 3 });
         const chimes = hour * interval;
         return {
           question: `时钟每到整点打一次铃，${hour}点的时候打了几下？如果每隔${interval}秒打一次，一共用了多少秒？`,
@@ -86,24 +96,28 @@ function generateLogicSubtemplates() {
     },
     {
       id: 'logic-bus-stop',
-      generate(rng, difficulty) {
-        const stops = rng.int(5, 10 + difficulty * 2);
-        const getOff = rng.int(2, Math.min(stops - 1, 5 + difficulty));
-        const getOn = rng.int(3, 8 + difficulty * 2);
-        const remaining = getOn - getOff;
+      band: 'medium',
+      generate(rng) {
+        const stops = pickNumberByBand(rng, 'medium', { min: 5, max: 12 });
+        const maxGetOn = pickNumberByBand(rng, 'medium', { min: 3, max: 10 });
+        // Ensure getOff ≤ getOn so remaining is never negative
+        const maxGetOff = Math.min(stops - 1, maxGetOn, 7);
+        const getOff = rng.int(2, Math.max(2, maxGetOff));
+        const remaining = maxGetOn - getOff;
         return {
-          question: `一辆公交车共有${stops}站，从起点站上来${getOn}人，到第${getOff}站下去了${getOff}人（没有人再上车），车上还有多少人？`,
+          question: `一辆公交车共有${stops}站，从起点站上来${maxGetOn}人，到第${getOff}站下去了${getOff}人（没有人再上车），车上还有多少人？`,
           answer: `${remaining}`,
           subtype: 'logic',
-          payload: { stops, getOn, getOff, remaining },
+          payload: { stops, getOn: maxGetOn, getOff, remaining },
         };
       },
     },
     {
       id: 'logic-egg-box',
-      generate(rng, difficulty) {
-        const eggs = rng.int(30, 80 + difficulty * 20);
-        const perBox = rng.int(6, 12);
+      band: 'easy',
+      generate(rng) {
+        const eggs = pickNumberByBand(rng, 'easy', { min: 30, max: 100 });
+        const perBox = pickNumberByBand(rng, 'easy', { min: 6, max: 12 });
         const fullBoxes = Math.floor(eggs / perBox);
         const remainder = eggs % perBox;
         return {
@@ -116,9 +130,10 @@ function generateLogicSubtemplates() {
     },
     {
       id: 'logic-continuous-add',
-      generate(rng, difficulty) {
-        const start = rng.int(1, 5 + difficulty);
-        const count = rng.int(5, 10 + difficulty * 2);
+      band: 'medium',
+      generate(rng) {
+        const start = pickNumberByBand(rng, 'medium', { min: 1, max: 6 });
+        const count = pickNumberByBand(rng, 'medium', { min: 5, max: 12 });
         const sum = (start + (start + count - 1)) * count / 2;
         return {
           question: `计算${start}到${start + count - 1}连续自然数的和是多少？`,
@@ -130,8 +145,10 @@ function generateLogicSubtemplates() {
     },
     {
       id: 'logic-pigeonhole-simple',
-      generate(rng, difficulty) {
-        const peopleCount = rng.int(5, 10 + difficulty * 2);
+      band: 'hard',
+      generate(rng) {
+        const peopleCount = pickNumberByBand(rng, 'hard', { min: 5, max: 12 });
+        // Use rng.int for computed max to keep groupCount ≤ peopleCount/2
         const groupCount = rng.int(2, Math.floor(peopleCount / 2));
         const answer = Math.floor(peopleCount / groupCount) + 1;
         return {
@@ -144,8 +161,9 @@ function generateLogicSubtemplates() {
     },
     {
       id: 'logic-repeated-division',
-      generate(rng, difficulty) {
-        const start = rng.int(100, 500 + difficulty * 100);
+      band: 'hard',
+      generate(rng) {
+        const start = pickNumberByBand(rng, 'hard', { min: 100, max: 500 });
         const divide1 = rng.int(2, 3);
         const divide2 = rng.int(2, 3);
         const result = Math.floor(start / divide1 / divide2);
@@ -159,8 +177,10 @@ function generateLogicSubtemplates() {
     },
     {
       id: 'logic-rectangle-perimeter',
-      generate(rng, difficulty) {
-        const length = rng.int(8, 20 + difficulty * 5);
+      band: 'hard',
+      generate(rng) {
+        const length = pickNumberByBand(rng, 'hard', { min: 8, max: 25 });
+        // Use rng.int for computed max to keep width < length
         const width = rng.int(4, length - 2);
         const perimeter = (length + width) * 2;
         return {
@@ -173,8 +193,9 @@ function generateLogicSubtemplates() {
     },
     {
       id: 'logic-digit-sum',
-      generate(rng, difficulty) {
-        const num = rng.int(100, 900 + difficulty * 100);
+      band: 'easy',
+      generate(rng) {
+        const num = pickNumberByBand(rng, 'easy', { min: 100, max: 500 });
         const sum = Math.floor(num / 100) + Math.floor((num % 100) / 10) + (num % 10);
         return {
           question: `一个三位数${num}，它的各位数字之和是多少？`,
@@ -192,8 +213,9 @@ export const logicTemplate = {
   gradeRange: ['4', '5', '6'],
   semester: 'all',
   subtemplates: generateLogicSubtemplates(),
-  generate(rng, difficulty) {
-    const subtemplate = rng.pick(this.subtemplates);
-    return subtemplate.generate(rng, difficulty);
+  generate(rng, difficultyLevel) {
+    const band = levelToBand(difficultyLevel);
+    const pool = this.subtemplates.filter(t => t.band === band);
+    return rng.pick(pool).generate(rng);
   },
 };

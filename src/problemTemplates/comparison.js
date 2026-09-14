@@ -1,4 +1,5 @@
-const people = ['小红', '小明', '小华', '小丽', '小强', '小芳', '小军', '小梅', '大伟', '小雪', '小刚'];
+import { pickNumberByBand, pickPerson, levelToBand } from './helpers.js';
+
 const items = {
   零食: ['饼干', '巧克力', '薯片', '果冻', '蛋糕', '面包', '爆米花', '坚果'],
   玩具: ['积木', '玩具车', '毛绒熊', '皮球', '拼图', '风筝', '玩具枪', '芭比娃娃', '遥控车', '魔方'],
@@ -6,6 +7,8 @@ const items = {
   水果: ['苹果', '香蕉', '橙子', '梨', '葡萄', '西瓜', '桃子', '草莓', '芒果', '柠檬'],
   文具: ['铅笔盒', '笔记本', '文件夹', '便利贴', '荧光笔'],
 };
+
+const PEOPLE_POOL = ['小红', '小明', '小华', '小丽', '小强', '小芳', '小军', '小梅', '大伟', '小雪', '小刚'];
 
 function pickRandom(arr, rng) {
   return arr[rng.int(0, arr.length - 1)];
@@ -15,12 +18,14 @@ function generateComparisonSubtemplates() {
   return [
     {
       id: 'comparison-more',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
+      band: 'easy',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
         const category = pickRandom(Object.keys(items), rng);
         const item = pickRandom(items[category], rng);
-        const a = rng.int(10, 30 + difficulty * 20);
+        const a = pickNumberByBand(rng, 'easy', { min: 10, max: 50 });
+        // Use rng.int for computed max to keep constraint b < a
         const b = rng.int(5, a - 1);
         const diff = a - b;
         return {
@@ -33,12 +38,11 @@ function generateComparisonSubtemplates() {
     },
     {
       id: 'comparison-less',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
-        const category = pickRandom(Object.keys(items), rng);
-        const item = pickRandom(items[category], rng);
-        const a = rng.int(20, 50 + difficulty * 20);
+      band: 'easy',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
+        const a = pickNumberByBand(rng, 'easy', { min: 20, max: 70 });
         const b = rng.int(10, a - 5);
         const diff = a - b;
         return {
@@ -51,10 +55,11 @@ function generateComparisonSubtemplates() {
     },
     {
       id: 'comparison-together',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
-        const a = rng.int(15, 40 + difficulty * 15);
+      band: 'easy',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
+        const a = pickNumberByBand(rng, 'easy', { min: 15, max: 55 });
         const b = rng.int(10, a - 3);
         const total = a + b;
         return {
@@ -67,11 +72,12 @@ function generateComparisonSubtemplates() {
     },
     {
       id: 'comparison-give',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
-        const a = rng.int(20, 50 + difficulty * 15);
-        const give = rng.int(3, 10 + difficulty * 2);
+      band: 'medium',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
+        const a = pickNumberByBand(rng, 'medium', { min: 20, max: 65 });
+        const give = pickNumberByBand(rng, 'medium', { min: 3, max: 12 });
         const diff = a - give;
         return {
           question: `${person1}比${person2}多${give}个苹果，${person1}有${a}个，${person2}有几个？`,
@@ -83,11 +89,12 @@ function generateComparisonSubtemplates() {
     },
     {
       id: 'comparison-height',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
-        const height1 = rng.int(130, 170 + difficulty * 5);
-        const diff = rng.int(3, 12 + difficulty * 3);
+      band: 'medium',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
+        const height1 = pickNumberByBand(rng, 'medium', { min: 130, max: 175 });
+        const diff = pickNumberByBand(rng, 'medium', { min: 3, max: 15 });
         const height2 = height1 - diff;
         return {
           question: `${person1}身高${height1}厘米，比${person2}高${diff}厘米，${person2}身高多少厘米？`,
@@ -99,11 +106,12 @@ function generateComparisonSubtemplates() {
     },
     {
       id: 'comparison-age',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
-        const age1 = rng.int(8, 14 + difficulty);
-        const diff = rng.int(2, 5 + difficulty);
+      band: 'medium',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
+        const age1 = pickNumberByBand(rng, 'medium', { min: 8, max: 15 });
+        const diff = pickNumberByBand(rng, 'medium', { min: 2, max: 6 });
         const age2 = age1 + diff;
         return {
           question: `${person1}今年${age1}岁，${person2}比${person1}大${diff}岁，${person2}今年几岁？`,
@@ -115,11 +123,12 @@ function generateComparisonSubtemplates() {
     },
     {
       id: 'comparison-remaining',
-      generate(rng, difficulty) {
-        const person = pickRandom(people, rng);
+      band: 'easy',
+      generate(rng) {
+        const person = pickPerson(rng);
         const category = pickRandom(Object.keys(items), rng);
         const item = pickRandom(items[category], rng);
-        const total = rng.int(30, 80 + difficulty * 20);
+        const total = pickNumberByBand(rng, 'easy', { min: 30, max: 100 });
         const used = rng.int(10, total - 10);
         const remaining = total - used;
         return {
@@ -132,13 +141,14 @@ function generateComparisonSubtemplates() {
     },
     {
       id: 'comparison-three',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
-        const person3 = pickRandom(people.filter(p => p !== person1 && p !== person2), rng);
+      band: 'hard',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
+        const person3 = pickRandom(PEOPLE_POOL.filter(p => p !== person1 && p !== person2), rng);
         const category = pickRandom(Object.keys(items), rng);
         const item = pickRandom(items[category], rng);
-        const a = rng.int(20, 50 + difficulty * 15);
+        const a = pickNumberByBand(rng, 'hard', { min: 20, max: 65 });
         const b = rng.int(15, a - 5);
         const c = rng.int(10, b - 3);
         const total = a + b + c;
@@ -153,11 +163,12 @@ function generateComparisonSubtemplates() {
     },
     {
       id: 'comparison-weight',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
-        const weight1 = rng.int(30, 60 + difficulty * 5);
-        const diff = rng.int(3, 15 + difficulty * 3);
+      band: 'hard',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
+        const weight1 = pickNumberByBand(rng, 'hard', { min: 30, max: 65 });
+        const diff = pickNumberByBand(rng, 'hard', { min: 3, max: 18 });
         const weight2 = weight1 - diff;
         return {
           question: `${person1}体重${weight1}千克，比${person2}重${diff}千克，${person2}体重多少千克？`,
@@ -169,11 +180,12 @@ function generateComparisonSubtemplates() {
     },
     {
       id: 'comparison-distance',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
-        const distance1 = rng.int(100, 500 + difficulty * 100);
-        const diff = rng.int(20, 100 + difficulty * 50);
+      band: 'hard',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
+        const distance1 = pickNumberByBand(rng, 'hard', { min: 100, max: 600 });
+        const diff = rng.int(20, Math.min(150, distance1 - 10));
         const distance2 = distance1 - diff;
         return {
           question: `${person1}跑了${distance1}米，比${person2}多跑${diff}米，${person2}跑了多少米？`,
@@ -185,11 +197,12 @@ function generateComparisonSubtemplates() {
     },
     {
       id: 'comparison-score',
-      generate(rng, difficulty) {
-        const person1 = pickRandom(people, rng);
-        const person2 = pickRandom(people.filter(p => p !== person1), rng);
-        const score1 = rng.int(80, 100);
-        const diff = rng.int(5, 20);
+      band: 'medium',
+      generate(rng) {
+        const person1 = pickPerson(rng);
+        const person2 = pickRandom(PEOPLE_POOL.filter(p => p !== person1), rng);
+        const score1 = pickNumberByBand(rng, 'medium', { min: 80, max: 100 });
+        const diff = pickNumberByBand(rng, 'medium', { min: 5, max: 20 });
         const score2 = score1 - diff;
         return {
           question: `${person1}考试得了${score1}分，比${person2}高${diff}分，${person2}得了多少分？`,
@@ -207,8 +220,9 @@ export const comparisonTemplate = {
   gradeRange: ['2', '3', '4', '5'],
   semester: 'all',
   subtemplates: generateComparisonSubtemplates(),
-  generate(rng, difficulty) {
-    const subtemplate = rng.pick(this.subtemplates);
-    return subtemplate.generate(rng, difficulty);
+  generate(rng, difficultyLevel) {
+    const band = levelToBand(difficultyLevel);
+    const pool = this.subtemplates.filter(t => t.band === band);
+    return rng.pick(pool).generate(rng);
   },
 };

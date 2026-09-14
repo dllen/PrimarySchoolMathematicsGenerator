@@ -1,3 +1,5 @@
+import { pickNumberByBand, pickPerson, levelToBand } from './helpers.js';
+
 /**
  * 鸡兔同笼问题模板
  * 经典的奥数应用题，通过总头数和总脚数求鸡兔数量
@@ -44,16 +46,12 @@ function generateChickenRabbitSubtemplates() {
   return [
     {
       id: 'chicken-rabbit-basic',
-      generate(rng, difficulty) {
+      band: 'easy',
+      generate(rng) {
         const scenario = pickRandom(scenarios, rng);
         const { animal1, animal2, leg1, leg2, unit1, unit2 } = scenario;
 
-        // 根据难度调整范围
-        const minHeads = 10 + difficulty * 5;
-        const maxHeads = 30 + difficulty * 15;
-        const totalHeads = rng.int(minHeads, maxHeads);
-
-        // 随机分配鸡兔数量
+        const totalHeads = pickNumberByBand(rng, 'easy', { min: 10, max: 30 });
         const chicken = rng.int(Math.floor(totalHeads * 0.2), Math.floor(totalHeads * 0.8));
         const rabbit = totalHeads - chicken;
         const totalLegs = chicken * leg1 + rabbit * leg2;
@@ -77,13 +75,9 @@ function generateChickenRabbitSubtemplates() {
     },
     {
       id: 'chicken-rabbit-simple',
-      generate(rng, difficulty) {
-        // 简化的鸡兔同笼，使用经典鸡兔问题
-        const minHeads = 10 + difficulty * 5;
-        const maxHeads = 40 + difficulty * 20;
-        const totalHeads = rng.int(minHeads, maxHeads);
-
-        // 随机分配鸡兔数量
+      band: 'easy',
+      generate(rng) {
+        const totalHeads = pickNumberByBand(rng, 'easy', { min: 10, max: 30 });
         const chicken = rng.int(Math.floor(totalHeads * 0.3), Math.floor(totalHeads * 0.7));
         const rabbit = totalHeads - chicken;
         const totalLegs = chicken * 2 + rabbit * 4;
@@ -107,16 +101,14 @@ function generateChickenRabbitSubtemplates() {
     },
     {
       id: 'chicken-rabbit-given-one',
-      generate(rng, difficulty) {
-        // 已知一个动物数量求另一个
-        const totalHeads = rng.int(20, 60 + difficulty * 20);
+      band: 'easy',
+      generate(rng) {
+        const totalHeads = pickNumberByBand(rng, 'easy', { min: 10, max: 30 });
         const chicken = rng.int(5, totalHeads - 5);
         const rabbit = totalHeads - chicken;
         const totalLegs = chicken * 2 + rabbit * 4;
 
         const ask = rng.int(0, 1) === 0 ? '鸡' : '兔';
-        const answer = ask === '鸡' ? `鸡${chicken}只，兔${rabbit}只` : `鸡${chicken}只，兔${rabbit}只`;
-
         let question;
         if (ask === '鸡') {
           question = `笼子里有鸡和兔，共有${totalHeads}个头，${totalLegs}条腿，已知兔有${rabbit}只，鸡有多少只？`;
@@ -126,7 +118,7 @@ function generateChickenRabbitSubtemplates() {
 
         return {
           question,
-          answer,
+          answer: `鸡${chicken}只，兔${rabbit}只`,
           subtype: 'chicken-rabbit',
           payload: { totalHeads, totalLegs, chicken, rabbit, given: ask },
         };
@@ -134,17 +126,18 @@ function generateChickenRabbitSubtemplates() {
     },
     {
       id: 'chicken-rabbit-difference',
-      generate(rng, difficulty) {
-        // 两个笼子的鸡兔数量差
-        const heads1 = rng.int(15, 40 + difficulty * 10);
-        const legs1 = rng.int(40, 120 + difficulty * 30);
-        const chicken1 = (4 * heads1 - legs1) / 2;
+      band: 'medium',
+      generate(rng) {
+        // Generate valid counts first, then compute legs from those counts
+        const heads1 = pickNumberByBand(rng, 'medium', { min: 15, max: 40 });
+        const chicken1 = rng.int(0, heads1);
         const rabbit1 = heads1 - chicken1;
+        const legs1 = chicken1 * 2 + rabbit1 * 4;
 
-        const heads2 = rng.int(15, 40 + difficulty * 10);
-        const legs2 = rng.int(40, 120 + difficulty * 30);
-        const chicken2 = (4 * heads2 - legs2) / 2;
+        const heads2 = pickNumberByBand(rng, 'medium', { min: 15, max: 40 });
+        const chicken2 = rng.int(0, heads2);
         const rabbit2 = heads2 - chicken2;
+        const legs2 = chicken2 * 2 + rabbit2 * 4;
 
         const question = `两个笼子里分别装着鸡和兔，第一个笼子里有${heads1}个头、${legs1}条腿，第二个笼子里有${heads2}个头、${legs2}条腿，两个笼子里兔相差多少只？`;
         const answer = `相差${Math.abs(rabbit1 - rabbit2)}只`;
@@ -159,17 +152,13 @@ function generateChickenRabbitSubtemplates() {
     },
     {
       id: 'chicken-rabbit-with-difference',
-      generate(rng, difficulty) {
-        // 已知头和腿，以及两种动物的数量差
+      band: 'medium',
+      generate(rng) {
         const scenario = pickRandom(scenarios, rng);
         const { animal1, animal2, leg1, leg2, unit1, unit2 } = scenario;
 
-        const minHeads = 15 + difficulty * 5;
-        const maxHeads = 50 + difficulty * 20;
-        const totalHeads = rng.int(minHeads, maxHeads);
-
-        // 随机分配，确保数量差合理
-        const ratio = rng.int(2, 6 + difficulty * 2); // 倍数关系
+        const totalHeads = pickNumberByBand(rng, 'medium', { min: 15, max: 50 });
+        const ratio = pickNumberByBand(rng, 'medium', { min: 2, max: 5 });
         const animal2Count = Math.floor(totalHeads / (ratio + 1));
         const animal1Count = totalHeads - animal2Count;
         const totalLegs = animal1Count * leg1 + animal2Count * leg2;
@@ -195,11 +184,11 @@ function generateChickenRabbitSubtemplates() {
     },
     {
       id: 'chicken-rabbit-buying',
-      generate(rng, difficulty) {
-        // 买鸡兔问题：已知总价、数量和差求单价或数量
-        const totalHeads = rng.int(10, 30 + difficulty * 10);
-        const price1 = rng.int(3, 8 + difficulty * 2);
-        const price2 = rng.int(5, 15 + difficulty * 3);
+      band: 'medium',
+      generate(rng) {
+        const totalHeads = pickNumberByBand(rng, 'medium', { min: 10, max: 30 });
+        const price1 = pickNumberByBand(rng, 'medium', { min: 3, max: 10 });
+        const price2 = pickNumberByBand(rng, 'medium', { min: 5, max: 15 });
         const chicken = rng.int(3, totalHeads - 3);
         const rabbit = totalHeads - chicken;
         const totalPrice = chicken * price1 + rabbit * price2;
@@ -207,7 +196,7 @@ function generateChickenRabbitSubtemplates() {
 
         const questionTemplate = pickRandom(questionsBuying, rng);
         const question = questionTemplate
-          .replace('{person}', pickRandom(['小明', '小红', '小华', '小丽', '小强', '小芳'], rng))
+          .replace('{person}', pickPerson(rng))
           .replace('{animal1}', '鸡')
           .replace('{animal2}', '兔')
           .replace('{totalHeads}', totalHeads.toString())
@@ -226,20 +215,20 @@ function generateChickenRabbitSubtemplates() {
     },
     {
       id: 'chicken-rabbit-move',
-      generate(rng, difficulty) {
-        // 移入移出问题：笼子里的动物发生变化
+      band: 'hard',
+      generate(rng) {
         const scenario = pickRandom(scenarios, rng);
         const { animal1, animal2, leg1, leg2, unit1, unit2 } = scenario;
 
-        const originalHeads = rng.int(20, 50 + difficulty * 15);
+        const originalHeads = pickNumberByBand(rng, 'hard', { min: 20, max: 50 });
         const animal1Orig = rng.int(Math.floor(originalHeads * 0.3), Math.floor(originalHeads * 0.7));
         const animal2Orig = originalHeads - animal1Orig;
         const originalLegs = animal1Orig * leg1 + animal2Orig * leg2;
 
         const action = rng.pick(['从笼子里放走', '从笼子里放出', '从笼子中移出']);
         const moveType = rng.pick(['一些', '几只']);
-        const movedCount = rng.int(3, 10 + difficulty * 2);
-        const moveLeg1 = rng.int(0, 1) === 0 ? leg1 : leg2; // 随机决定放走哪种
+        const movedCount = pickNumberByBand(rng, 'hard', { min: 3, max: 12 });
+        const moveLeg1 = rng.int(0, 1) === 0 ? leg1 : leg2;
 
         let resultHeads, resultLegs;
         if (moveLeg1 === leg1) {
@@ -269,10 +258,10 @@ function generateChickenRabbitSubtemplates() {
     },
     {
       id: 'chicken-rabbit-multiple',
-      generate(rng, difficulty) {
-        // 倍数关系问题：一个动物是另一个的倍数
-        const totalHeads = rng.int(15, 40 + difficulty * 15);
-        const multiplier = rng.int(2, 4 + difficulty); // 倍数
+      band: 'hard',
+      generate(rng) {
+        const totalHeads = pickNumberByBand(rng, 'hard', { min: 15, max: 40 });
+        const multiplier = pickNumberByBand(rng, 'hard', { min: 2, max: 4 });
         const animal2Count = Math.floor(totalHeads / (multiplier + 1));
         const animal1Count = totalHeads - animal2Count;
         const totalLegs = animal1Count * 2 + animal2Count * 4;
@@ -289,26 +278,21 @@ function generateChickenRabbitSubtemplates() {
     },
     {
       id: 'chicken-rabbit-legs-only',
-      generate(rng, difficulty) {
-        // 只给腿数和数量差，不给头数（更高难度）
-        const diff = rng.int(5, 20 + difficulty * 5); // 数量差
-        const totalLegs = rng.int(60, 180 + difficulty * 60);
+      band: 'hard',
+      generate(rng) {
+        const diff = pickNumberByBand(rng, 'hard', { min: 5, max: 25 });
+        const totalLegs = pickNumberByBand(rng, 'hard', { min: 60, max: 180 });
 
-        // 计算：设鸡x只，兔(x+diff)只
-        // 2x + 4(x+diff) = totalLegs
-        // 6x + 4*diff = totalLegs
-        // x = (totalLegs - 4*diff) / 6
+        // 设鸡x只，兔(x+diff)只 → 2x + 4(x+diff) = totalLegs → 6x + 4*diff = totalLegs
         const chicken = Math.floor((totalLegs - 4 * diff) / 6);
         const rabbit = chicken + diff;
         const totalHeads = chicken + rabbit;
 
-        if (chicken < 0 || rabbit < 0 || totalHeads <= 0) {
-          // 重新生成合理的数值
-          return this.generate(rng, difficulty);
+        if (chicken < 0 || rabbit < 0 || totalHeads <= 0 || (totalLegs - 4 * diff) % 6 !== 0) {
+          return this.generate(rng);
         }
 
-        const scenario = pickRandom(scenarios.filter(s => s.leg1 === 2 && s.leg2 === 4), rng);
-        const question = `笼子里有鸡和兔，兔比鸡多${diff}只，数一数共有${totalLegs}条腿，鸡和兔各有多少只？（不告诉你有多少个头）`;
+        const question = `笼子里有鸡和兔，兔比鸡多${diff}只，数一数共有${totalLegs}条腿，鸡和兔各有多少只？`;
 
         return {
           question,
@@ -326,8 +310,9 @@ export const chickenRabbitTemplate = {
   gradeRange: ['3', '4', '5', '6'],
   semester: 'all',
   subtemplates: generateChickenRabbitSubtemplates(),
-  generate(rng, difficulty) {
-    const subtemplate = rng.pick(this.subtemplates);
-    return subtemplate.generate(rng, difficulty);
+  generate(rng, difficultyLevel) {
+    const band = levelToBand(difficultyLevel);
+    const pool = this.subtemplates.filter(t => t.band === band);
+    return rng.pick(pool).generate(rng);
   },
 };
