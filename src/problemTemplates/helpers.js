@@ -58,6 +58,13 @@ export function pickPerson(rng) {
   return rng.pick(PERSON_POOL);
 }
 
+/** 生成两个不重复的中文人名(来自 PERSON_POOL)。 */
+export function pickTwoPeople(rng) {
+  const a = rng.pick(PERSON_POOL);
+  const pool = PERSON_POOL.filter(p => p !== a);
+  return [a, rng.pick(pool)];
+}
+
 /**
  * 调试/测试用范围断言;value 必须在 [lo, hi],否则抛出含 label 的明确错误。
  * 模板 generate 末尾可用,数字出 band 时立即报警。

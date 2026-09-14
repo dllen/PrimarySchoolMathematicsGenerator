@@ -6,6 +6,7 @@ import {
   pickNumberByBand,
   pickPairByBand,
   pickPerson,
+  pickTwoPeople,
   assertInRange,
 } from './helpers.js';
 
@@ -81,6 +82,18 @@ describe('pickPerson', () => {
       const name = pickPerson(rng);
       expect(typeof name).toBe('string');
       expect(name.length).toBeGreaterThanOrEqual(2);
+    }
+  });
+});
+
+describe('pickTwoPeople', () => {
+  it('returns two distinct Chinese names', () => {
+    const rng = createRng(42);
+    for (let i = 0; i < 50; i++) {
+      const [a, b] = pickTwoPeople(rng);
+      expect(a).not.toBe(b);
+      expect(typeof a).toBe('string');
+      expect(typeof b).toBe('string');
     }
   });
 });
