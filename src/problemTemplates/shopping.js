@@ -188,6 +188,24 @@ function generateShoppingSubtemplates() {
         };
       },
     },
+    {
+      id: 'shopping-counting',
+      band: 'easy',
+      generate(rng) {
+        const category = pickRandom(Object.keys(items), rng);
+        const item = pickRandom(items[category], rng);
+        const person = pickPerson(rng);
+        const n1 = rng.int(1, 5);
+        const n2 = rng.int(1, 5);
+        const total = n1 + n2;
+        return {
+          question: `${person}买了${n1}个${item}和${n2}个${item},一共买了多少个?`,
+          answer: `${total}个`,
+          subtype: 'shopping',
+          payload: { n1, n2, total },
+        };
+      },
+    },
   ];
 }
 

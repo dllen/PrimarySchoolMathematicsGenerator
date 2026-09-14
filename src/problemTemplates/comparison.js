@@ -212,12 +212,31 @@ function generateComparisonSubtemplates() {
         };
       },
     },
+    {
+      id: 'comparison-fewer-more',
+      band: 'easy',
+      generate(rng) {
+        const a = rng.int(1, 10);
+        let b = rng.int(1, 10);
+        while (b === a) b = rng.int(1, 10);
+        const diff = Math.abs(a - b);
+        const question = a > b
+          ? `${a}比${b}多几个?`
+          : `${b}比${a}多几个?`;
+        return {
+          question,
+          answer: `${diff}个`,
+          subtype: 'comparison',
+          payload: { a, b, diff },
+        };
+      },
+    },
   ];
 }
 
 export const comparisonTemplate = {
   id: 'comparison-complex',
-  gradeRange: ['2', '3', '4', '5'],
+  gradeRange: ['1', '2', '3', '4', '5'],
   semester: 'all',
   subtemplates: generateComparisonSubtemplates(),
   generate(rng, difficultyLevel) {

@@ -5,7 +5,7 @@ import { createRng } from '../utils/rng.js';
 describe('comparisonTemplate', () => {
   it('metadata matches spec', () => {
     expect(comparisonTemplate.id).toBe('comparison-complex');
-    expect(comparisonTemplate.gradeRange).toEqual(['2', '3', '4', '5']);
+    expect(comparisonTemplate.gradeRange).toEqual(['1', '2', '3', '4', '5']);
   });
 
   it('has subtemplates and generates valid problems', () => {
