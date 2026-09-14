@@ -10,6 +10,11 @@ import {
   gcd,
   pickTwoSpeeds,
   pickRatio,
+  factorial,
+  perm,
+  comb,
+  lcm,
+  isPrime,
   assertInRange,
 } from './helpers.js';
 
@@ -133,6 +138,54 @@ describe('pickRatio', () => {
       const { a, b } = pickRatio(rng, 'medium');
       expect(gcd(a, b)).toBe(1);
     }
+  });
+});
+
+describe('factorial', () => {
+  it('computes small factorials', () => {
+    expect(factorial(0)).toBe(1);
+    expect(factorial(1)).toBe(1);
+    expect(factorial(5)).toBe(120);
+    expect(factorial(6)).toBe(720);
+  });
+  it('rejects n > 6 to avoid overflow', () => {
+    expect(() => factorial(7)).toThrow(/n must be <= 6/);
+  });
+});
+
+describe('perm', () => {
+  it('computes permutations A(n,r)', () => {
+    expect(perm(5, 2)).toBe(20);
+    expect(perm(6, 3)).toBe(120);
+    expect(perm(4, 4)).toBe(24);
+  });
+});
+
+describe('comb', () => {
+  it('computes combinations C(n,r)', () => {
+    expect(comb(5, 2)).toBe(10);
+    expect(comb(6, 3)).toBe(20);
+    expect(comb(6, 0)).toBe(1);
+  });
+});
+
+describe('lcm', () => {
+  it('computes least common multiple', () => {
+    expect(lcm(4, 6)).toBe(12);
+    expect(lcm(3, 5)).toBe(15);
+    expect(lcm(12, 18)).toBe(36);
+  });
+});
+
+describe('isPrime', () => {
+  it('identifies primes and non-primes', () => {
+    expect(isPrime(2)).toBe(true);
+    expect(isPrime(7)).toBe(true);
+    expect(isPrime(13)).toBe(true);
+    expect(isPrime(1)).toBe(false);
+    expect(isPrime(0)).toBe(false);
+    expect(isPrime(8)).toBe(false);
+    expect(isPrime(15)).toBe(false);
   });
 });
 

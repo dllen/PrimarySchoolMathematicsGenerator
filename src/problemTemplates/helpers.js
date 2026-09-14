@@ -85,6 +85,39 @@ export function pickRatio(rng, band) {
   return { a: a / g, b: b / g };
 }
 
+
+/** 阶乘: n <= 6 (6!=720, 7!=5040 超过 perm <= 1000 约束)。 */
+export function factorial(n) {
+  if (n > 6) throw new Error('factorial: n must be <= 6');
+  return n <= 1 ? 1 : n * factorial(n - 1);
+}
+
+/** 排列数 A(n,r) = n! / (n-r)! */
+export function perm(n, r) {
+  return factorial(n) / factorial(n - r);
+}
+
+/** 组合数 C(n,r) = n! / (r! * (n-r)!) */
+export function comb(n, r) {
+  return factorial(n) / (factorial(r) * factorial(n - r));
+}
+
+/** 最小公倍数 lcm(a,b) = |a*b| / gcd(a,b) */
+export function lcm(a, b) {
+  return Math.abs(a * b) / gcd(a, b);
+}
+
+/** 质数判断(试除法,适合 n <= 1000) */
+export function isPrime(n) {
+  if (n < 2) return false;
+  if (n === 2) return true;
+  if (n % 2 === 0) return false;
+  for (let i = 3; i * i <= n; i += 2) {
+    if (n % i === 0) return false;
+  }
+  return true;
+}
+
 /**
  * 调试/测试用范围断言;value 必须在 [lo, hi],否则抛出含 label 的明确错误。
  * 模板 generate 末尾可用,数字出 band 时立即报警。
