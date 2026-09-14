@@ -65,6 +65,26 @@ export function pickTwoPeople(rng) {
   return [a, rng.pick(pool)];
 }
 
+
+/** 欧几里得算法求最大公约数。 */
+export function gcd(a, b) {
+  return b === 0 ? Math.abs(a) : gcd(b, a % b);
+}
+
+/** 行程问题:生成两个不同的速度值 (m/min)。 */
+export function pickTwoSpeeds(rng, band, { min, max }) {
+  const [a, b] = pickPairByBand(rng, band, { min, max });
+  return { speed1: a, speed2: b };
+}
+
+/** 分配比例:生成一个最简整数比 a:b。 */
+export function pickRatio(rng, band) {
+  const a = pickNumberByBand(rng, band, { min: 1, max: 5 });
+  const b = pickNumberByBand(rng, band, { min: 1, max: 5 });
+  const g = gcd(a, b);
+  return { a: a / g, b: b / g };
+}
+
 /**
  * 调试/测试用范围断言;value 必须在 [lo, hi],否则抛出含 label 的明确错误。
  * 模板 generate 末尾可用,数字出 band 时立即报警。

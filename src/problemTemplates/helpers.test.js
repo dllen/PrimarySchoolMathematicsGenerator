@@ -7,6 +7,9 @@ import {
   pickPairByBand,
   pickPerson,
   pickTwoPeople,
+  gcd,
+  pickTwoSpeeds,
+  pickRatio,
   assertInRange,
 } from './helpers.js';
 
@@ -94,6 +97,41 @@ describe('pickTwoPeople', () => {
       expect(a).not.toBe(b);
       expect(typeof a).toBe('string');
       expect(typeof b).toBe('string');
+    }
+  });
+});
+
+describe('gcd', () => {
+  it('computes gcd correctly', () => {
+    expect(gcd(12, 8)).toBe(4);
+    expect(gcd(8, 12)).toBe(4);
+    expect(gcd(7, 5)).toBe(1);
+    expect(gcd(100, 75)).toBe(25);
+  });
+  it('handles gcd with zero', () => {
+    expect(gcd(0, 5)).toBe(5);
+    expect(gcd(5, 0)).toBe(5);
+  });
+});
+
+describe('pickTwoSpeeds', () => {
+  it('returns two distinct values in band-scaled range', () => {
+    const rng = createRng(42);
+    for (let i = 0; i < 30; i++) {
+      const { speed1, speed2 } = pickTwoSpeeds(rng, 'medium', { min: 50, max: 120 });
+      expect(speed1).not.toBe(speed2);
+      expect(speed1).toBeGreaterThanOrEqual(50);
+      expect(speed1).toBeLessThanOrEqual(120);
+    }
+  });
+});
+
+describe('pickRatio', () => {
+  it('returns a ratio with gcd 1', () => {
+    const rng = createRng(42);
+    for (let i = 0; i < 50; i++) {
+      const { a, b } = pickRatio(rng, 'medium');
+      expect(gcd(a, b)).toBe(1);
     }
   });
 });
