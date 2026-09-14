@@ -36,6 +36,24 @@ function generateShareSubtemplates() {
       },
     },
     {
+      id: 'share-apple',
+      band: 'medium',
+      generate(rng) {
+        // Spec §3.2: 已知总数和每人分得数且有剩余,求人数.
+        const person = pickPerson(rng);
+        const each = rng.int(3, 7);
+        const people = rng.int(3, 8);
+        const remain = rng.int(1, 3);
+        const total = each * people + remain;
+        return {
+          question: `${person}把${total}个苹果平均分给小朋友,每人分到${each}个,还剩${remain}个。一共有几位小朋友?`,
+          answer: `${people}位`,
+          subtype: 'share-candy',
+          payload: { total, each, remain, people },
+        };
+      },
+    },
+    {
       id: 'share-half',
       band: 'hard',
       generate(rng) {

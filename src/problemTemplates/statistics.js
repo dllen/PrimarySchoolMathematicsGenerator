@@ -51,6 +51,25 @@ function generateStatisticsSubtemplates() {
       },
     },
     {
+      id: 'statistics-chart-read',
+      band: 'medium',
+      generate(rng) {
+        // Spec §3.5: 从给定数据读条形图,说出最高/最低.
+        const labels = ['一班', '二班', '三班', '四班'];
+        const data = labels.map(() => rng.int(10, 50));
+        const max = Math.max(...data);
+        const min = Math.min(...data);
+        const maxClass = labels[data.indexOf(max)];
+        const minClass = labels[data.indexOf(min)];
+        return {
+          question: `条形统计图显示各班人数:${labels.map((l, i) => `${l}${data[i]}人`).join(',')}。哪个班人数最多?哪个班最少?`,
+          answer: `${maxClass}最多(${max}人),${minClass}最少(${min}人)`,
+          subtype: 'statistics',
+          payload: { data, max, min, maxClassIdx: data.indexOf(max), minClassIdx: data.indexOf(min) },
+        };
+      },
+    },
+    {
       id: 'statistics-mean-compare',
       band: 'hard',
       generate(rng) {

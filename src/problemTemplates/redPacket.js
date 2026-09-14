@@ -33,20 +33,20 @@ function generateRedPacketSubtemplates() {
       },
     },
     {
-      id: 'redpacket-balance',
+      id: 'redpacket-calculate',
       band: 'hard',
       generate(rng) {
-        // Hard band scales max by 1.8; pick s1/s2 directly so they stay below incomes.
-        const i1 = pickNumberByBand(rng, 'hard', { min: 20, max: 50 });
-        const i2 = pickNumberByBand(rng, 'hard', { min: 10, max: 40 });
-        const s1 = rng.int(5, Math.max(5, i1 - 5));
-        const s2 = rng.int(3, Math.max(3, i2 - 3));
+        // Spec §3.5: 已知收入支出与最终余额,求某笔未知收入.
+        const i1 = rng.int(20, 50);
+        const i2 = rng.int(10, 40);
+        const s1 = rng.int(5, 15);
+        const s2 = rng.int(3, 12);
         const final = i1 + i2 - s1 - s2;
         return {
-          question: `小华收到两个红包${i1}元和${i2}元,买书花了${s1}元,买文具花了${s2}元。还剩多少元?`,
-          answer: `${final}元`,
+          question: `小华收到红包${i1}元,买书花了${s1}元,买文具花了${s2}元,最后还剩${final}元。他还收到了另一个多少元的红包?`,
+          answer: `${i2}元`,
           subtype: 'red-packet',
-          payload: { i1, i2, s1, s2, final },
+          payload: { i1, s1, s2, final, i2 },
         };
       },
     },

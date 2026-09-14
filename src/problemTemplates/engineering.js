@@ -21,13 +21,14 @@ function generateEngineeringSubtemplates() {
       id: 'engineering-together',
       band: 'medium',
       generate(rng) {
-        const r1 = pickNumberByBand(rng, 'medium', { min: 3, max: 10 });
-        const r2 = pickNumberByBand(rng, 'medium', { min: 3, max: 10 });
-        const hours = pickNumberByBand(rng, 'medium', { min: 2, max: 6 });
+        // Spec §3.1: 两人合作,求时间 (inverse of the forward variant).
+        const r1 = rng.int(3, 10);
+        const r2 = rng.int(3, 10);
+        const hours = rng.int(2, 6);
         const total = (r1 + r2) * hours;
         return {
-          question: `甲每小时做${r1}个,乙每小时做${r2}个,两人一起做${hours}小时,共完成多少个?`,
-          answer: `${total}个`,
+          question: `甲每小时做${r1}个,乙每小时做${r2}个,两人一起做${total}个零件需要多少小时?`,
+          answer: `${hours}小时`,
           subtype: 'engineering',
           payload: { r1, r2, hours, total },
         };
@@ -37,14 +38,15 @@ function generateEngineeringSubtemplates() {
       id: 'engineering-complete',
       band: 'medium',
       generate(rng) {
-        const hours = pickNumberByBand(rng, 'medium', { min: 3, max: 8 });
-        const rate = pickNumberByBand(rng, 'medium', { min: 3, max: 12 });
+        // Spec §3.1: 已知总量和时间,求效率.
+        const rate = rng.int(3, 12);
+        const hours = rng.int(3, 8);
         const total = rate * hours;
         return {
-          question: `一项工程,每小时做${rate}个,${hours}小时完成,共做多少个?`,
-          answer: `${total}个`,
+          question: `一项工程总量是${total}个零件,${hours}小时完成,平均每小时做多少个?`,
+          answer: `${rate}个/小时`,
           subtype: 'engineering',
-          payload: { rate, hours, total },
+          payload: { total, hours, rate },
         };
       },
     },

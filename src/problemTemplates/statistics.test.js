@@ -35,6 +35,14 @@ describe('statisticsTemplate', () => {
     const { max, min, range } = result.payload;
     expect(range).toBe(max - min);
   });
+  it('medium (chart-read): max/min match the data', () => {
+    const result = findWith(2, p => p.maxClassIdx !== undefined);
+    const { data, max, min } = result.payload;
+    expect(max).toBe(Math.max(...data));
+    expect(min).toBe(Math.min(...data));
+    expect(result.answer).toContain(`${max}人`);
+    expect(result.answer).toContain(`${min}人`);
+  });
   it('hard (compare): diff = |m1 - m2|', () => {
     const result = findWith(3, p => p.m1 !== undefined && p.m2 !== undefined);
     const { m1, m2, diff } = result.payload;

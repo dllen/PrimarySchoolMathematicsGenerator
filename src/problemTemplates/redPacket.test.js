@@ -27,10 +27,13 @@ describe('redPacketTemplate', () => {
     const { income, spend, remain } = result.payload;
     expect(remain).toBe(income - spend);
   });
-  it('hard: final = i1 + i2 - s1 - s2', () => {
+  it('hard: infers the unknown second red packet from the final balance', () => {
     const rng = createRng(3);
     const result = redPacketTemplate.generate(rng, 3);
     const { i1, i2, s1, s2, final } = result.payload;
     expect(final).toBe(i1 + i2 - s1 - s2);
+    // The unknown (i2) must not be leaked into the question text.
+    expect(result.question).not.toContain(`${i2}元`);
+    expect(result.question).toMatch(/另一个多少元的红包/);
   });
 });
