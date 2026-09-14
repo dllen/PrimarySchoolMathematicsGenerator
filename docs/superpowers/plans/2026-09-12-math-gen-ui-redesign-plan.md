@@ -103,7 +103,7 @@ src/style.css
 - Modify: `src/main.js`
 - Modify: `src/style.css`(清空为单行注释 + re-export,确保旧引用不破)
 
-- [ ] **Step 1: 安装 Tailwind 与字体依赖**
+✓ [x] **Step 1: 安装 Tailwind 与字体依赖**
 
 ```bash
 npm install -D tailwindcss@^3.4.0 postcss@^8.4.0 autoprefixer@^10.4.0
@@ -112,7 +112,7 @@ npm install @fontsource/lora @fontsource/lxgw-wenkai-tc
 
 预期: `package.json` dependencies 与 devDependencies 各自新增上述包,无报错。
 
-- [ ] **Step 2: 创建 Tailwind 配置**
+✓ [x] **Step 2: 创建 Tailwind 配置**
 
 创建 `tailwind.config.js`(项目根):
 
@@ -164,7 +164,7 @@ export default {
 }
 ```
 
-- [ ] **Step 3: 创建 PostCSS 配置**
+✓ [x] **Step 3: 创建 PostCSS 配置**
 
 创建 `postcss.config.js`(项目根):
 
@@ -177,7 +177,7 @@ export default {
 }
 ```
 
-- [ ] **Step 4: 创建 CSS tokens 文件**
+✓ [x] **Step 4: 创建 CSS tokens 文件**
 
 创建 `src/assets/styles/tokens.css`:
 
@@ -262,7 +262,7 @@ export default {
 }
 ```
 
-- [ ] **Step 5: 创建 base.css**
+✓ [x] **Step 5: 创建 base.css**
 
 创建 `src/assets/styles/base.css`:
 
@@ -310,7 +310,7 @@ export default {
 }
 ```
 
-- [ ] **Step 6: 创建 utilities.css**
+✓ [x] **Step 6: 创建 utilities.css**
 
 创建 `src/assets/styles/utilities.css`:
 
@@ -349,7 +349,7 @@ export default {
 }
 ```
 
-- [ ] **Step 7: 修改 src/main.js**
+✓ [x] **Step 7: 修改 src/main.js**
 
 修改 `src/main.js` 引入新样式:
 
@@ -374,7 +374,7 @@ app.use(router)
 app.mount('#app')
 ```
 
-- [ ] **Step 8: 清空 src/style.css(防引用断链)**
+✓ [x] **Step 8: 清空 src/style.css(防引用断链)**
 
 将 `src/style.css` 替换为单行:
 
@@ -383,7 +383,7 @@ app.mount('#app')
 @import './assets/styles/base.css';
 ```
 
-- [ ] **Step 9: 验证 Tailwind 工作**
+✓ [x] **Step 9: 验证 Tailwind 工作**
 
 启动 dev server:
 
@@ -395,7 +395,7 @@ npm run dev
 
 预期: 页面背景从原本的 `#f5f5f5` 变成米白 `#FAF7F2`,字体应用 Lora。
 
-- [ ] **Step 10: 验证生产构建**
+✓ [x] **Step 10: 验证生产构建**
 
 ```bash
 npm run build
@@ -403,7 +403,7 @@ npm run build
 
 预期: 构建无 Tailwind/PostCSS 错误,`dist/assets/` 中包含生成 CSS 文件。
 
-- [ ] **Step 11: 提交**
+✓ [x] **Step 11: 提交**
 
 ```bash
 git add package.json tailwind.config.js postcss.config.js \
@@ -426,7 +426,7 @@ git commit -m "feat(styles): introduce Tailwind + design tokens (paper-warm pale
 - Create: `src/components/base/BaseSheet.vue`
 - Create: `src/components/base/index.js`
 
-- [ ] **Step 1: 写 BaseButton 失败测试**
+✓ [x] **Step 1: 写 BaseButton 失败测试**
 
 创建 `src/components/base/BaseButton.test.js`:
 
@@ -469,7 +469,7 @@ describe('BaseButton', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+✓ [x] **Step 2: 运行测试确认失败**
 
 ```bash
 npx vitest run src/components/base/BaseButton.test.js
@@ -477,7 +477,7 @@ npx vitest run src/components/base/BaseButton.test.js
 
 预期: FAIL,`Cannot find module './BaseButton.vue'`。
 
-- [ ] **Step 3: 实现 BaseButton**
+✓ [x] **Step 3: 实现 BaseButton**
 
 创建 `src/components/base/BaseButton.vue`:
 
@@ -543,7 +543,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+✓ [x] **Step 4: 运行测试确认通过**
 
 ```bash
 npx vitest run src/components/base/BaseButton.test.js
@@ -551,7 +551,7 @@ npx vitest run src/components/base/BaseButton.test.js
 
 预期: 5 个测试全部 PASS。
 
-- [ ] **Step 5: 实现 BaseBadge**
+✓ [x] **Step 5: 实现 BaseBadge**
 
 创建 `src/components/base/BaseBadge.vue`:
 
@@ -587,7 +587,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 6: 实现 BaseCard**
+✓ [x] **Step 6: 实现 BaseCard**
 
 创建 `src/components/base/BaseCard.vue`:
 
@@ -633,7 +633,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 7: 实现 BaseInput**
+✓ [x] **Step 7: 实现 BaseInput**
 
 创建 `src/components/base/BaseInput.vue`:
 
@@ -663,7 +663,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 8: 实现 BaseSelect**
+✓ [x] **Step 8: 实现 BaseSelect**
 
 创建 `src/components/base/BaseSelect.vue`:
 
@@ -694,7 +694,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 9: 实现 BaseTabs**
+✓ [x] **Step 9: 实现 BaseTabs**
 
 创建 `src/components/base/BaseTabs.vue`:
 
@@ -736,7 +736,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 10: 实现 BaseSheet(移动端底部弹出)**
+✓ [x] **Step 10: 实现 BaseSheet(移动端底部弹出)**
 
 创建 `src/components/base/BaseSheet.vue`:
 
@@ -793,7 +793,7 @@ export default {
 </style>
 ```
 
-- [ ] **Step 11: 创建 Base 组件统一导出**
+✓ [x] **Step 11: 创建 Base 组件统一导出**
 
 创建 `src/components/base/index.js`:
 
@@ -807,7 +807,7 @@ export { default as BaseTabs } from './BaseTabs.vue'
 export { default as BaseSheet } from './BaseSheet.vue'
 ```
 
-- [ ] **Step 12: 跑全部测试**
+✓ [x] **Step 12: 跑全部测试**
 
 ```bash
 npx vitest run src/components/base/
@@ -815,7 +815,7 @@ npx vitest run src/components/base/
 
 预期: BaseButton 5 测试 PASS,其他 Base 组件无报错(无测试则跳过)。
 
-- [ ] **Step 13: 提交**
+✓ [x] **Step 13: 提交**
 
 ```bash
 git add src/components/base/
@@ -830,7 +830,7 @@ git commit -m "feat(base): add 7 base UI components (Button/Badge/Card/Input/Sel
 - Create: `src/composables/useBreakpoint.js`
 - Create: `src/composables/useBreakpoint.test.js`
 
-- [ ] **Step 1: 写失败测试**
+✓ [x] **Step 1: 写失败测试**
 
 创建 `src/composables/useBreakpoint.test.js`:
 
@@ -865,7 +865,7 @@ describe('useBreakpoint', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+✓ [x] **Step 2: 运行测试确认失败**
 
 ```bash
 npx vitest run src/composables/useBreakpoint.test.js
@@ -873,7 +873,7 @@ npx vitest run src/composables/useBreakpoint.test.js
 
 预期: FAIL,`Cannot find module './useBreakpoint.js'`。
 
-- [ ] **Step 3: 实现 useBreakpoint**
+✓ [x] **Step 3: 实现 useBreakpoint**
 
 创建 `src/composables/useBreakpoint.js`:
 
@@ -910,7 +910,7 @@ export function useBreakpoint() {
 
 > 注: 因 Vue ref 在 SSR / 测试环境下需 `.value`,API 改为函数式 getter,简化调用方:`const { isMobile } = useBreakpoint(); if (isMobile()) {...}`。
 
-- [ ] **Step 4: 运行测试确认通过**
+✓ [x] **Step 4: 运行测试确认通过**
 
 ```bash
 npx vitest run src/composables/useBreakpoint.test.js
@@ -918,7 +918,7 @@ npx vitest run src/composables/useBreakpoint.test.js
 
 预期: 3 个测试全部 PASS。
 
-- [ ] **Step 5: 提交**
+✓ [x] **Step 5: 提交**
 
 ```bash
 git add src/composables/useBreakpoint.js src/composables/useBreakpoint.test.js
@@ -935,7 +935,7 @@ git commit -m "feat(composables): add useBreakpoint for reactive media query"
 - Create: `src/components/layout/MobileNav.vue`
 - Modify: `src/App.vue`
 
-- [ ] **Step 1: 写 AppHeader 失败测试**
+✓ [x] **Step 1: 写 AppHeader 失败测试**
 
 创建 `src/components/layout/AppHeader.test.js`:
 
@@ -972,7 +972,7 @@ describe('AppHeader', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+✓ [x] **Step 2: 运行测试确认失败**
 
 ```bash
 npx vitest run src/components/layout/AppHeader.test.js
@@ -980,7 +980,7 @@ npx vitest run src/components/layout/AppHeader.test.js
 
 预期: FAIL,`Cannot find module './AppHeader.vue'`。
 
-- [ ] **Step 3: 实现 AppHeader**
+✓ [x] **Step 3: 实现 AppHeader**
 
 创建 `src/components/layout/AppHeader.vue`:
 
@@ -1049,7 +1049,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+✓ [x] **Step 4: 运行测试确认通过**
 
 ```bash
 npx vitest run src/components/layout/AppHeader.test.js
@@ -1057,7 +1057,7 @@ npx vitest run src/components/layout/AppHeader.test.js
 
 预期: 2 个测试全部 PASS。
 
-- [ ] **Step 5: 实现 MobileNav**
+✓ [x] **Step 5: 实现 MobileNav**
 
 创建 `src/components/layout/MobileNav.vue`:
 
@@ -1105,7 +1105,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 6: 修改 src/App.vue**
+✓ [x] **Step 6: 修改 src/App.vue**
 
 修改 `src/App.vue`:
 
@@ -1151,7 +1151,7 @@ export default {
 </style>
 ```
 
-- [ ] **Step 7: 手动验证**
+✓ [x] **Step 7: 手动验证**
 
 ```bash
 npm run dev
@@ -1165,7 +1165,7 @@ npm run dev
 
 预期: 全部行为正常,顶栏 sticky 在顶部,导航链接 hover 变深棕。
 
-- [ ] **Step 8: 跑全量测试**
+✓ [x] **Step 8: 跑全量测试**
 
 ```bash
 npx vitest run
@@ -1173,7 +1173,7 @@ npx vitest run
 
 预期: 已有测试全部 PASS,新增 AppHeader 测试 PASS,无回归。
 
-- [ ] **Step 9: 提交**
+✓ [x] **Step 9: 提交**
 
 ```bash
 git add src/components/layout/ src/App.vue
@@ -1187,7 +1187,7 @@ git commit -m "feat(layout): add AppHeader + MobileNav + page transition"
 **Files:**
 - Modify: `src/components/HomePage.vue`
 
-- [ ] **Step 1: 查看现有 HomePage 实现**
+✓ [x] **Step 1: 查看现有 HomePage 实现**
 
 ```bash
 cat src/components/HomePage.vue
@@ -1195,7 +1195,7 @@ cat src/components/HomePage.vue
 
 确认结构与依赖。
 
-- [ ] **Step 2: 重写 HomePage 模板**
+✓ [x] **Step 2: 重写 HomePage 模板**
 
 将 `src/components/HomePage.vue` 替换为:
 
@@ -1226,7 +1226,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 3: 手动验证**
+✓ [x] **Step 3: 手动验证**
 
 启动 dev server,访问根路径:
 
@@ -1242,7 +1242,7 @@ npm run dev
 - 暖米白底 + Lora 字体
 - 点击按钮跳转 `/workbench`
 
-- [ ] **Step 4: 跑测试**
+✓ [x] **Step 4: 跑测试**
 
 ```bash
 npx vitest run
@@ -1250,7 +1250,7 @@ npx vitest run
 
 预期: 已有测试全部 PASS。
 
-- [ ] **Step 5: 提交**
+✓ [x] **Step 5: 提交**
 
 ```bash
 git add src/components/HomePage.vue
@@ -1267,7 +1267,7 @@ git commit -m "feat(home): redesign HomePage as minimal onboarding screen"
 - Create: `src/components/workbench/WorkbenchHero.vue`
 - Modify: `src/views/GeneratorView.vue`
 
-- [ ] **Step 1: 写 GradeCard 失败测试**
+✓ [x] **Step 1: 写 GradeCard 失败测试**
 
 创建 `src/components/workbench/GradeCard.test.js`:
 
@@ -1302,7 +1302,7 @@ describe('GradeCard', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+✓ [x] **Step 2: 运行测试确认失败**
 
 ```bash
 npx vitest run src/components/workbench/GradeCard.test.js
@@ -1310,7 +1310,7 @@ npx vitest run src/components/workbench/GradeCard.test.js
 
 预期: FAIL,`Cannot find module './GradeCard.vue'`。
 
-- [ ] **Step 3: 实现 GradeCard**
+✓ [x] **Step 3: 实现 GradeCard**
 
 创建 `src/components/workbench/GradeCard.vue`:
 
@@ -1365,7 +1365,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+✓ [x] **Step 4: 运行测试确认通过**
 
 ```bash
 npx vitest run src/components/workbench/GradeCard.test.js
@@ -1373,7 +1373,7 @@ npx vitest run src/components/workbench/GradeCard.test.js
 
 预期: 3 个测试全部 PASS。
 
-- [ ] **Step 5: 实现 WorkbenchHero**
+✓ [x] **Step 5: 实现 WorkbenchHero**
 
 创建 `src/components/workbench/WorkbenchHero.vue`:
 
@@ -1396,7 +1396,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 6: 重写 GeneratorView**
+✓ [x] **Step 6: 重写 GeneratorView**
 
 修改 `src/views/GeneratorView.vue` 为工作台结构(完整替换):
 
@@ -1590,7 +1590,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 7: 手动验证**
+✓ [x] **Step 7: 手动验证**
 
 启动 dev server,访问 `/workbench`:
 
@@ -1608,7 +1608,7 @@ npm run dev
 - 自定义配置 tab 显示 ConfigPanel
 - 预设 tab 显示 PresetSelector
 
-- [ ] **Step 8: 跑全量测试**
+✓ [x] **Step 8: 跑全量测试**
 
 ```bash
 npx vitest run
@@ -1616,7 +1616,7 @@ npx vitest run
 
 预期: 已有测试 + 新增 GradeCard 测试全部 PASS。可能存在 GeneratorView 的旧测试需要更新(下一任务处理)。
 
-- [ ] **Step 9: 提交**
+✓ [x] **Step 9: 提交**
 
 ```bash
 git add src/components/workbench/ src/views/GeneratorView.vue
@@ -1630,7 +1630,7 @@ git commit -m "feat(workbench): redesign GeneratorView as hero + 6 grade cards +
 **Files:**
 - Modify: `src/views/HistoryView.vue`
 
-- [ ] **Step 1: 查看现有 HistoryView**
+✓ [x] **Step 1: 查看现有 HistoryView**
 
 ```bash
 cat src/views/HistoryView.vue
@@ -1638,7 +1638,7 @@ cat src/views/HistoryView.vue
 
 确认数据模型(history list 字段)。
 
-- [ ] **Step 2: 重写 HistoryView**
+✓ [x] **Step 2: 重写 HistoryView**
 
 将 `src/views/HistoryView.vue` 替换为:
 
@@ -1769,7 +1769,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 3: 验证 db.js 是否暴露 deleteProblemSet**
+✓ [x] **Step 3: 验证 db.js 是否暴露 deleteProblemSet**
 
 ```bash
 grep -n "deleteProblemSet\|export" src/db.js | head -20
@@ -1783,7 +1783,7 @@ export async function deleteProblemSet(id) {
 }
 ```
 
-- [ ] **Step 4: 手动验证**
+✓ [x] **Step 4: 手动验证**
 
 启动 dev server,访问 `/history`:
 
@@ -1797,7 +1797,7 @@ npm run dev
 - 每条:标题(年级 · 题型 · 题数) + 元信息(日期 · 难度) + 查看/删除
 - 桌面端横向布局,移动端纵向布局
 
-- [ ] **Step 5: 跑测试**
+✓ [x] **Step 5: 跑测试**
 
 ```bash
 npx vitest run
@@ -1805,7 +1805,7 @@ npx vitest run
 
 预期: 已有测试全部 PASS。
 
-- [ ] **Step 6: 提交**
+✓ [x] **Step 6: 提交**
 
 ```bash
 git add src/views/HistoryView.vue src/db.js
@@ -1819,7 +1819,7 @@ git commit -m "feat(history): redesign HistoryView with paper-warm list + empty 
 **Files:**
 - Modify: `src/views/HistoryDetailView.vue`
 
-- [ ] **Step 1: 查看现有 HistoryDetailView**
+✓ [x] **Step 1: 查看现有 HistoryDetailView**
 
 ```bash
 cat src/views/HistoryDetailView.vue
@@ -1827,7 +1827,7 @@ cat src/views/HistoryDetailView.vue
 
 确认 props / 数据加载逻辑。
 
-- [ ] **Step 2: 重写 HistoryDetailView**
+✓ [x] **Step 2: 重写 HistoryDetailView**
 
 将 `src/views/HistoryDetailView.vue` 替换为:
 
@@ -1944,7 +1944,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 3: 验证 db.js 是否暴露 getProblemSet**
+✓ [x] **Step 3: 验证 db.js 是否暴露 getProblemSet**
 
 ```bash
 grep -n "getProblemSet\|export" src/db.js | head -20
@@ -1958,7 +1958,7 @@ export async function getProblemSet(id) {
 }
 ```
 
-- [ ] **Step 4: 手动验证**
+✓ [x] **Step 4: 手动验证**
 
 启动 dev server,访问 `/history/<id>`:
 
@@ -1968,7 +1968,7 @@ export async function getProblemSet(id) {
 - 题目网格
 - 底部"返回工作台" + "再生成一份"
 
-- [ ] **Step 5: 提交**
+✓ [x] **Step 5: 提交**
 
 ```bash
 git add src/views/HistoryDetailView.vue src/db.js
@@ -1984,7 +1984,7 @@ git commit -m "feat(history): redesign HistoryDetailView with metadata card + ac
 - Modify: `src/views/QuickStartView.vue`
 - Modify: `src/router/index.js`
 
-- [ ] **Step 1: 实现 AboutView**
+✓ [x] **Step 1: 实现 AboutView**
 
 创建 `src/views/AboutView.vue`:
 
@@ -2024,7 +2024,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 2: 修改 QuickStartView 为重定向包装器**
+✓ [x] **Step 2: 修改 QuickStartView 为重定向包装器**
 
 将 `src/views/QuickStartView.vue` 替换为:
 
@@ -2043,7 +2043,7 @@ export default {
 </script>
 ```
 
-- [ ] **Step 3: 修改路由**
+✓ [x] **Step 3: 修改路由**
 
 将 `src/router/index.js` 替换为:
 
@@ -2113,7 +2113,7 @@ const router = createRouter({
 export default router
 ```
 
-- [ ] **Step 4: 手动验证全部路由**
+✓ [x] **Step 4: 手动验证全部路由**
 
 启动 dev server:
 
@@ -2133,7 +2133,7 @@ npm run dev
 
 预期: 全部路径正常工作,顶栏导航 active 状态正确。
 
-- [ ] **Step 5: 跑全量测试**
+✓ [x] **Step 5: 跑全量测试**
 
 ```bash
 npx vitest run
@@ -2141,7 +2141,7 @@ npx vitest run
 
 预期: 已有测试 + 新增测试全部 PASS。
 
-- [ ] **Step 6: 提交**
+✓ [x] **Step 6: 提交**
 
 ```bash
 git add src/views/AboutView.vue src/views/QuickStartView.vue src/router/index.js
@@ -2160,7 +2160,7 @@ git commit -m "feat(routing): add /workbench + /about routes, redirect legacy pa
 
 > 注:本任务为视觉升级 + Tailwind 迁移。功能不变,仅样式与结构微调。
 
-- [ ] **Step 1: 重构 ConfigPanel 为 Tailwind class**
+✓ [x] **Step 1: 重构 ConfigPanel 为 Tailwind class**
 
 打开 `src/components/ConfigPanel.vue`,将所有自定义 CSS class(如 `.config-panel`, `.config-row`, `.config-item`)替换为 Tailwind class:
 
@@ -2197,14 +2197,14 @@ git commit -m "feat(routing): add /workbench + /about routes, redirect legacy pa
 - `config-item label` → `font-semibold text-ink-deep min-w-[80px] text-left whitespace-nowrap`
 - `config-item input/select` → 用 `BaseInput`/`BaseSelect` 替代
 
-- [ ] **Step 2: 重构 ConfigWizard 为 Tailwind**
+✓ [x] **Step 2: 重构 ConfigWizard 为 Tailwind**
 
 打开 `src/components/ConfigWizard.vue`,应用相同规则:
 - 步骤指示器:用 `BaseBadge` 显示当前步骤
 - 步骤切换:用 `BaseButton` 替代自定义按钮
 - 保持 3 步结构(基础 → 题型 → 高级)不变
 
-- [ ] **Step 3: 重构 PresetSelector 为卡片网格**
+✓ [x] **Step 3: 重构 PresetSelector 为卡片网格**
 
 打开 `src/components/PresetSelector.vue`,将单列下拉替换为 2-3 列网格(用 `GradeCard` 类似的 `BaseCard`):
 
@@ -2225,7 +2225,7 @@ git commit -m "feat(routing): add /workbench + /about routes, redirect legacy pa
 </template>
 ```
 
-- [ ] **Step 4: 重构 PresetManager 为列表 + 编辑表单**
+✓ [x] **Step 4: 重构 PresetManager 为列表 + 编辑表单**
 
 打开 `src/components/PresetManager.vue`,布局改为两栏(桌面)或上下堆叠(移动):
 - 左:预设列表(用 `BaseCard`)
@@ -2233,7 +2233,7 @@ git commit -m "feat(routing): add /workbench + /about routes, redirect legacy pa
 
 移动端改为 `<BaseSheet>` 弹出层。
 
-- [ ] **Step 5: 手动验证**
+✓ [x] **Step 5: 手动验证**
 
 启动 dev server:
 
@@ -2247,7 +2247,7 @@ npm run dev
 - PresetSelector 显示卡片网格
 - PresetManager 桌面端两栏,移动端 sheet
 
-- [ ] **Step 6: 跑测试**
+✓ [x] **Step 6: 跑测试**
 
 ```bash
 npx vitest run
@@ -2255,7 +2255,7 @@ npx vitest run
 
 预期: 已有测试全部 PASS。
 
-- [ ] **Step 7: 提交**
+✓ [x] **Step 7: 提交**
 
 ```bash
 git add src/components/ConfigPanel.vue src/components/ConfigWizard.vue \
@@ -2273,7 +2273,7 @@ git commit -m "refactor(components): migrate ConfigPanel/Wizard/Preset* to Tailw
 - Modify: `src/components/ConfirmDialog.vue`
 - Modify: `src/components/ToastContainer.vue`
 
-- [ ] **Step 1: 重构 ActionBar**
+✓ [x] **Step 1: 重构 ActionBar**
 
 打开 `src/components/ActionBar.vue`,应用:
 - 桌面端:横向按钮组(主操作"生成"用 ember,次操作 ghost)
@@ -2295,7 +2295,7 @@ git commit -m "refactor(components): migrate ConfigPanel/Wizard/Preset* to Tailw
 </template>
 ```
 
-- [ ] **Step 2: 重构 ExportPreview 为暖色 sheet**
+✓ [x] **Step 2: 重构 ExportPreview 为暖色 sheet**
 
 打开 `src/components/ExportPreview.vue`,将模态框样式升级:
 - 遮罩:bg-ink-deep/40
@@ -2303,7 +2303,7 @@ git commit -m "refactor(components): migrate ConfigPanel/Wizard/Preset* to Tailw
 - 按钮组:用 BaseButton
 - 移动端用 BaseSheet 替换自定义模态
 
-- [ ] **Step 3: 重构 ConfirmDialog**
+✓ [x] **Step 3: 重构 ConfirmDialog**
 
 打开 `src/components/ConfirmDialog.vue`,简化为:
 
@@ -2350,7 +2350,7 @@ export default {
 </style>
 ```
 
-- [ ] **Step 4: 重构 ToastContainer 暖色调**
+✓ [x] **Step 4: 重构 ToastContainer 暖色调**
 
 打开 `src/components/ToastContainer.vue`,更新配色:
 - success:bg-success/10 border-success text-success
@@ -2358,7 +2358,7 @@ export default {
 - warning:bg-warning/10 border-warning text-warning
 - info:bg-paper-card border-rule-soft text-ink-deep
 
-- [ ] **Step 5: 手动验证**
+✓ [x] **Step 5: 手动验证**
 
 启动 dev server:
 
@@ -2372,7 +2372,7 @@ npm run dev
 - ConfirmDialog 弹窗居中,暖色卡片
 - Toast 显示在右上角,暖色调
 
-- [ ] **Step 6: 跑测试**
+✓ [x] **Step 6: 跑测试**
 
 ```bash
 npx vitest run
@@ -2380,7 +2380,7 @@ npx vitest run
 
 预期: 已有测试全部 PASS。
 
-- [ ] **Step 7: 提交**
+✓ [x] **Step 7: 提交**
 
 ```bash
 git add src/components/ActionBar.vue src/components/ExportPreview.vue \
@@ -2398,18 +2398,18 @@ git commit -m "refactor(components): warm-palette upgrade for ActionBar/Export/C
 - Create: `cypress/e2e/workbench-redesign.cy.js`
 - Create: `cypress/e2e/mobile-sheet.cy.js`
 
-- [ ] **Step 1: 升级 ProblemGrid 间距/字号**
+✓ [x] **Step 1: 升级 ProblemGrid 间距/字号**
 
 打开 `src/components/ProblemGrid.vue`:
 - 字号:`text-base`(15px) → `text-md`(17px) 提高可读性
 - 间距:`gap-3` → `gap-4` 更宽松
 - 行高:`leading-base` → `leading-loose` 给书写空间
 
-- [ ] **Step 2: 升级 AnswerPage 同款间距**
+✓ [x] **Step 2: 升级 AnswerPage 同款间距**
 
 打开 `src/components/AnswerPage.vue`,应用与 ProblemGrid 相同的间距/字号规则。
 
-- [ ] **Step 3: 创建 workbench-redesign E2E**
+✓ [x] **Step 3: 创建 workbench-redesign E2E**
 
 创建 `cypress/e2e/workbench-redesign.cy.js`:
 
@@ -2446,7 +2446,7 @@ describe('工作台 UI 重设计', () => {
 > 若 GradeCard 没有 `data-test="grade-card"` 属性,在 Task 6 Step 3 的 GradeCard 模板根元素上加 `:data-test="'grade-card'"`。
 > 同样,在 Task 6 Step 6 的 GeneratorView 预览区根 div 加 `data-test="preview-root"`。
 
-- [ ] **Step 4: 创建 mobile-sheet E2E**
+✓ [x] **Step 4: 创建 mobile-sheet E2E**
 
 创建 `cypress/e2e/mobile-sheet.cy.js`:
 
@@ -2475,7 +2475,7 @@ describe('移动端底部 sheet', () => {
 })
 ```
 
-- [ ] **Step 5: 跑 E2E(可选,需 Cypress GUI 或 CI)**
+✓ [x] **Step 5: 跑 E2E(可选,需 Cypress GUI 或 CI)**
 
 ```bash
 npx cypress run --spec cypress/e2e/workbench-redesign.cy.js
@@ -2484,7 +2484,7 @@ npx cypress run --spec cypress/e2e/mobile-sheet.cy.js
 
 预期: 全部用例 PASS。
 
-- [ ] **Step 6: 跑全量单测**
+✓ [x] **Step 6: 跑全量单测**
 
 ```bash
 npx vitest run
@@ -2492,7 +2492,7 @@ npx vitest run
 
 预期: 全部 PASS。
 
-- [ ] **Step 7: 提交**
+✓ [x] **Step 7: 提交**
 
 ```bash
 git add src/components/ProblemGrid.vue src/components/AnswerPage.vue \
@@ -2508,7 +2508,7 @@ git commit -m "feat(e2e): add workbench-redesign + mobile-sheet cypress specs"
 - Modify: 各组件文件(基于需要)
 - Create: `src/composables/useBreakpoint.js`(已在 Task 3 创建,本任务在 GeneratorView 中使用)
 
-- [ ] **Step 1: 在 GeneratorView 中接入 useBreakpoint**
+✓ [x] **Step 1: 在 GeneratorView 中接入 useBreakpoint**
 
 在 `src/views/GeneratorView.vue` 的 setup 中引入 `useBreakpoint`:
 
@@ -2524,7 +2524,7 @@ const { isMobile } = useBreakpoint()
 <div :class="isMobile() ? 'grid grid-cols-2 gap-3 mb-8' : 'grid grid-cols-3 gap-3 mb-8'">
 ```
 
-- [ ] **Step 2: 全量检查所有可点击元素的最小高度**
+✓ [x] **Step 2: 全量检查所有可点击元素的最小高度**
 
 搜索所有 `<button>` 与可点击元素,确保满足 ≥ 44×44px:
 
@@ -2534,7 +2534,7 @@ grep -rn "min-h-\[44" src/components/ src/views/
 
 应至少在 BaseButton / BaseInput / BaseSelect / MobileNav 等组件中存在。缺失的补充 `min-h-[44px]` 类。
 
-- [ ] **Step 3: 移动端 iPhone SE 测试**
+✓ [x] **Step 3: 移动端 iPhone SE 测试**
 
 启动 dev server,用 DevTools 切到 iPhone SE (375×667):
 
@@ -2549,11 +2549,11 @@ npm run dev
 - 按钮 ≥ 44px
 - ActionBar sticky 在底部,不遮挡内容
 
-- [ ] **Step 4: 移动端 Android 测试**
+✓ [x] **Step 4: 移动端 Android 测试**
 
 用真机或 Android Chrome DevTools(模拟 360×640),同上检查。
 
-- [ ] **Step 5: 提交(如改动)**
+✓ [x] **Step 5: 提交(如改动)**
 
 ```bash
 git add src/views/GeneratorView.vue src/components/
@@ -2567,7 +2567,7 @@ git commit -m "fix(mobile): ensure 44px tap targets + 2-col mobile grade grid"
 **Files:**
 - Modify: `src/assets/styles/base.css`
 
-- [ ] **Step 1: 添加 @media print 块到 base.css**
+✓ [x] **Step 1: 添加 @media print 块到 base.css**
 
 在 `src/assets/styles/base.css` 末尾追加:
 
@@ -2620,7 +2620,7 @@ git commit -m "fix(mobile): ensure 44px tap targets + 2-col mobile grade grid"
 }
 ```
 
-- [ ] **Step 2: 手动验证打印**
+✓ [x] **Step 2: 手动验证打印**
 
 启动 dev server:
 
@@ -2635,7 +2635,7 @@ npm run dev
 - 无按钮 / 顶栏 / 配置面板
 - 字号 ≥ 14pt,行距 ≥ 1.8
 
-- [ ] **Step 3: 提交**
+✓ [x] **Step 3: 提交**
 
 ```bash
 git add src/assets/styles/base.css
@@ -2649,7 +2649,7 @@ git commit -m "feat(print): adapt print styles — switch to sans-serif + 1.8 li
 **Files:**
 - Modify: 按需修复
 
-- [ ] **Step 1: 生产构建**
+✓ [x] **Step 1: 生产构建**
 
 ```bash
 npm run build
@@ -2657,13 +2657,13 @@ npm run build
 
 预期: 构建成功,无 Tailwind/PostCSS 错误。
 
-- [ ] **Step 2: 启动 preview server**
+✓ [x] **Step 2: 启动 preview server**
 
 ```bash
 npx vite preview --port 5050
 ```
 
-- [ ] **Step 3: 运行 Lighthouse**
+✓ [x] **Step 3: 运行 Lighthouse**
 
 用 Chrome DevTools → Lighthouse → 勾选 Performance / Accessibility / Best Practices / SEO → Analyze:
 
@@ -2675,11 +2675,11 @@ npx vite preview --port 5050
 - Best Practices:HTTPS、图片懒加载
 - SEO:meta description、title
 
-- [ ] **Step 4: 修复后重新跑**
+✓ [x] **Step 4: 修复后重新跑**
 
 修复后重复 Step 1-3,直到达标。
 
-- [ ] **Step 5: 提交(如有改动)**
+✓ [x] **Step 5: 提交(如有改动)**
 
 ```bash
 git add .
@@ -2695,7 +2695,7 @@ git commit -m "perf: lighthouse pass — fonts/a11y/seo tuning"
 - Modify: `MOBILE_FEATURES.md`(如存在)
 - Modify: `CHANGELOG.md`
 
-- [ ] **Step 1: 更新 README 添加 v2 UI 章节**
+✓ [x] **Step 1: 更新 README 添加 v2 UI 章节**
 
 在 `README.md` 顶部添加:
 
@@ -2712,7 +2712,7 @@ git commit -m "perf: lighthouse pass — fonts/a11y/seo tuning"
 详见设计文档: `docs/superpowers/specs/2026-09-12-math-gen-ui-redesign-design.md`
 ```
 
-- [ ] **Step 2: 更新 CHANGELOG**
+✓ [x] **Step 2: 更新 CHANGELOG**
 
 在 `CHANGELOG.md` 顶部添加:
 
@@ -2738,7 +2738,7 @@ git commit -m "perf: lighthouse pass — fonts/a11y/seo tuning"
 - Lighthouse ≥ 90(性能 / a11y / 最佳实践 / SEO)
 ```
 
-- [ ] **Step 3: 提交**
+✓ [x] **Step 3: 提交**
 
 ```bash
 git add README.md CHANGELOG.md MOBILE_FEATURES.md
@@ -2749,7 +2749,7 @@ git commit -m "docs: update README/CHANGELOG for v2 UI redesign"
 
 ## Task 17: 全量回归 + 最终提交
 
-- [ ] **Step 1: 全量单测**
+✓ [x] **Step 1: 全量单测**
 
 ```bash
 npx vitest run
@@ -2757,7 +2757,7 @@ npx vitest run
 
 预期: 全部 PASS,无回归。
 
-- [ ] **Step 2: 全量 E2E(可选)**
+✓ [x] **Step 2: 全量 E2E(可选)**
 
 ```bash
 npx cypress run
@@ -2765,7 +2765,7 @@ npx cypress run
 
 预期: 全部 PASS,无回归。
 
-- [ ] **Step 3: 手动冒烟测试**
+✓ [x] **Step 3: 手动冒烟测试**
 
 启动 dev server,完整跑一遍核心流程:
 1. 进入 / → 点击"开始 →"
@@ -2775,7 +2775,7 @@ npx cypress run
 5. 进入 /history/<id> → 点击"再生成一份"
 6. 切换到移动端视图,重复 1-5
 
-- [ ] **Step 4: 构建产物检查**
+✓ [x] **Step 4: 构建产物检查**
 
 ```bash
 npm run build
@@ -2784,13 +2784,13 @@ ls -lh dist/assets/*.css dist/assets/*.js | head -10
 
 预期: CSS ≤ 30KB gzipped,JS 总和 ≤ 200KB gzipped。
 
-- [ ] **Step 5: 部署到 gh-pages(可选)**
+✓ [x] **Step 5: 部署到 gh-pages(可选)**
 
 ```bash
 npm run deploy
 ```
 
-- [ ] **Step 6: 最终 commit(如有遗留改动)**
+✓ [x] **Step 6: 最终 commit(如有遗留改动)**
 
 ```bash
 git status
@@ -2798,7 +2798,7 @@ git add .
 git commit -m "chore: v2 UI redesign — final regression pass"
 ```
 
-- [ ] **Step 7: 关闭 brainstorm session(如还在运行)**
+✓ [x] **Step 7: 关闭 brainstorm session(如还在运行)**
 
 如视觉助手还在运行,可告知用户手动关闭浏览器或保留。
 

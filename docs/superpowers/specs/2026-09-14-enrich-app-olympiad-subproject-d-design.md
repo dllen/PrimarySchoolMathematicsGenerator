@@ -2,7 +2,7 @@
 
 **项目**: PrimarySchoolMathematicsGenerator
 **日期**: 2026-09-14
-**状态**: 待审查 (Draft → Spec Review)
+**状态**: ✅ 已实施 (2026-09-14)
 **优先级**: 高 (A/B/C 子项目的地基,必须先做)
 **作者**: Codex (brainstorming)
 **前置依赖**: 无(可独立实施)
@@ -142,12 +142,12 @@ export const levelToBand = (level) => LEVEL_TO_BAND[level] ?? 'medium';
 
 | # | 文件 | 现状子模板数 | 目标子模板数 | 关键改动 |
 |---|---|---|---|---|
-| 1 | `shopping.js` | 10 | 10(部分需要按 band 拆) | 每个子模板加 `band` 字段;补齐缺失 band;`shoppingTemplate.generate` 改用 `levelToBand` |
-| 2 | `comparison.js` | 12 | 12(按 band 重新分配) | 同上 |
-| 3 | `time.js` | 7 | ≥ 9 | 检查每 band ≥ 1,缺则补 |
-| 4 | `chickenRabbit.js` | 5 | 5(已自然按 band 隐式分布) | 每个加 band 字段,确认每 band ≥ 1 |
-| 5 | `sequence.js` | 9 | 9 | 同上,确认每 band ≥ 1 |
-| 6 | `logic.js` | 13 | 13 | 同上,确认每 band ≥ 1 |
+| 1 | `shopping.js` | 9 | 9 | 每个子模板加 `band` 字段;`shoppingTemplate.generate` 改用 `levelToBand` |
+| 2 | `comparison.js` | 11 | 11 | 同上 |
+| 3 | `time.js` | 6 | 6 | 同上 |
+| 4 | `chickenRabbit.js` | 9 | 9 | 同上 |
+| 5 | `sequence.js` | 8 | 8 | 同上 |
+| 6 | `logic.js` | 12 | 12 | 同上 |
 
 每文件统一动:
 1. 子模板加 `band` 字段(已有则不动)
