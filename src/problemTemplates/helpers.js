@@ -1,0 +1,69 @@
+// src/problemTemplates/helpers.js
+// 跨模板通用的随机参数生成器 (Sub-project D, 2026-09-14)
+// 不依赖 Vue / DOM,可被任何纯 JS 测试或模板直接 import。
+
+/** @typedef {'easy' | 'medium' | 'hard'} Band */
+export const BANDS = ['easy', 'medium', 'hard'];
+
+/** DIFFICULTY_TO_LEVEL 反向映射:level 1/2/3 → easy/medium/hard。 */
+const LEVEL_TO_BAND = { 1: 'easy', 2: 'medium', 3: 'hard' };
+
+/** 把 difficultyLevel (1/2/3) 映射到 band;未知值兜底为 medium。 */
+export const levelToBand = (level) => LEVEL_TO_BAND[level] ?? 'medium';
+
+/** 各 band 对输入区间 [min, max] 的缩放因子 */
+const BAND_SCALE = {
+  easy: 0.5,
+  medium: 1.0,
+  hard: 1.8,
+};
+
+/**
+ * 按 band 缩放后,在区间内取一个整数。
+ *  - easy:   [floor(min*0.5), floor(max*0.5)],下界兜底为 1
+ *  - medium: [min, max]
+ *  - hard:   [floor(min*1.8), floor(max*1.8)]
+ */
+export function pickNumberByBand(rng, band, { min, max }) {
+  const scale = BAND_SCALE[band] ?? 1.0;
+  let lo = Math.floor(min * scale);
+  let hi = Math.floor(max * scale);
+  if (band === 'easy') lo = Math.max(1, lo);
+  return rng.int(lo, hi);
+}
+
+/**
+ * 按 band 取两个不同的整数(用于"差题"/"比多少"类)。
+ * 保证返回的 pair 满足 a !== b 且都在缩放后区间内。
+ */
+export function pickPairByBand(rng, band, { min, max }) {
+  const a = pickNumberByBand(rng, band, { min, max });
+  let b;
+  let tries = 0;
+  do {
+    b = pickNumberByBand(rng, band, { min, max });
+    tries++;
+  } while (b === a && tries < 10);
+  return [a, b];
+}
+
+// 12 个中文常用人名,与小学应用题语境契合。
+const PERSON_POOL = [
+  '小明', '小红', '小华', '小丽', '小强', '小芳',
+  '小军', '小梅', '大伟', '小玲', '小雪', '小刚',
+];
+
+/** 从 12 个中文人名中随机选一个。 */
+export function pickPerson(rng) {
+  return rng.pick(PERSON_POOL);
+}
+
+/**
+ * 调试/测试用范围断言;value 必须在 [lo, hi],否则抛出含 label 的明确错误。
+ * 模板 generate 末尾可用,数字出 band 时立即报警。
+ */
+export function assertInRange(value, lo, hi, label = 'value') {
+  if (value < lo || value > hi) {
+    throw new Error(`assertInRange: ${label}=${value} not in [${lo}, ${hi}]`);
+  }
+}
