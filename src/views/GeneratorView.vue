@@ -51,7 +51,7 @@
 
     <!-- 预览区(已选年级或已配置后显示) -->
     <section v-if="selectedGrade || showAdvanced">
-      <div ref="printRoot" data-test="preview-root" class="print-root" :class="{ 'export-mode': enhancedExport.exporting }">
+      <div ref="printRoot" data-test="preview-root" class="print-root" :class="{ 'export-mode': exporting }">
         <div class="worksheet-header">
           <h3>数学练习题</h3>
           <div class="info-row print-only">
@@ -76,7 +76,7 @@
         class="mt-6"
         :problems="problems"
         :isMobile="isMobile"
-        :exporting="enhancedExport.exporting"
+        :exporting="exporting"
         @generate="generateProblems"
         @export="handleExport"
         @show-history="$router.push('/history')"
@@ -84,11 +84,11 @@
     </section>
 
     <ExportPreview
-      :visible="enhancedExport.previewVisible"
-      :type="enhancedExport.previewType"
-      :preview-data="enhancedExport.previewData"
+      :visible="previewVisible"
+      :type="previewType"
+      :preview-data="previewData"
       :isMobile="isMobile"
-      :env="enhancedExport.env"
+      :env="env"
       @close="enhancedExport.closePreview"
       @save="enhancedExport.saveImage"
       @share="handleShare"
@@ -175,6 +175,8 @@ export default {
 
     const generator = useProblemGenerator()
     const enhancedExport = useEnhancedExport()
+    // 解构顶层 refs,以便在模板中自动解包(Boolean / String / Object 类型 prop)
+    const { previewVisible, previewType, previewData, exporting, env } = enhancedExport
     const toast = useToast()
     const { success, error, warning, info, showToast } = toast
 
@@ -294,6 +296,11 @@ export default {
       config,
       gradePresets,
       enhancedExport,
+      previewVisible,
+      previewType,
+      previewData,
+      exporting,
+      env,
       showAdvanced,
       activeTab,
       selectedGrade,
