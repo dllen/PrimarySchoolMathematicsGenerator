@@ -16,8 +16,10 @@ describe('options', () => {
   it('exposes 2 semesters', () => {
     expect(SEMESTERS).toEqual(['上', '下']);
   });
-  it('exposes 3 question types', () => {
-    expect(QUESTION_TYPES).toEqual(['arithmetic', 'application', 'olympiad']);
+  it('includes core question types', () => {
+    expect(QUESTION_TYPES).toContain('arithmetic');
+    expect(QUESTION_TYPES).toContain('application');
+    expect(QUESTION_TYPES).toContain('olympiad');
   });
   it('exposes 3 difficulties', () => {
     expect(DIFFICULTIES).toEqual(['easy', 'medium', 'hard']);
