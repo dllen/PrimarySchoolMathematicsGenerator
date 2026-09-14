@@ -173,25 +173,21 @@ B 和 C 扩展了题型数量（工程、浓度、数论等）和难度梯度，
 
 ## 4. helpers.js 扩展
 
-新增两个中文情境专属函数：
+新增一个中文情境专属函数：
 
 ```js
 /**
- * 生成不重复的两个人物名（来自 PEOPLE_POOL）
+ * 生成两个不重复的中文人名（来自 PEOPLE_POOL）。
+ * 用于"小明和小红一起…"这类双人情境题目。
  */
 export function pickTwoPeople(rng) {
   const a = pickPerson(rng);
   const b = pickPerson(rng);
   return a === b ? pickTwoPeople(rng) : [a, b];
 }
-
-/**
- * 生成一个随机的中国节日/季节场景关键词
- */
-export function pickScenario() {
-  // 用于题目文本润色，可选：春节、中秋、国庆、暑假、农历新年等
-}
 ```
+
+> **不实现 `pickScenario()`**：原 spec 中的"场景润色函数"被移除。题目文本中的情境通过子模板自己的 `id` 和 `question` 文案体现，不需要运行时随机润色。
 
 ---
 
@@ -267,7 +263,7 @@ export const APPLICATION_TEMPLATES = [
 ## 9. 交付物清单
 
 - 新文件：`boatCrossing.js`、`shareCandy.js`、`libraryCorner.js`、`queueProblem.js`、`redPacket.js`、`sportsScore.js`、`harvestField.js`、`dutyRoster.js`
-- helpers.js 新增 `pickTwoPeople`、`pickScenario`
+- helpers.js 新增 `pickTwoPeople`
 - `constants/options.js` 新增 8 个 subtype
 - `index.js` 更新 `APPLICATION_TEMPLATES`
 - 每个新模板对应 `*.test.js`

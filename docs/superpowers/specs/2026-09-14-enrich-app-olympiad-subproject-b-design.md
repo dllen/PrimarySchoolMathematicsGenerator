@@ -159,16 +159,6 @@ export const QUESTION_TYPES = [
 
 **约束**: 统计数据不超过 10 个数，数值范围 easy: 10–50，medium: 20–80，hard: 30–100。
 
-### 3.6 年龄问题增强 (`comparison.js` 扩展)
-
-`comparison.js` 已有单步年龄子模板（`comparison-age`），新增多步版本：
-
-| 子模板 | band | 年级 | 描述 |
-|---|---|---|---|
-| `age-multi-step` | hard | 5–6 | 已知今年年龄差，几年前/后年龄倍数关系 |
-
----
-
 ## 4. 1–2 年级简单版
 
 `shopping.js` / `time.js` / `comparison.js` 各自新增 1–2 年级子模板：
@@ -189,7 +179,6 @@ export const QUESTION_TYPES = [
 |---|---|---|
 | `pickTwoSpeeds` | `(rng, band) => { speed1, speed2 }` | 行程问题，保证 speed1 ≠ speed2 |
 | `pickRatio` | `(rng, band) => { a, b }` | 分配比例，保证 gcd(a,b)=1 |
-| `pickConcentration` | `(rng, band) => { solute, solution, percent }` | 浓度问题，solute/solution = percent |
 
 ---
 
@@ -253,7 +242,7 @@ export const APPLICATION_TEMPLATES = [
 ## 10. 交付物清单
 
 - 新文件：`engineering.js`、`concentration.js`、`distance.js`、`ratio.js`、`statistics.js`
-- helpers.js 新增 3 个函数
+- helpers.js 新增 `pickTwoSpeeds`、`pickRatio`
 - `constants/options.js` 新增 5 个 subtype
 - `index.js` 更新 `APPLICATION_TEMPLATES`
 - 每个新模板对应 `*.test.js`
