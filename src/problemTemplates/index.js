@@ -17,6 +17,12 @@ import { concentrationTemplate } from './concentration.js';
 import { distanceTemplate } from './distance.js';
 import { ratioTemplate } from './ratio.js';
 import { statisticsTemplate } from './statistics.js';
+import { numberTheoryTemplate } from './numberTheory.js';
+import { combinatoricsTemplate } from './combinatorics.js';
+import { probabilityTemplate } from './probability.js';
+import { inequalityTemplate } from './inequality.js';
+import { geometryCountTemplate } from './geometryCount.js';
+import { advancedLogicTemplate } from './advancedLogic.js';
 
 export const APPLICATION_TEMPLATES = [
   shoppingTemplate, timeTemplate, comparisonTemplate, chickenRabbitTemplate,
@@ -29,7 +35,12 @@ export const APPLICATION_TEMPLATES = [
   ratioTemplate, statisticsTemplate,
 ];
 
-export const OLYMPIAD_TEMPLATES = [sequenceTemplate, logicTemplate];
+export const OLYMPIAD_TEMPLATES = [
+  sequenceTemplate, logicTemplate,
+  // Plan C: 6 olympiad-depth templates
+  numberTheoryTemplate, combinatoricsTemplate, probabilityTemplate,
+  inequalityTemplate, geometryCountTemplate, advancedLogicTemplate,
+];
 
 export function templatesFor(type, grade) {
   const all = type === 'application' ? APPLICATION_TEMPLATES : OLYMPIAD_TEMPLATES;

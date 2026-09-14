@@ -9,6 +9,9 @@ export const QUESTION_TYPES = [
   // Plan B:
   'engineering', 'concentration', 'distance',
   'ratio', 'statistics',
+  // Plan C:
+  'number-theory', 'combinatorics', 'probability',
+  'inequality', 'geometry-count', 'logic-advanced',
 ];
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ANSWER_MODES = ['hidden', 'inline', 'separate'];

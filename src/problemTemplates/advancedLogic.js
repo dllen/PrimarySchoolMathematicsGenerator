@@ -22,13 +22,16 @@ function generateAdvancedLogicSubtemplates() {
       band: 'easy',
       generate(rng) {
         const [a, b] = [pickPerson(rng), pickPerson(rng)];
-        const taller = rng.pick([a, b]);
-        const shorter = taller === a ? b : a;
+        const x = rng.int(1, 6);
+        let y = rng.int(1, 6);
+        while (y === x) y = rng.int(1, 6);
+        const lower = Math.min(x, y);
+        const lowerPerson = x < y ? a : b;
         return {
-          question: `${a}比${b}高,两人中谁更矮?`,
-          answer: `${shorter}`,
+          question: `${a}有${x}个苹果,${b}有${y}个苹果,谁更少?`,
+          answer: lowerPerson,
           subtype: 'logic-advanced',
-          payload: { a, b },
+          payload: { x, y, lower },
         };
       },
     },

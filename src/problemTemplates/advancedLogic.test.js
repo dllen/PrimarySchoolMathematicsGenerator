@@ -13,13 +13,18 @@ function findWith(level, predicate, maxIters = 500) {
 
 describe('advancedLogicTemplate', () => {
   for (const [band, level] of [['easy', 1], ['medium', 2], ['hard', 3]]) {
-    it(`${band}: three distinct names in payload`, () => {
+    it(`${band}: answer is non-empty`, () => {
       const rng = createRng(band);
       const result = advancedLogicTemplate.generate(rng, level);
       expect(typeof result.answer).toBe('string');
       expect(result.answer.length).toBeGreaterThan(0);
     });
   }
+  it('easy (deduction): lower = min(x, y)', () => {
+    const result = findWith(1, p => p.x !== undefined && p.y !== undefined);
+    const { x, y, lower } = result.payload;
+    expect(lower).toBe(Math.min(x, y));
+  });
   it('medium (truth-teller): three distinct people', () => {
     const result = findWith(2, p => p.p1 !== undefined);
     const { p1, p2, p3 } = result.payload;
