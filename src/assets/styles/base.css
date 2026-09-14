@@ -42,6 +42,23 @@
 }
 
 /* ============================================
+ * Layout components — design-system page containers
+ * 2026-09-14: 此前 .container-content 仅在模板中使用却未在 CSS 中
+ * 定义,导致 Tailwind 静默丢弃,所有页面在桌面端都顶满屏幕;
+ * 现在在 @layer components 里以 token 形式定义,使其与设计系统对齐。
+ * ============================================ */
+@layer components {
+  /* 标准页面容器:居中 + 设计 token 的 960px 最大宽度 + 移动端水平内边距 */
+  .container-content {
+    @apply mx-auto w-full max-w-content px-4 sm:px-6;
+  }
+  /* 紧凑容器(阅读向:About / 长文):720px,提升可读性 */
+  .container-narrow {
+    @apply mx-auto w-full max-w-narrow px-4 sm:px-6;
+  }
+}
+
+/* ============================================
  * Legacy styles — preserved for existing components
  * These rules will be migrated to Tailwind utility classes
  * in later tasks (Task 6-12). DO NOT add new code here.
