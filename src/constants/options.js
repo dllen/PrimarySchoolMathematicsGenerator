@@ -1,6 +1,12 @@
 export const GRADES = ['1', '2', '3', '4', '5', '6'];
 export const SEMESTERS = ['上', '下'];
-export const QUESTION_TYPES = ['arithmetic', 'application', 'olympiad'];
+export const QUESTION_TYPES = [
+  'arithmetic', 'application', 'olympiad',
+  // Plan A:
+  'boat-crossing', 'share-candy', 'library',
+  'queue', 'red-packet', 'sports-score',
+  'harvest', 'duty-roster',
+];
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ANSWER_MODES = ['hidden', 'inline', 'separate'];
 export const PROBLEM_TYPES = ['result', 'operand'];

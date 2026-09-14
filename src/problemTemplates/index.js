@@ -4,8 +4,22 @@ import { comparisonTemplate } from './comparison.js';
 import { sequenceTemplate } from './sequence.js';
 import { logicTemplate } from './logic.js';
 import { chickenRabbitTemplate } from './chickenRabbit.js';
+import { boatCrossingTemplate } from './boatCrossing.js';
+import { shareCandyTemplate } from './shareCandy.js';
+import { libraryCornerTemplate } from './libraryCorner.js';
+import { queueProblemTemplate } from './queueProblem.js';
+import { redPacketTemplate } from './redPacket.js';
+import { sportsScoreTemplate } from './sportsScore.js';
+import { harvestFieldTemplate } from './harvestField.js';
+import { dutyRosterTemplate } from './dutyRoster.js';
 
-export const APPLICATION_TEMPLATES = [shoppingTemplate, timeTemplate, comparisonTemplate, chickenRabbitTemplate];
+export const APPLICATION_TEMPLATES = [
+  shoppingTemplate, timeTemplate, comparisonTemplate, chickenRabbitTemplate,
+  // Plan A: 8 Chinese context templates
+  boatCrossingTemplate, shareCandyTemplate, libraryCornerTemplate,
+  queueProblemTemplate, redPacketTemplate, sportsScoreTemplate,
+  harvestFieldTemplate, dutyRosterTemplate,
+];
 
 export const OLYMPIAD_TEMPLATES = [sequenceTemplate, logicTemplate];
 
