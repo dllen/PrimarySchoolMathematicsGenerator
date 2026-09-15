@@ -57,7 +57,7 @@ describe('ProblemGeneratorFactory', () => {
       expect(Array.isArray(types)).toBe(true);
       expect(types).toContain('result');
       expect(types).toContain('operand');
-      expect(types).toEqual(['result', 'operand', 'arithmetic', 'application', 'olympiad']);
+      expect(types).toEqual(['result', 'operand', 'arithmetic', 'application', 'olympiad', 'dsl']);
     });
 
     it('should return immutable array', () => {

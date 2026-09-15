@@ -54,8 +54,8 @@ function computeHash(s) {
 /**
  * Normalize answerDef.expression from shorthand string to a variable node.
  * Per DSL v1.0 docs, "expression": "total" means { type: 'variable', name: 'total' }.
- * Bare-string shorthand is allowed for top-level answer only (chicken-rabbit
- * expressions stay nested in derived variables and are already nodes).
+ * Bare-string shorthand is allowed for top-level answer only; chicken-rabbit
+ * expressions stay nested in derived variables and are already nodes.
  */
 function normalizeAnswerExpr(answerDef) {
   if (typeof answerDef?.expression === 'string') {
@@ -103,7 +103,9 @@ export function generateQuestion({ template, seed, index = 0, options = {} }) {
 
   const hash = computeHash(`${template.id}|${question}|${answerText}|${index}`);
 
-  // 验证（不通过则抛错，让调用方决定重试）
+  // 验证（不通过则抛错，让调用方决定重试）。
+  // reversePending 模板（鸡兔同笼等）answer.value 暂为 undefined，
+  // 等 solver reverse 求值上线后再启用强校验。
   const mvr = mathValidator({ answer: solved.value, answerDef: normalizedAnswer, vars });
   if (!mvr.ok && !solved.reversePending) throw new Error(`math validation failed: ${mvr.reason}`);
   const avr = answerValidator({ answer: solved.value, answerDef: normalizedAnswer });
