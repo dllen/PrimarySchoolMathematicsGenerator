@@ -12,7 +12,7 @@ Make `reverse generation` a first-class concept across the core engine, **withou
 
 ### Concrete deliverables
 
-1. `src/core/solver.js` returns the real answer value when `answer.reverse === true` (no more `reversePending`).
+1. `src/core/solver.js` returns the real answer value when `answer.reverse === true` (no more `reversePending`; docstring + `@returns` JSDoc refreshed).
 2. `src/core/schema.js` validates `strategy: 'reverse'` + `role: 'target'` templates at startup (fail-loud).
 3. `src/core/dependency.js` exposes a new `reverseTopologicalOrder(variables)` utility (target-first).
 4. `src/core/reverse.js` (NEW) defines the `ReverseStrategy` interface + a default stub that throws "Phase 3" — the seam for Phase 3.
@@ -378,7 +378,7 @@ Expected: all green, coverage ≥80% on touched files. CI runs this on every pus
 | 4 | `feat(core): reverseTopologicalOrder in dependency.js` | `dependency.js`, `dependency.test.js` |
 | 5 | `feat(core): reverse.js — ReverseStrategy interface + default stub` | `reverse.js`, `reverse.test.js` |
 | 6 | `test(core): solver returns vars[name] when answer.reverse=true (replaces reversePending)` | `solver.test.js` |
-| 7 | `fix(core): solver returns real answer when reverse=true` | `solver.js`, `solver.test.js` |
+| 7 | `fix(core): solver returns real answer when reverse=true (drops reversePending + refresh docstring)` | `solver.js`, `solver.test.js` |
 | 8 | `feat(core): generate.js routes strategy=reverse with fallback` | `generate.js`, `generate.test.js` |
 | 9 | `feat(core): export reverse API from index.js` | `index.js`, `index.test.js` |
 | 10 | `test(e2e): chicken-rabbit end-to-end produces real answers, validates constraints` | `tests/core-e2e.test.js` |
