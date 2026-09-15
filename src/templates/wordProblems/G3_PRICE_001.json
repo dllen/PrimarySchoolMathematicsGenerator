@@ -1,0 +1,13 @@
+{
+  "id": "G3_PRICE_001",
+  "version": "1.0",
+  "metadata": { "name": "单价数量总价", "type": "word_problem", "grade": 3 },
+  "variables": {
+    "unitPrice": { "type": "random", "valueType": "integer", "generator": { "strategy": "range", "min": 2, "max": 20 } },
+    "quantity": { "type": "random", "valueType": "integer", "generator": { "strategy": "range", "min": 2, "max": 10 } },
+    "total": { "type": "derived", "valueType": "integer", "expression": { "type": "operation", "op": "multiply", "args": [{ "type": "variable", "name": "unitPrice" }, { "type": "variable", "name": "quantity" }] } }
+  },
+  "constraints": [{ "type": "range", "target": "total", "min": 1, "max": 200 }],
+  "answer": { "type": "integer", "expression": "total", "unit": "元" },
+  "renderer": { "question": "一本{{unitPrice}}元，小明买了{{quantity}}本，一共需要多少钱？" }
+}
