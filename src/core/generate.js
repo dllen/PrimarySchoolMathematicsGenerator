@@ -107,7 +107,7 @@ export function generateQuestion({ template, seed, index = 0, options = {} }) {
   const mvr = mathValidator({ answer: solved.value, answerDef: normalizedAnswer, vars });
   if (!mvr.ok && !solved.reversePending) throw new Error(`math validation failed: ${mvr.reason}`);
   const avr = answerValidator({ answer: solved.value, answerDef: normalizedAnswer });
-  if (!avr.ok) throw new Error(`answer validation failed: ${avr.reason}`);
+  if (!avr.ok && !solved.reversePending) throw new Error(`answer validation failed: ${avr.reason}`);
 
   return {
     id: `${template.id}-${finalSeed}-${index}`,
