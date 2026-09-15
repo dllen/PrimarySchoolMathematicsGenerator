@@ -3,6 +3,7 @@ import { ResultProblemStrategy } from './ResultProblemStrategy.js';
 import { ArithmeticStrategy } from './ArithmeticStrategy.js';
 import { ApplicationStrategy } from './ApplicationStrategy.js';
 import { OlympiadStrategy } from './OlympiadStrategy.js';
+import { DslStrategy } from './DslStrategy.js';
 
 /**
  * 题目生成器工厂类
@@ -27,6 +28,8 @@ export class ProblemGeneratorFactory {
         return new ApplicationStrategy(config);
       case 'olympiad':
         return new OlympiadStrategy(config);
+      case 'dsl':
+        return new DslStrategy(config);
       default:
         throw new Error(`不支持的题目类型: ${type}`);
     }
@@ -37,7 +40,18 @@ export class ProblemGeneratorFactory {
    * @returns {Array} 支持的题目类型数组
    */
   static getSupportedTypes() {
-    return ['result', 'operand', 'arithmetic', 'application', 'olympiad'];
+    return ['result', 'operand', 'arithmetic', 'application', 'olympiad', 'dsl'];
+  }
+
+  /**
+   * 新版工厂入口：直接传 { mode, ...config }，mode 决定策略类型。
+   * 与 createStrategy(type, config) 等价但更友好。
+   * @param {{ mode: string }} opts
+   */
+  static create(opts = {}) {
+    const { mode, ...config } = opts;
+    if (!mode) throw new Error('create() requires opts.mode');
+    return ProblemGeneratorFactory.createStrategy(mode, config);
   }
 
   /**
