@@ -145,6 +145,23 @@ describe('pickForBand', () => {
       /No subtemplates for band=hard in template=holey/
     );
   });
+  it('返回结果附带 subtemplateId 与 band', () => {
+    const template = {
+      id: 'fake',
+      subtemplates: [
+        { id: 'fake-easy-1', band: 'easy', generate: () => ({ tag: 'e1' }) },
+        { id: 'fake-easy-2', band: 'easy', generate: () => ({ tag: 'e2' }) },
+        { id: 'fake-hard-1', band: 'hard', generate: () => ({ tag: 'h1' }) },
+      ],
+    };
+    const easy = pickForBand(template, 1, createRng(1));
+    expect(easy.subtemplateId).toMatch(/^fake-easy-\d$/);
+    expect(easy.band).toBe('easy');
+    expect(easy.tag).toBeDefined(); // 兼容旧字段
+    const hard = pickForBand(template, 3, createRng(2));
+    expect(hard.subtemplateId).toBe('fake-hard-1');
+    expect(hard.band).toBe('hard');
+  });
 });
 
 describe('gcd', () => {

@@ -3,22 +3,10 @@ import { ProblemGeneratorFactory } from '../strategies/ProblemGeneratorFactory.j
 import { useProblemLibrary } from './useProblemLibrary.js';
 import { usePreloadedLibrary } from './usePreloadedLibrary.js';
 import { queryLibrary } from '../db.js';
+import { buildComposition, computeCap, enumerateSubtypes } from '../problemTemplates/diversity.js';
+import { levelToBand } from '../problemTemplates/helpers.js';
 
 const ARITHMETIC_DEFAULT_PROBLEM_TYPE = 'result';
-
-function buildComposition(config) {
-  if (config.composition && Object.values(config.composition).some((v) => v > 0)) {
-    return { ...config.composition };
-  }
-  const types = config.questionTypes;
-  const base = Math.floor(config.problemCount / types.length);
-  const remainder = config.problemCount % types.length;
-  const out = { arithmetic: 0, application: 0, olympiad: 0 };
-  types.forEach((t, i) => {
-    out[t] = base + (i === 0 ? remainder : 0);
-  });
-  return out;
-}
 
 let rngCounter = 0;
 
@@ -37,6 +25,19 @@ export function useProblemGenerator() {
 
   async function generate(config) {
     const composition = buildComposition(config);
+    // 多样化 dedup:预计算 cap 与使用计数
+    // cap 必须按「active band 可达的 subtype 数」计算,否则高年级 + 少 subtype 的 band 会算出一个
+    // 看起来合理但实际永远触不到的天花板,导致题目数永远凑不够。详见 2026-09-15 任务说明。
+    const activeBand = levelToBand(difficultyToLevel(config.difficulty));
+    const appSubtypes = enumerateSubtypes('application', config.grade, activeBand);
+    const olySubtypes = enumerateSubtypes('olympiad', config.grade, activeBand);
+    const appCap = computeCap(composition.application || 0, appSubtypes.length);
+    const olyCap = computeCap(composition.olympiad || 0, olySubtypes.length);
+    const usage = {
+      application: new Map(),  // subtemplateId -> count
+      olympiad: new Map(),
+    };
+    const capFor = (type) => (type === 'application' ? appCap : olyCap);
     const seen = new Set();
     const results = [];
 
@@ -104,14 +105,24 @@ export function useProblemGenerator() {
         try {
           const p = await generateOneLive(type, config);
           if (seen.has(p.question)) continue;
+          // 多样化 dedup:仅 application/olympiad(arithmetic 不走模板)
+          if ((type === 'application' || type === 'olympiad') && p.subtemplateId) {
+            const cap = capFor(type);
+            const used = usage[type].get(p.subtemplateId) || 0;
+            if (used >= cap) continue;  // 超额,跳过,继续 retry
+            usage[type].set(p.subtemplateId, used + 1);
+          }
           seen.add(p.question);
-          results.push({
+          const result = {
             type,
             subtype: p.subtype,
             question: p.question,
             answer: p.answer,
             payload: p.payload || {},
-          });
+          };
+          if (p.subtemplateId) result.subtemplateId = p.subtemplateId;
+          if (p.band) result.band = p.band;
+          results.push(result);
           produced++;
         } catch (err) {
           // grade/template mismatch — skip

@@ -97,4 +97,40 @@ describe('useProblemGenerator', () => {
     const problems = await gen.generate(config);
     expect(problems.length).toBe(3);
   });
+
+  it('单 batch 内每个 subtemplateId 出现次数 ≤ ceil(N/M) + 1', async () => {
+    const { enumerateSubtypes } = await import('../problemTemplates/diversity.js');
+    const gen = useProblemGenerator();
+    const config = {
+      grade: '5',  // grade 5+ 让 application/olympiad 各自在 medium band 有 ≥ 15 个 subtype
+      semester: '上',
+      questionTypes: ['application', 'olympiad'],
+      difficulty: 'medium',
+      problemCount: 30,
+      operations: {},
+      digits: {},
+      termCount: 2,
+      useBrackets: false,
+      allowRepeatOperators: true,
+      knowledgePoints: [],
+      composition: { application: 15, olympiad: 15, arithmetic: 0 },
+    };
+    const problems = await gen.generate(config);
+    expect(problems.length).toBe(30);
+
+    const counts = new Map();
+    for (const p of problems) {
+      if (p.subtemplateId) {
+        counts.set(p.subtemplateId, (counts.get(p.subtemplateId) || 0) + 1);
+      }
+    }
+    // 按 type 分别算 cap,断言取 max(应用题/奥数题 cap) — 直白,不再依赖合并 M 的隐藏巧合
+    const appCap = Math.ceil(15 / enumerateSubtypes('application', '5').length) + 1;
+    const olyCap = Math.ceil(15 / enumerateSubtypes('olympiad', '5').length) + 1;
+    for (const [, n] of counts) {
+      expect(n).toBeLessThanOrEqual(Math.max(appCap, olyCap));
+    }
+    // sanity: 至少触达 5 个不同 subtype(证明多样化了)
+    expect(counts.size).toBeGreaterThanOrEqual(5);
+  });
 });

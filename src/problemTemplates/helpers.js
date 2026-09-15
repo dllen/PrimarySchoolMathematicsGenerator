@@ -95,7 +95,10 @@ export function pickForBand(template, difficultyLevel, rng) {
   if (pool.length === 0) {
     throw new Error(`No subtemplates for band=${band} in template=${template.id}`);
   }
-  return rng.pick(pool).generate(rng);
+  const subtemplate = rng.pick(pool);
+  const result = subtemplate.generate(rng);
+  // 新增:让调用方拿到 subtemplate 粒度的 id 与 band,用于去重 / 报告
+  return { ...result, subtemplateId: subtemplate.id, band };
 }
 
 /** 欧几里得算法求最大公约数。 */
