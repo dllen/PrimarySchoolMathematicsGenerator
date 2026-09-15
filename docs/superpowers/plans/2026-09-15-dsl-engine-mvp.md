@@ -57,7 +57,7 @@
 - Create: `src/core/random.js`
 - Test: `src/core/random.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/core/random.test.js`:
 
@@ -123,12 +123,12 @@ describe('createRng', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/core/random.test.js`
 Expected: FAIL — "Cannot find module './random.js'"
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/core/random.js`:
 
@@ -202,12 +202,12 @@ export function createRng(seed) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/core/random.test.js`
 Expected: 8 passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -223,7 +223,7 @@ git commit -m "feat(core): SeedableRNG (mulberry32) + stream 命名子流"
 - Create: `src/core/dependency.js`
 - Test: `src/core/dependency.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/core/dependency.test.js`:
 
@@ -291,12 +291,12 @@ describe('buildDependencyGraph', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/core/dependency.test.js`
 Expected: FAIL — "Cannot find module"
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/core/dependency.js`:
 
@@ -395,12 +395,12 @@ export function buildDependencyGraph(variables) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/core/dependency.test.js`
 Expected: 6 passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -416,7 +416,7 @@ git commit -m "feat(core): 变量依赖图 + 拓扑排序 + 循环检测"
 - Create: `src/core/expression.js`
 - Test: `src/core/expression.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/core/expression.test.js`:
 
@@ -499,12 +499,12 @@ describe('evaluate', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/core/expression.test.js`
 Expected: FAIL — module not found
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/core/expression.js`:
 
@@ -580,12 +580,12 @@ export function evaluate(expr, ctx) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/core/expression.test.js`
 Expected: 10 passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -601,7 +601,7 @@ git commit -m "feat(core): 表达式求值器 (literal/variable/operation/condit
 - Create: `src/core/constraint.js`
 - Test: `src/core/constraint.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/core/constraint.test.js`:
 
@@ -675,12 +675,12 @@ describe('validateConstraints', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/core/constraint.test.js`
 Expected: FAIL — module not found
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/core/constraint.js`:
 
@@ -782,12 +782,12 @@ export function validateConstraints(constraints, ctx) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/core/constraint.test.js`
 Expected: 13 passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -803,7 +803,7 @@ git commit -m "feat(core): 9 类约束验证器 (range/comparison/divisible/inte
 - Create: `src/core/solver.js`
 - Test: `src/core/solver.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/core/solver.test.js`:
 
@@ -828,12 +828,12 @@ describe('solveAnswer', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/core/solver.test.js`
 Expected: FAIL — module not found
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/core/solver.js`:
 
@@ -864,12 +864,12 @@ export function solveAnswer(answerDef, vars) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/core/solver.test.js`
 Expected: 3 passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -885,7 +885,7 @@ git commit -m "feat(core): 简单 expression 求值；reverse generation 留 TOD
 - Create: `src/core/renderer.js`
 - Test: `src/core/renderer.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/core/renderer.test.js`:
 
@@ -916,12 +916,12 @@ describe('render', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/core/renderer.test.js`
 Expected: FAIL
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/core/renderer.js`:
 
@@ -964,12 +964,12 @@ export function renderAnswer(value, answerDef) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/core/renderer.test.js`
 Expected: 5 passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -985,7 +985,7 @@ git commit -m "feat(core): 文本模板渲染 ({{var}} 替换 + 单位追加)"
 - Create: `src/core/difficulty.js`
 - Test: `src/core/difficulty.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/core/difficulty.test.js`:
 
@@ -1028,12 +1028,12 @@ describe('scoreToLevel', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/core/difficulty.test.js`
 Expected: FAIL
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/core/difficulty.js`:
 
@@ -1104,12 +1104,12 @@ export function scoreToLevel(score) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/core/difficulty.test.js`
 Expected: 12 passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -1125,7 +1125,7 @@ git commit -m "feat(core): 5 档难度评分 (operation+variable+depth, 知识�
 - Create: `src/core/validator.js`
 - Test: `src/core/validator.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/core/validator.test.js`:
 
@@ -1175,12 +1175,12 @@ describe('uniquenessValidator', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/core/validator.test.js`
 Expected: FAIL
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/core/validator.js`:
 
@@ -1225,12 +1225,12 @@ export function uniquenessValidator({ hash, batchHashes = [] }) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/core/validator.test.js`
 Expected: 7 passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -1246,7 +1246,7 @@ git commit -m "feat(core): Math/Answer/Uniqueness 验证器"
 - Create: `src/core/schema.js`
 - Test: `src/core/schema.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/core/schema.test.js`:
 
@@ -1303,12 +1303,12 @@ describe('validateTemplate', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/core/schema.test.js`
 Expected: FAIL
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/core/schema.js`:
 
@@ -1379,12 +1379,12 @@ export function validateTemplate(t) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/core/schema.test.js`
 Expected: 6 passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -1400,7 +1400,7 @@ git commit -m "feat(core): JSON 模板运行时校验"
 - Create: `src/core/generate.js`
 - Test: `src/core/generate.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/core/generate.test.js`:
 
@@ -1442,7 +1442,7 @@ describe('generateQuestion', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/core/generate.test.js`
 Expected: FAIL — generate.js not found, AND G3_PRICE_001.json not found (next task will add it; this task expects to import it).
@@ -1454,7 +1454,7 @@ Expected: FAIL — generate.js not found, AND G3_PRICE_001.json not found (next 
 const priceTpl = { /* ... inline JSON ... */ };
 ```
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/core/generate.js`:
 
@@ -1580,7 +1580,7 @@ export function generateQuestion({ template, seed, index = 0, options = {} }) {
 export { uniquenessValidator };
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 > **依赖**：此测试需要 `src/templates/wordProblems/G3_PRICE_001.json` 已存在（Task 12）。如果 Task 12 还没做，先创建 stub 文件：
 
@@ -1605,7 +1605,7 @@ export { uniquenessValidator };
 Run: `npx vitest run src/core/generate.test.js`
 Expected: 3 passed (with stub)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -1620,7 +1620,7 @@ git commit -m "feat(core): generateQuestion 顶层编排 (template+seed → Ques
 **Files:**
 - Create: `src/templates/index.js`
 
-- [ ] **Step 1: 写代码（无独立测试，由 Task 12/13 覆盖）**
+- [x] **Step 1: 写代码（无独立测试，由 Task 12/13 覆盖）**
 
 `src/templates/index.js`:
 
@@ -1660,7 +1660,7 @@ export function listTemplatesByGrade(grade) {
 }
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -1677,7 +1677,7 @@ git commit -m "feat(templates): 模板注册表 + schema 启动期校验"
 - Create: `src/templates/wordProblems/G3_MIX_001.json`
 - Create: `src/templates/olympiad/O23_CHICKEN_RABBIT_001.json`
 
-- [ ] **Step 1: 写 G3_PRICE_001.json（对齐 docs §24）**
+- [x] **Step 1: 写 G3_PRICE_001.json（对齐 docs §24）**
 
 `src/templates/wordProblems/G3_PRICE_001.json`:
 
@@ -1716,7 +1716,7 @@ git commit -m "feat(templates): 模板注册表 + schema 启动期校验"
 }
 ```
 
-- [ ] **Step 2: 写 G3_MIX_001.json（对齐 docs §25）**
+- [x] **Step 2: 写 G3_MIX_001.json（对齐 docs §25）**
 
 `src/templates/wordProblems/G3_MIX_001.json`:
 
@@ -1760,7 +1760,7 @@ git commit -m "feat(templates): 模板注册表 + schema 启动期校验"
 }
 ```
 
-- [ ] **Step 3: 写 O23_CHICKEN_RABBIT_001.json（对齐 docs §28）**
+- [x] **Step 3: 写 O23_CHICKEN_RABBIT_001.json（对齐 docs §28）**
 
 `src/templates/olympiad/O23_CHICKEN_RABBIT_001.json`:
 
@@ -1794,12 +1794,12 @@ git commit -m "feat(templates): 模板注册表 + schema 启动期校验"
 
 > **注意**：本模板 answer 是反推，本期 MVP `solver.js` 留 TODO。e2e 测试需要为这个模板特殊处理（允许 reversePending）。
 
-- [ ] **Step 4: Run generate.test.js + schema.test.js 验证 3 模板**
+- [x] **Step 4: Run generate.test.js + schema.test.js 验证 3 模板**
 
 Run: `npx vitest run src/core/generate.test.js src/core/schema.test.js src/core/index.test.js`
 Expected: all pass
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -1814,7 +1814,7 @@ git commit -m "feat(templates): 3 个示范 JSON 模板 (G3_PRICE/G3_MIX/O23_CHI
 **Files:**
 - Create: `src/core/index.js`
 
-- [ ] **Step 1: 写桶 + 写 smoke test**
+- [x] **Step 1: 写桶 + 写 smoke test**
 
 `src/core/index.js`:
 
@@ -1862,12 +1862,12 @@ describe('core barrel exports', () => {
 });
 ```
 
-- [ ] **Step 2: Run test**
+- [x] **Step 2: Run test**
 
 Run: `npx vitest run src/core/index.test.js`
 Expected: 1 passed
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -1883,7 +1883,7 @@ git commit -m "feat(core): 公开 API 桶"
 - Create: `src/strategies/DslStrategy.js`
 - Test: `src/strategies/DslStrategy.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/strategies/DslStrategy.test.js`:
 
@@ -1916,12 +1916,12 @@ describe('DslStrategy', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/strategies/DslStrategy.test.js`
 Expected: FAIL
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/strategies/DslStrategy.js`:
 
@@ -1957,12 +1957,12 @@ export class DslStrategy extends ProblemGeneratorStrategy {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/strategies/DslStrategy.test.js`
 Expected: 4 passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -1978,11 +1978,11 @@ git commit -m "feat(strategies): DslStrategy 桥接 JSON 模板 + core"
 - Modify: `src/strategies/ProblemGeneratorFactory.js:1-30`
 - Test: `src/strategies/ProblemGeneratorFactory.test.js`
 
-- [ ] **Step 1: 查看现有 factory**
+- [x] **Step 1: 查看现有 factory**
 
 Run: `cat src/strategies/ProblemGeneratorFactory.js`
 
-- [ ] **Step 2: 写新增测试**
+- [x] **Step 2: 写新增测试**
 
 `src/strategies/ProblemGeneratorFactory.test.js` (在现有文件追加):
 
@@ -2005,12 +2005,12 @@ describe('ProblemGeneratorFactory dsl mode', () => {
 });
 ```
 
-- [ ] **Step 3: Run test to verify it fails**
+- [x] **Step 3: Run test to verify it fails**
 
 Run: `npx vitest run src/strategies/ProblemGeneratorFactory.test.js`
 Expected: FAIL — factory throws on mode=dsl
 
-- [ ] **Step 4: 修改 factory**
+- [x] **Step 4: 修改 factory**
 
 `src/strategies/ProblemGeneratorFactory.js` 顶部追加：
 
@@ -2026,12 +2026,12 @@ dsl: DslStrategy,
 
 (具体改动以现有 factory 代码为准，保持原风格)
 
-- [ ] **Step 5: Run test to verify it passes**
+- [x] **Step 5: Run test to verify it passes**
 
 Run: `npx vitest run src/strategies/ProblemGeneratorFactory.test.js`
 Expected: all pass (新增 2 + 原有)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -2046,7 +2046,7 @@ git commit -m "feat(strategies): ProblemGeneratorFactory 注册 dsl mode"
 **Files:**
 - Create: `tests/core-e2e.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `tests/core-e2e.test.js`:
 
@@ -2094,22 +2094,22 @@ describe('DSL engine e2e', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it passes**
+- [x] **Step 2: Run test to verify it passes**
 
 Run: `npx vitest run tests/core-e2e.test.js`
 Expected: 3 passed
 
-- [ ] **Step 3: Run full test suite**
+- [x] **Step 3: Run full test suite**
 
 Run: `npm run test:run 2>&1 | tail -20`
 Expected: ≥ 878 passed (876 baseline + 新增 16+ 个 core 测试 + 5 个 DslStrategy/factory/e2e)，**2 个 HistoryView 失败不属本 PR 范围**
 
-- [ ] **Step 4: 覆盖率检查**
+- [x] **Step 4: 覆盖率检查**
 
 Run: `npm run test:run -- --coverage 2>&1 | tail -30`
 Expected: 80% 阈值保持（不下降）
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -2121,7 +2121,7 @@ git commit -m "test(core): 端到端 e2e (dsl mode 5 题不重复 + 奥数生成
 
 ## Task 17: 完整回归 + 收尾
 
-- [ ] **Step 1: 跑全量测试**
+- [x] **Step 1: 跑全量测试**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -2130,7 +2130,7 @@ npm run test:run 2>&1 | tail -10
 
 Expected: pass 数 ≥ 876 + 新增；fail 数 = 2（pre-existing HistoryView）
 
-- [ ] **Step 2: build 检查**
+- [x] **Step 2: build 检查**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -2139,7 +2139,7 @@ npm run build 2>&1 | tail -10
 
 Expected: dist/ 生成成功，无 import 错误
 
-- [ ] **Step 3: 创建 PR**
+- [x] **Step 3: 创建 PR**
 
 ```bash
 cd /Users/shichaopeng/Work/self-dir/projects/PrimarySchoolMathematicsGenerator
@@ -2179,12 +2179,12 @@ EOF
 
 执行前 checklist：
 
-- [ ] Spec §1-§9 每节都有对应 task（spec coverage: 11 模块 → Task 1-10 + 11 桶；JSON 模板 → Task 12；DslStrategy → Task 14；Factory 注册 → Task 15；e2e → Task 16）
-- [ ] 无 TBD/TODO 占位（除"reverse generation 第三期"为明确非目标）
-- [ ] API 名称跨 task 一致：`createRng` / `evaluate` / `buildDependencyGraph` / `validateConstraints` / `solveAnswer` / `render` / `calculateDifficulty` / `scoreToLevel` / `mathValidator` / `answerValidator` / `uniquenessValidator` / `validateTemplate` / `generateQuestion` / `loadTemplates` / `listTemplatesByGrade`
-- [ ] Question 字段（templateId/seed/index/variables/question/answer/difficulty/hash）跨 task 一致
-- [ ] 每步有可执行代码 + 可运行命令
-- [ ] 覆盖率阈值 80% 不变
+- [x] Spec §1-§9 每节都有对应 task（spec coverage: 11 模块 → Task 1-10 + 11 桶；JSON 模板 → Task 12；DslStrategy → Task 14；Factory 注册 → Task 15；e2e → Task 16）
+- [x] 无 TBD/TODO 占位（除"reverse generation 第三期"为明确非目标）
+- [x] API 名称跨 task 一致：`createRng` / `evaluate` / `buildDependencyGraph` / `validateConstraints` / `solveAnswer` / `render` / `calculateDifficulty` / `scoreToLevel` / `mathValidator` / `answerValidator` / `uniquenessValidator` / `validateTemplate` / `generateQuestion` / `loadTemplates` / `listTemplatesByGrade`
+- [x] Question 字段（templateId/seed/index/variables/question/answer/difficulty/hash）跨 task 一致
+- [x] 每步有可执行代码 + 可运行命令
+- [x] 覆盖率阈值 80% 不变
 
 ---
 
