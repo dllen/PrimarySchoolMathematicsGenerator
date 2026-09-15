@@ -1,22 +1,5 @@
-import { ProblemGeneratorStrategy } from './ProblemGeneratorStrategy.js';
-import { templatesFor } from '../problemTemplates/index.js';
-import { DIFFICULTY_TO_LEVEL } from '../constants/options.js';
+import { BandAwareStrategy } from './BandAwareStrategy.js';
 
-export class OlympiadStrategy extends ProblemGeneratorStrategy {
-  constructor(config) {
-    super(config);
-    this.difficultyLevel = DIFFICULTY_TO_LEVEL[config.difficulty] ?? 2;
-    this.templates = templatesFor('olympiad', config.grade);
-  }
-
-  generate(rng) {
-    if (this.templates.length === 0) {
-      throw new Error(`No olympiad templates available for grade ${this.config.grade}`);
-    }
-    const tpl = rng.pick(this.templates);
-    // Delegate to the template: its generate() maps the difficulty level to a
-    // band and filters subtemplates. Picking a subtemplate here directly
-    // bypassed that filter, making every `band` label inert.
-    return tpl.generate(rng, this.difficultyLevel);
-  }
+export class OlympiadStrategy extends BandAwareStrategy {
+  constructor(config) { super(config, { type: 'olympiad' }); }
 }
