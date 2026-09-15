@@ -47,4 +47,86 @@ describe('validateTemplate', () => {
     delete t.variables.unitPrice.type;
     expect(validateTemplate(t).ok).toBe(false);
   });
+
+describe('reverse strategy validation', () => {
+  const baseReverseTpl = {
+    id: 'REVERSE_OK',
+    metadata: { name: 'reverse ok', type: 'olympiad', grade: 4 },
+    variables: {
+      target: { type: 'random', valueType: 'integer', role: 'target',
+                 generator: { strategy: 'range', min: 1, max: 10 } },
+      x: { type: 'random', valueType: 'integer',
+           generator: { strategy: 'range', min: 1, max: 10 } },
+    },
+    answer: { type: 'integer', expression: { type: 'variable', name: 'target' } },
+    renderer: { question: '?' },
+    generator: { strategy: 'reverse' },
+  };
+
+  it('should accept valid template with strategy=reverse + role=target', () => {
+    const r = validateTemplate(baseReverseTpl);
+    expect(r.ok).toBe(true);
+  });
+
+  it('should reject strategy=reverse without any role=target variable', () => {
+    const tpl = { ...baseReverseTpl,
+                  variables: { x: baseReverseTpl.variables.x },
+                  generator: { strategy: 'reverse' } };
+    const r = validateTemplate(tpl);
+    expect(r.ok).toBe(false);
+    expect(r.errors.join(' ')).toMatch(/role='target'/);
+  });
+
+  it('should reject role=target on derived variable', () => {
+    const tpl = { ...baseReverseTpl,
+                  variables: {
+                    target: { type: 'derived', valueType: 'integer', role: 'target',
+                              expression: { type: 'literal', value: 5 } },
+                    x: baseReverseTpl.variables.x,
+                  } };
+    const r = validateTemplate(tpl);
+    expect(r.ok).toBe(false);
+    expect(r.errors.join(' ')).toMatch(/type='random'/);
+  });
+
+  it('should reject role=target without generator', () => {
+    const tpl = { ...baseReverseTpl,
+                  variables: {
+                    target: { type: 'random', valueType: 'integer', role: 'target' },
+                    x: baseReverseTpl.variables.x,
+                  } };
+    const r = validateTemplate(tpl);
+    expect(r.ok).toBe(false);
+    expect(r.errors.join(' ')).toMatch(/generator/);
+  });
+
+  it('should reject multiple role=target variables', () => {
+    const tpl = { ...baseReverseTpl,
+                  variables: {
+                    t1: { type: 'random', valueType: 'integer', role: 'target',
+                          generator: { strategy: 'range', min: 1, max: 5 } },
+                    t2: { type: 'random', valueType: 'integer', role: 'target',
+                          generator: { strategy: 'range', min: 1, max: 5 } },
+                  } };
+    const r = validateTemplate(tpl);
+    expect(r.ok).toBe(false);
+    expect(r.errors.join(' ')).toMatch(/multiple role='target'/);
+  });
+
+  it('should still accept existing forward templates (regression)', () => {
+    const tpl = {
+      id: 'FWD', metadata: { name: 'forward', type: 'word_problem', grade: 3 },
+      variables: {
+        a: { type: 'random', valueType: 'integer',
+             generator: { strategy: 'range', min: 1, max: 10 } },
+        b: { type: 'random', valueType: 'integer',
+             generator: { strategy: 'range', min: 1, max: 10 } },
+      },
+      answer: { type: 'integer', expression: { type: 'variable', name: 'a' } },
+      renderer: { question: '?' },
+    };
+    const r = validateTemplate(tpl);
+    expect(r.ok).toBe(true);
+  });
+});
 });
