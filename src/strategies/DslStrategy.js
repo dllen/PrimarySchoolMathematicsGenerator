@@ -12,6 +12,7 @@ export class DslStrategy extends ProblemGeneratorStrategy {
     super(config);
     this.type = 'dsl';
     this.allTemplates = loadTemplates();
+    this._counter = 0;
   }
 
   generate(rng) {
@@ -21,8 +22,11 @@ export class DslStrategy extends ProblemGeneratorStrategy {
     }
     const pick = (rng?.next?.() ?? Math.random());
     const template = candidates[Math.floor(pick * candidates.length)];
+    // 每次调用递增 index，确保同一毫秒内的多次 generate 不会 hash 撞车
     return generateQuestion({
       template,
+      seed: Date.now(),
+      index: this._counter++,
       options: this.config,
     });
   }
