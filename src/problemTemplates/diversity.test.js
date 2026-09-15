@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { enumerateSubtypes, computeCap, pickUnderCap, buildComposition } from './diversity.js';
+import { enumerateSubtypes, computeCap, pickUnderCap, buildComposition, pickNextSubtemplate } from "./diversity.js";
+import { BandAwareStrategy } from "../strategies/BandAwareStrategy.js";
+import { createRng } from "../utils/rng.js";
 
 describe('enumerateSubtypes', () => {
   it('flattens application templates for grade 3 into (templateId, subtemplateId, band)', () => {
@@ -128,3 +130,36 @@ describe('enumerateSubtypes (band filter)', () => {
   });
 });
 
+
+describe('pickNextSubtemplate', () => {
+  const config = { grade: '3', semester: '上', difficulty: 'medium' };
+
+  it('returns null when all candidates exceed cap', () => {
+    const s = new BandAwareStrategy(config, { type: 'application' });
+    const cands = s.listSubtemplates({ band: 'medium' });
+    const usage = new Map(cands.map(c => [c.subtemplateId, 5]));
+    const r = pickNextSubtemplate(s, 'medium', usage, 5, createRng(1));
+    expect(r).toBeNull();
+  });
+
+  it('skips candidates that exceed cap', () => {
+    const s = new BandAwareStrategy(config, { type: 'application' });
+    const cands = s.listSubtemplates({ band: 'medium' });
+    // Saturate the first one
+    const usage = new Map([[cands[0].subtemplateId, 10]]);
+    const r = pickNextSubtemplate(s, 'medium', usage, 5, createRng(2));
+    expect(r).not.toBeNull();
+    expect(r.subtemplateId).not.toBe(cands[0].subtemplateId);
+    expect(r.band).toBe('medium');
+  });
+
+  it('picks from full pool when usage is empty', () => {
+    const s = new BandAwareStrategy(config, { type: 'application' });
+    const cands = s.listSubtemplates({ band: 'medium' });
+    const usage = new Map();
+    for (let i = 0; i < 50; i++) {
+      const r = pickNextSubtemplate(s, 'medium', usage, 5, createRng(i + 100));
+      expect(cands.find(c => c.subtemplateId === r.subtemplateId)).toBeDefined();
+    }
+  });
+});

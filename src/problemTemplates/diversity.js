@@ -68,3 +68,21 @@ export function buildComposition(config) {
   });
   return out;
 }
+
+/**
+ * 从 strategy 当前 band 候选里,挑一个未超额 (templateId, subtemplateId) 对。
+ * @param {BandAwareStrategy} strategy
+ * @param {'easy'|'medium'|'hard'} band
+ * @param {Map<string, number>} usageMap - subtemplateId → 已用次数
+ * @param {number} cap - computeCap 结果
+ * @param {Function} rng - 需支持 int(min, max)
+ * @returns {{templateId: string, subtemplateId: string, band: 'easy'|'medium'|'hard'} | null}
+ *   null = 当前 band 已无候选(由 caller 决定 advance band 或兜底)
+ */
+export function pickNextSubtemplate(strategy, band, usageMap, cap, rng) {
+  const candidates = strategy.listSubtemplates({ band }).filter(
+    (c) => (usageMap.get(c.subtemplateId) || 0) < cap
+  );
+  if (candidates.length === 0) return null;
+  return candidates[rng.int(0, candidates.length - 1)];
+}
