@@ -12,7 +12,17 @@ describe('solveAnswer', () => {
     expect(solveAnswer(answerDef, { n: 42 }).value).toBe(42);
   });
 
-  it('鸡兔同笼反推留 TODO（reverse generation）', () => {
-    expect(solveAnswer({ type: 'integer', expression: { type: 'variable', name: 'chickens' }, reverse: true }, { chickens: 5 }).reversePending).toBe(true);
+  it('should return vars[name] when answer.reverse is true and variable exists', () => {
+    const def = { type: 'integer', expression: { type: 'variable', name: 'chickens' }, reverse: true };
+    const r = solveAnswer(def, { chickens: 23, rabbits: 12, heads: 35, legs: 94 });
+    expect(r.ok).toBe(true);
+    expect(r.value).toBe(23);
+    expect(r.type).toBe('integer');
+    expect(r.reversePending).toBeUndefined();
+  });
+
+  it('should throw when reverse answer references ungenerated variable', () => {
+    const def = { type: 'integer', expression: { type: 'variable', name: 'ghosts' }, reverse: true };
+    expect(() => solveAnswer(def, { chickens: 5 })).toThrow(/ungenerated variable.*ghosts/);
   });
 });
