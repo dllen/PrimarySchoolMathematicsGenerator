@@ -1,0 +1,25 @@
+{
+  "id": "O23_CHICKEN_RABBIT_001",
+  "version": "1.0",
+  "metadata": {
+    "name": "鸡兔同笼",
+    "type": "olympiad",
+    "grade": 4,
+    "topic": "chicken_rabbit",
+    "knowledgePoints": ["equation", "enumeration"]
+  },
+  "variables": {
+    "chickens": { "type": "random", "valueType": "integer", "generator": { "strategy": "range", "min": 1, "max": 40 } },
+    "rabbits": { "type": "random", "valueType": "integer", "generator": { "strategy": "range", "min": 1, "max": 30 } },
+    "heads": { "type": "derived", "valueType": "integer", "expression": { "type": "operation", "op": "add", "args": [{ "type": "variable", "name": "chickens" }, { "type": "variable", "name": "rabbits" }] } },
+    "legs": { "type": "derived", "valueType": "integer", "expression": { "type": "operation", "op": "add", "args": [{ "type": "operation", "op": "multiply", "args": [{ "type": "literal", "value": 2 }, { "type": "variable", "name": "chickens" }] }, { "type": "operation", "op": "multiply", "args": [{ "type": "literal", "value": 4 }, { "type": "variable", "name": "rabbits" }] }] } }
+  },
+  "constraints": [
+    { "type": "range", "target": "heads", "min": 5, "max": 50 },
+    { "type": "range", "target": "legs", "min": 10, "max": 200 },
+    { "type": "derived", "expression": { "type": "operation", "op": "eq", "args": [{ "type": "variable", "name": "legs" }, { "type": "operation", "op": "add", "args": [{ "type": "operation", "op": "multiply", "args": [{ "type": "literal", "value": 2 }, { "type": "variable", "name": "chickens" }] }, { "type": "operation", "op": "multiply", "args": [{ "type": "literal", "value": 4 }, { "type": "variable", "name": "rabbits" }] }] }] } }
+  ],
+  "answer": { "type": "integer", "expression": "chickens", "reverse": true, "unit": "只" },
+  "renderer": { "question": "笼子里有{{heads}}个头，{{legs}}条腿，已知鸡有2条腿、兔有4条腿，问鸡有多少只？" },
+  "difficulty": { "level": 4 }
+}

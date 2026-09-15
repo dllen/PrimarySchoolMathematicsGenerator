@@ -1,0 +1,37 @@
+{
+  "id": "G3_MIX_001",
+  "version": "1.0",
+  "metadata": {
+    "name": "连续加减",
+    "type": "word_problem",
+    "grade": 3,
+    "semester": 1,
+    "topic": "mixed_operation",
+    "knowledgePoints": ["addition", "subtraction"]
+  },
+  "variables": {
+    "initial": { "type": "random", "valueType": "integer", "generator": { "strategy": "range", "min": 20, "max": 60 } },
+    "increase": { "type": "random", "valueType": "integer", "generator": { "strategy": "range", "min": 5, "max": 30 } },
+    "decrease": { "type": "random", "valueType": "integer", "generator": { "strategy": "range", "min": 1, "max": 20 } },
+    "remaining": {
+      "type": "derived", "valueType": "integer",
+      "expression": {
+        "type": "operation", "op": "subtract",
+        "args": [
+          { "type": "operation", "op": "add", "args": [{ "type": "variable", "name": "initial" }, { "type": "variable", "name": "increase" }] },
+          { "type": "variable", "name": "decrease" }
+        ]
+      }
+    }
+  },
+  "constraints": [
+    {
+      "type": "comparison", "op": "lt",
+      "left": "decrease",
+      "right": { "type": "operation", "op": "add", "args": [{ "type": "variable", "name": "initial" }, { "type": "variable", "name": "increase" }] }
+    }
+  ],
+  "answer": { "type": "integer", "expression": "remaining", "unit": "本" },
+  "renderer": { "question": "小明原来有{{initial}}本书，又买了{{increase}}本，送给同学{{decrease}}本，还剩多少本？" },
+  "difficulty": { "level": 3 }
+}
