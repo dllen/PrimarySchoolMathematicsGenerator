@@ -1,6 +1,7 @@
 /**
  * JSON template schema validator (runtime).
- * Docs: v2-tech-docs/Math DSL v1.0 §2 顶层结构
+ * Docs: v2-tech-docs/Math DSL v1.0 §2 顶层结构;
+ *       v2-tech-docs/Math DSL v1.1 §44 (GenerationRole / role='target')
  */
 
 const REQUIRED_TOP = ['id', 'metadata', 'variables', 'answer', 'renderer'];
@@ -49,6 +50,28 @@ export function validateTemplate(t) {
       if (def.type === 'derived' && !def.expression) {
         errors.push(`variable ${name} derived needs expression`);
       }
+    }
+
+    // Reverse strategy validation (added 2026-09-15)
+    let hasTarget = false;
+    for (const [name, def] of Object.entries(t.variables)) {
+      if (def.role !== 'target') continue;
+      hasTarget = true;
+      if (def.type !== 'random') {
+        errors.push(`variable ${name}: role='target' requires type='random'`);
+      }
+      if (!def.generator || !def.generator.strategy) {
+        errors.push(`role='target' variable ${name} needs generator`);
+      }
+    }
+    if (hasTarget) {
+      const targetCount = Object.values(t.variables).filter(d => d.role === 'target').length;
+      if (targetCount > 1) {
+        errors.push(`multiple role='target' variables not supported`);
+      }
+    }
+    if (t.generator?.strategy === 'reverse' && !hasTarget) {
+      errors.push(`reverse strategy requires at least one role='target' variable`);
     }
   }
 

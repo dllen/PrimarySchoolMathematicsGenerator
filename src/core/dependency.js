@@ -1,6 +1,7 @@
 /**
- * Variable dependency graph + topological order + cycle detection.
- * Docs: v2-tech-docs/Math DSL v1.1 §12-21
+ * Variable dependency graph + topological order + cycle detection +
+ * reverseTopologicalOrder (target-first order).
+ * Docs: v2-tech-docs/Math DSL v1.1 §12-21, §44-45
  * Accepts both envelope ({ type: 'operation', op, args }) and
  * shorthand ({ op, args }) expression forms per DSL docs §9/§24.
  */
@@ -88,4 +89,26 @@ export function buildDependencyGraph(variables) {
   }
 
   return { nodes, edges, order };
+}
+
+
+/**
+ * Topological order with role='target' variables placed first.
+ * Useful for reverse-generation flow (target-first). Cycle detection still
+ * uses the same DAG invariant as buildDependencyGraph.
+ *
+ * @param {Record<string, any>} variables - template.variables
+ * @returns {string[]} variable names in evaluation order
+ */
+export function reverseTopologicalOrder(variables) {
+  // Reuse the existing forward topo (proves DAG, raises on cycle).
+  const { order: forwardOrder } = buildDependencyGraph(variables);
+
+  const targets = [];
+  const others = [];
+  for (const name of forwardOrder) {
+    if (variables[name]?.role === 'target') targets.push(name);
+    else others.push(name);
+  }
+  return [...targets, ...others];
 }

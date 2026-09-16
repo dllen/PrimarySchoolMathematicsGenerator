@@ -19,3 +19,14 @@ describe('core barrel exports', () => {
     expect(typeof core.generateQuestion).toBe('function');
   });
 });
+
+describe('reverse exports', () => {
+  it('should export reverseTopologicalOrder, defaultReverseStrategy, reverseStrategies', async () => {
+    const mod = await import('./index.js');
+    expect(typeof mod.reverseTopologicalOrder).toBe('function');
+    expect(mod.defaultReverseStrategy).toBeDefined();
+    expect(mod.defaultReverseStrategy.name).toBe('default');
+    expect(mod.reverseStrategies).toBeDefined();
+    expect(mod.reverseStrategies.default).toBe(mod.defaultReverseStrategy);
+  });
+});
