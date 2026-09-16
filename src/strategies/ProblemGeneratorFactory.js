@@ -1,3 +1,8 @@
+import { DigitPuzzleStrategy } from './DigitPuzzleStrategy.js';
+import { QuickMathStrategy } from './QuickMathStrategy.js';
+import { FractionArithmeticStrategy } from './FractionArithmeticStrategy.js';
+import { DecimalArithmeticStrategy } from './DecimalArithmeticStrategy.js';
+
 import { OperandProblemStrategy } from './OperandProblemStrategy.js';
 import { ResultProblemStrategy } from './ResultProblemStrategy.js';
 import { ArithmeticStrategy } from './ArithmeticStrategy.js';
@@ -30,6 +35,14 @@ export class ProblemGeneratorFactory {
         return new OlympiadStrategy(config);
       case 'dsl':
         return new DslStrategy(config);
+      case 'digit-puzzle':
+        return new DigitPuzzleStrategy(config);
+      case 'quick-math':
+        return new QuickMathStrategy(config);
+      case 'fraction-arithmetic':
+        return new FractionArithmeticStrategy(config);
+      case 'decimal-arithmetic':
+        return new DecimalArithmeticStrategy(config);
       default:
         throw new Error(`不支持的题目类型: ${type}`);
     }
@@ -40,7 +53,8 @@ export class ProblemGeneratorFactory {
    * @returns {Array} 支持的题目类型数组
    */
   static getSupportedTypes() {
-    return ['result', 'operand', 'arithmetic', 'application', 'olympiad', 'dsl'];
+    return ['result', 'operand', 'arithmetic', 'application', 'olympiad', 'dsl',
+      'digit-puzzle', 'quick-math', 'fraction-arithmetic', 'decimal-arithmetic'];
   }
 
   /**

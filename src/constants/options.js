@@ -12,6 +12,9 @@ export const QUESTION_TYPES = [
   // Plan C:
   'number-theory', 'combinatorics', 'probability',
   'inequality', 'geometry-count', 'logic-advanced',
+  // Batch E (算术变体):
+  'digit-puzzle', 'quick-math',
+  'fraction-arithmetic', 'decimal-arithmetic',
 ];
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ANSWER_MODES = ['hidden', 'inline', 'separate'];

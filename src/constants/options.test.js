@@ -60,3 +60,17 @@ describe('knowledgePoints', () => {
     }
   });
 });
+describe('options batch E', () => {
+  it('QUESTION_TYPES includes digit-puzzle', () => {
+    expect(QUESTION_TYPES).toContain('digit-puzzle');
+  });
+  it('QUESTION_TYPES includes quick-math', () => {
+    expect(QUESTION_TYPES).toContain('quick-math');
+  });
+  it('QUESTION_TYPES includes fraction-arithmetic', () => {
+    expect(QUESTION_TYPES).toContain('fraction-arithmetic');
+  });
+  it('QUESTION_TYPES includes decimal-arithmetic', () => {
+    expect(QUESTION_TYPES).toContain('decimal-arithmetic');
+  });
+});
