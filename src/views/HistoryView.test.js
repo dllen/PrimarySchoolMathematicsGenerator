@@ -175,7 +175,12 @@ describe('HistoryView 批量删除', () => {
     expect(confirmBtn).toBeTruthy()
     // 通过 ConfirmDialog 的 $emit 触发 confirm（更可靠，绕过 BaseButton DOM 中转）
     wrapper.findComponent({ name: 'ConfirmDialog' }).vm.$emit('confirm')
-    await waitDexie()
+    // 等待异步链:bulkDelete -> loadHistory -> exitSelectionMode 全部完成
+    // 直接轮询 selectionMode,避免依赖 Vue 内部时序
+    const deadline = Date.now() + 2000
+    while (wrapper.vm.selectionMode !== false && Date.now() < deadline) {
+      await waitDexie()
+    }
     // DB 应只剩 3 条
     expect(await db.problemSets.count()).toBe(3)
     // 视图应退出选择模式（通过 setup 暴露的 ref 验证，避免 DOM 时序问题）
