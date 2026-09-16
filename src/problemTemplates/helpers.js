@@ -198,3 +198,37 @@ export function makeRng(rng) {
     : (arr) => rng.pick(arr);
   return { int, pick };
 }
+
+/** 生成合法 HH:MM 时间。band 控制分钟进度(0/5/1 步进)。 */
+export function pickClockTime(rng, band = 'medium') {
+  const hour = rng.int(0, 23);
+  const minuteStep = band === 'easy' ? 0 : band === 'medium' ? 5 : 1;
+  const minuteMax = 60 / Math.max(minuteStep, 1) - 1;
+  const minute = minuteStep === 0 ? 0 : rng.int(0, minuteMax) * minuteStep;
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+}
+
+/** 生成 0.5–0.95 区间的折扣率(以 0.05 为步长)。 */
+export function pickDiscountRate(rng, band = 'medium') {
+  const steps = [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95];
+  const idx = band === 'easy' ? rng.int(0, 4)
+           : band === 'hard' ? rng.int(5, 9)
+           : rng.int(2, 7);
+  return steps[idx];
+}
+
+/** 返回 2 个不同的合理速度(km/h),band 缩放。 */
+export function pickSpeedPair(rng, band = 'medium') {
+  const scale = band === 'easy' ? 0.5 : band === 'hard' ? 1.8 : 1.0;
+  const lo = Math.max(10, Math.floor(30 * scale));
+  const hi = Math.floor(120 * scale);
+  const a = rng.int(lo, hi);
+  let b = rng.int(lo, hi);
+  let tries = 0;
+  while (b === a && tries < 10) {
+    b = rng.int(lo, hi);
+    tries++;
+  }
+  if (b === a) b = a + 1; // 兜底
+  return [Math.min(a, b), Math.max(a, b)];
+}

@@ -20,6 +20,9 @@ import {
   makeRng,
   simplifyFraction,
   formatFraction,
+  pickClockTime,
+  pickDiscountRate,
+  pickSpeedPair,
 } from './helpers.js';
 
 describe('BANDS', () => {
@@ -319,5 +322,54 @@ describe('makeRng', () => {
     expect(r.int(0, 9)).toBe(1);
     expect(r.pick(['a', 'b'])).toBe('a');
     expect(calls).toBe(2);
+  });
+});
+
+describe('pickClockTime', () => {
+  it('returns valid HH:MM string', () => {
+    const rng = createRng(1);
+    for (let i = 0; i < 20; i++) {
+      const t = pickClockTime(rng, 'medium');
+      expect(t).toMatch(/^([01]?\d|2[0-3]):[0-5]\d$/);
+    }
+  });
+  it('clamps hour to 0-23', () => {
+    const rng = createRng(2);
+    for (let i = 0; i < 50; i++) {
+      const t = pickClockTime(rng, 'hard');
+      const [h] = t.split(':').map(Number);
+      expect(h).toBeGreaterThanOrEqual(0);
+      expect(h).toBeLessThan(24);
+    }
+  });
+});
+
+describe('pickDiscountRate', () => {
+  it('returns rate in [0.5, 0.95]', () => {
+    const rng = createRng(3);
+    for (let i = 0; i < 30; i++) {
+      const r = pickDiscountRate(rng, 'medium');
+      expect(r).toBeGreaterThanOrEqual(0.5);
+      expect(r).toBeLessThanOrEqual(0.95);
+    }
+  });
+});
+
+describe('pickSpeedPair', () => {
+  it('returns two distinct positive integers', () => {
+    const rng = createRng(4);
+    for (let i = 0; i < 20; i++) {
+      const [a, b] = pickSpeedPair(rng, 'medium');
+      expect(a).toBeGreaterThan(0);
+      expect(b).toBeGreaterThan(0);
+      expect(a).not.toBe(b);
+    }
+  });
+  it('respects band scaling', () => {
+    const rngEasy = createRng(5);
+    const rngHard = createRng(5);
+    const [aEasy] = pickSpeedPair(rngEasy, 'easy');
+    const [aHard] = pickSpeedPair(rngHard, 'hard');
+    expect(aHard).toBeGreaterThanOrEqual(aEasy);
   });
 });
