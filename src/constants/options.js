@@ -15,6 +15,15 @@ export const QUESTION_TYPES = [
   // Batch E (算术变体):
   'digit-puzzle', 'quick-math',
   'fraction-arithmetic', 'decimal-arithmetic',
+  // Batch F: 应用 (A 类 8 + D 类 7)
+  'discount', 'interest', 'boat-current', 'train-bridge',
+  'clock-angle', 'proportion-dist', 'average', 'formation',
+  'chicken-rabbit-3var', 'tree-planting-building', 'age-problem-family',
+  'distance-circular', 'unitary-work', 'concentration-triple',
+  'comparison-multi',
+  // Batch F: 奥数 (A 类 5)
+  'inclusion-exclusion', 'perfect-square', 'coloring',
+  'extreme-value', 'logic-deduction',
 ];
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ANSWER_MODES = ['hidden', 'inline', 'separate'];

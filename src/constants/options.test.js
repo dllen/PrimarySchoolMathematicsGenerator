@@ -74,3 +74,31 @@ describe('options batch E', () => {
     expect(QUESTION_TYPES).toContain('decimal-arithmetic');
   });
 });
+
+describe('options batch F', () => {
+  it('QUESTION_TYPES includes Batch F application templates', () => {
+    // Batch F 应用题
+    expect(QUESTION_TYPES).toContain('discount');
+    expect(QUESTION_TYPES).toContain('interest');
+    expect(QUESTION_TYPES).toContain('boat-current');
+    expect(QUESTION_TYPES).toContain('train-bridge');
+    expect(QUESTION_TYPES).toContain('clock-angle');
+    expect(QUESTION_TYPES).toContain('proportion-dist');
+    expect(QUESTION_TYPES).toContain('average');
+    expect(QUESTION_TYPES).toContain('formation');
+    // Batch F 奥数题
+    expect(QUESTION_TYPES).toContain('inclusion-exclusion');
+    expect(QUESTION_TYPES).toContain('perfect-square');
+    expect(QUESTION_TYPES).toContain('coloring');
+    expect(QUESTION_TYPES).toContain('extreme-value');
+    expect(QUESTION_TYPES).toContain('logic-deduction');
+    // Batch F 应用变体
+    expect(QUESTION_TYPES).toContain('chicken-rabbit-3var');
+    expect(QUESTION_TYPES).toContain('tree-planting-building');
+    expect(QUESTION_TYPES).toContain('age-problem-family');
+    expect(QUESTION_TYPES).toContain('distance-circular');
+    expect(QUESTION_TYPES).toContain('unitary-work');
+    expect(QUESTION_TYPES).toContain('concentration-triple');
+    expect(QUESTION_TYPES).toContain('comparison-multi');
+  });
+});

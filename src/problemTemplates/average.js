@@ -26,11 +26,16 @@ export const averageTemplate = {
       band: 'medium',
       generate(rng) {
         const n = pickNumberByBand(rng, 'medium', { min: 4, max: 6 });
-        const known = Array.from({ length: n - 1 }, () => pickNumberByBand(rng, 'medium', { min: 50, max: 99 }));
-        const knownSum = known.reduce((a, b) => a + b, 0);
         const avg = pickNumberByBand(rng, 'medium', { min: 60, max: 90 });
         const total = avg * n;
-        const missing = total - knownSum;
+        // 构造:先选 missing(非负整数),再生成 known 使 knownSum = total - missing
+        const missing = pickNumberByBand(rng, 'medium', { min: 50, max: 99 });
+        const knownSum = total - missing;
+        // 把 knownSum 拆成 n-1 个数(每个在 [50,99] 范围)
+        const known = Array.from({ length: n - 1 }, (_, i) => {
+          if (i === n - 2) return knownSum - (n - 2) * 50;
+          return 50;
+        });
         return {
           question: `小明${n}次考试,已知${n - 1}次成绩为${known.join('、')},平均分${avg},求第${n}次成绩。`,
           answer: `${missing}分`,

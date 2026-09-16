@@ -27,10 +27,11 @@ export const interestTemplate = {
       id: 'interest-find-principal',
       band: 'medium',
       generate(rng) {
+        // 构造:选 principal,rate,years,使 interest = principal * rate% * years / 100 落在合理范围
+        const principal = pickNumberByBand(rng, 'medium', { min: 1000, max: 5000 });
         const ratePct = pickNumberByBand(rng, 'medium', { min: 2, max: 4 });
-        const years = pickNumberByBand(rng, 'medium', { min: 2, max: 5 });
-        const interest = pickNumberByBand(rng, 'medium', { min: 200, max: 1500 });
-        const principal = Math.round(interest * 100 / (ratePct * years));
+        const years = pickNumberByBand(rng, 'medium', { min: 2, max: 4 });
+        const interest = Math.round(principal * ratePct / 100 * years);
         const total = principal + interest;
         return {
           question: `某人存款${years}年,年利率${ratePct}%,到期共取回${total}元(本金+利息),求本金。`,
@@ -44,10 +45,12 @@ export const interestTemplate = {
       id: 'interest-compare',
       band: 'hard',
       generate(rng) {
-        const principal = pickNumberByBand(rng, 'hard', { min: 5000, max: 20000 });
+        // band=hard 把 min/max 各乘 1.8:hard min = 5000*1.8=9000,hard max = 20000*1.8=36000 → 超出 10000
+        // 直接用构造:principal 控制在 10000 以内
+        const principal = pickNumberByBand(rng, 'hard', { min: 1000, max: 5000 });
         const rate1 = pickNumberByBand(rng, 'hard', { min: 2, max: 3 });
         const rate2 = rate1 + 1;
-        const years = pickNumberByBand(rng, 'hard', { min: 3, max: 5 });
+        const years = pickNumberByBand(rng, 'hard', { min: 1, max: 3 });
         const interest1 = Math.round(principal * rate1 / 100 * years);
         const interest2 = Math.round(principal * rate2 / 100 * years);
         const diff = interest2 - interest1;
