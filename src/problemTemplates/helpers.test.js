@@ -342,6 +342,21 @@ describe('pickClockTime', () => {
       expect(h).toBeLessThan(24);
     }
   });
+  it('easy band produces only :00 minutes (整点)', () => {
+    const rng = createRng(7);
+    for (let i = 0; i < 30; i++) {
+      const t = pickClockTime(rng, 'easy');
+      expect(t.endsWith(':00')).toBe(true);
+    }
+  });
+  it('medium band produces only multiples of 5 minutes', () => {
+    const rng = createRng(8);
+    for (let i = 0; i < 50; i++) {
+      const t = pickClockTime(rng, 'medium');
+      const [, mm] = t.split(':');
+      expect(mm).toMatch(/^(00|05|10|15|20|25|30|35|40|45|50|55)$/);
+    }
+  });
 });
 
 describe('pickDiscountRate', () => {
@@ -352,6 +367,23 @@ describe('pickDiscountRate', () => {
       expect(r).toBeGreaterThanOrEqual(0.5);
       expect(r).toBeLessThanOrEqual(0.95);
     }
+  });
+  it('mean(easy) < mean(hard) over 100 samples per band (deep discount vs small)', () => {
+    const sample = (band, seed) => {
+      const rng = createRng(seed);
+      let sum = 0;
+      const n = 100;
+      for (let i = 0; i < n; i++) sum += pickDiscountRate(rng, band);
+      return sum / n;
+    };
+    const meanEasy = sample('easy', 11);
+    const meanHard = sample('hard', 13);
+    expect(meanEasy).toBeLessThan(meanHard);
+    // sanity bounds: easy mean ∈ [0.5, 0.7], hard mean ∈ [0.75, 0.95]
+    expect(meanEasy).toBeGreaterThanOrEqual(0.5);
+    expect(meanEasy).toBeLessThanOrEqual(0.7);
+    expect(meanHard).toBeGreaterThanOrEqual(0.75);
+    expect(meanHard).toBeLessThanOrEqual(0.95);
   });
 });
 
@@ -371,5 +403,26 @@ describe('pickSpeedPair', () => {
     const [aEasy] = pickSpeedPair(rngEasy, 'easy');
     const [aHard] = pickSpeedPair(rngHard, 'hard');
     expect(aHard).toBeGreaterThanOrEqual(aEasy);
+  });
+  it('mean(easy) < mean(hard) over 200 samples per band (scaled km/h range)', () => {
+    const sample = (band, seed) => {
+      const rng = createRng(seed);
+      let sum = 0;
+      const n = 200;
+      for (let i = 0; i < n; i++) {
+        const [a, b] = pickSpeedPair(rng, band);
+        sum += (a + b) / 2;
+      }
+      return sum / n;
+    };
+    const meanEasy = sample('easy', 21);
+    const meanHard = sample('hard', 23);
+    expect(meanEasy).toBeLessThan(meanHard);
+    // easy ∈ [15, 60] (floor(30*0.5)=15, floor(120*0.5)=60) → midpoint ≈ 37.5
+    expect(meanEasy).toBeGreaterThanOrEqual(15);
+    expect(meanEasy).toBeLessThanOrEqual(60);
+    // hard ∈ [54, 216] (floor(30*1.8)=54, floor(120*1.8)=216) → midpoint ≈ 135
+    expect(meanHard).toBeGreaterThanOrEqual(54);
+    expect(meanHard).toBeLessThanOrEqual(216);
   });
 });

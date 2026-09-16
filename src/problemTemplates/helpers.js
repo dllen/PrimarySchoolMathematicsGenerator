@@ -18,6 +18,20 @@ const BAND_SCALE = {
   hard: 1.8,
 };
 
+/** pickClockTime: 分钟进度(0=整点,5=5的倍数,1=任意分钟) */
+const BAND_MINUTE_STEP = {
+  easy: 0,
+  medium: 5,
+  hard: 1,
+};
+
+/** pickDiscountRate: 10 档折扣 steps 数组的 band→索引区间(覆盖到 0.5/0.95) */
+const BAND_DISCOUNT_RANGE = {
+  easy: [0, 4],   // 0.50 – 0.70 (深折扣,让"便宜多少"更有冲击)
+  medium: [2, 7], // 0.60 – 0.85
+  hard: [5, 9],   // 0.75 – 0.95 (小折扣,反推原价更难)
+};
+
 /**
  * 按 band 缩放后,在区间内取一个整数。
  *  - easy:   [floor(min*0.5), floor(max*0.5)],下界兜底为 1
@@ -199,27 +213,39 @@ export function makeRng(rng) {
   return { int, pick };
 }
 
-/** 生成合法 HH:MM 时间。band 控制分钟进度(0/5/1 步进)。 */
+/**
+ * 生成合法 HH:MM 时间。band → 分钟步进(BAND_MINUTE_STEP):
+ *  - easy   → :00 only (整点)
+ *  - medium → multiples of 5 minutes (00/05/10/.../55)
+ *  - hard   → any minute (00–59)
+ * 小时始终在 [0, 23] 区间,与分钟步进无关。
+ */
 export function pickClockTime(rng, band = 'medium') {
   const hour = rng.int(0, 23);
-  const minuteStep = band === 'easy' ? 0 : band === 'medium' ? 5 : 1;
-  const minuteMax = 60 / Math.max(minuteStep, 1) - 1;
-  const minute = minuteStep === 0 ? 0 : rng.int(0, minuteMax) * minuteStep;
+  const minuteStep = BAND_MINUTE_STEP[band] ?? 5;
+  const minute = minuteStep === 0 ? 0 : rng.int(0, 60 / minuteStep - 1) * minuteStep;
   return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
 
-/** 生成 0.5–0.95 区间的折扣率(以 0.05 为步长)。 */
+/**
+ * 生成 0.5–0.95 区间的折扣率(以 0.05 为步长)。
+ * band → 索引区间 (BAND_DISCOUNT_RANGE),easy 偏深折扣、hard 偏小折扣,
+ * 让"现价反推原价 / 便宜多少"在不同难度下有不同数值冲击。
+ */
 export function pickDiscountRate(rng, band = 'medium') {
   const steps = [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95];
-  const idx = band === 'easy' ? rng.int(0, 4)
-           : band === 'hard' ? rng.int(5, 9)
-           : rng.int(2, 7);
-  return steps[idx];
+  const [loIdx, hiIdx] = BAND_DISCOUNT_RANGE[band] ?? [2, 7];
+  return steps[rng.int(loIdx, hiIdx)];
 }
 
-/** 返回 2 个不同的合理速度(km/h),band 缩放。 */
+/**
+ * 返回 2 个不同的合理速度(km/h),band 缩放。
+ * 用于 boats / trains / 环形跑道等"机械/车辆"类行程题(km/h 域);
+ * 区别于 pickTwoSpeeds(rng, band, {min,max}) —— 那个走 m/min 步行域。
+ * 返回 [min, max],保证两值都落在缩放后区间内且不相等;区间退化时抛错。
+ */
 export function pickSpeedPair(rng, band = 'medium') {
-  const scale = band === 'easy' ? 0.5 : band === 'hard' ? 1.8 : 1.0;
+  const scale = BAND_SCALE[band] ?? 1.0;
   const lo = Math.max(10, Math.floor(30 * scale));
   const hi = Math.floor(120 * scale);
   const a = rng.int(lo, hi);
@@ -229,6 +255,8 @@ export function pickSpeedPair(rng, band = 'medium') {
     b = rng.int(lo, hi);
     tries++;
   }
-  if (b === a) b = a + 1; // 兜底
+  if (b === a) {
+    throw new Error(`pickSpeedPair: cannot draw two distinct values in band=${band} range [${lo}, ${hi}]`);
+  }
   return [Math.min(a, b), Math.max(a, b)];
 }
