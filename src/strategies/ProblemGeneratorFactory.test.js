@@ -14,3 +14,44 @@ describe('ProblemGeneratorFactory dsl mode', () => {
     expect(typeof q.question).toBe('string');
   });
 });
+
+import { DigitPuzzleStrategy } from './DigitPuzzleStrategy.js';
+import { QuickMathStrategy } from './QuickMathStrategy.js';
+import { FractionArithmeticStrategy } from './FractionArithmeticStrategy.js';
+import { DecimalArithmeticStrategy } from './DecimalArithmeticStrategy.js';
+
+describe('ProblemGeneratorFactory batch E modes', () => {
+  const cfg = { difficulty: 'medium', grade: '4' };
+
+  it('should create DigitPuzzleStrategy', () => {
+    const s = ProblemGeneratorFactory.createStrategy('digit-puzzle', cfg);
+    expect(s).toBeInstanceOf(DigitPuzzleStrategy);
+  });
+  it('should create QuickMathStrategy', () => {
+    const s = ProblemGeneratorFactory.createStrategy('quick-math', cfg);
+    expect(s).toBeInstanceOf(QuickMathStrategy);
+  });
+  it('should create FractionArithmeticStrategy', () => {
+    const s = ProblemGeneratorFactory.createStrategy('fraction-arithmetic', cfg);
+    expect(s).toBeInstanceOf(FractionArithmeticStrategy);
+  });
+  it('should create DecimalArithmeticStrategy', () => {
+    const s = ProblemGeneratorFactory.createStrategy('decimal-arithmetic', cfg);
+    expect(s).toBeInstanceOf(DecimalArithmeticStrategy);
+  });
+  it('getSupportedTypes includes batch E modes', () => {
+    const types = ProblemGeneratorFactory.getSupportedTypes();
+    expect(types).toContain('digit-puzzle');
+    expect(types).toContain('quick-math');
+    expect(types).toContain('fraction-arithmetic');
+    expect(types).toContain('decimal-arithmetic');
+  });
+  it('create() with new modes returns a working strategy', () => {
+    for (const mode of ['digit-puzzle', 'quick-math', 'fraction-arithmetic', 'decimal-arithmetic']) {
+      const s = ProblemGeneratorFactory.create({ mode, ...cfg });
+      expect(s).toBeDefined();
+      const r = s.generate();
+      expect(r).toBeDefined();
+    }
+  });
+});

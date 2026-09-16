@@ -23,6 +23,15 @@ import { probabilityTemplate } from './probability.js';
 import { inequalityTemplate } from './inequality.js';
 import { geometryCountTemplate } from './geometryCount.js';
 import { advancedLogicTemplate } from './advancedLogic.js';
+import { treePlantingTemplate } from './treePlanting.js';
+import { profitLossTemplate } from './profitLoss.js';
+import { ageProblemTemplate } from './ageProblem.js';
+import { unitaryTemplate } from './unitary.js';
+import { reverseTemplate } from './reverse.js';
+import { magicSquareTemplate } from './magicSquare.js';
+import { matchstickTemplate } from './matchstick.js';
+import { equationTransformTemplate } from './equationTransform.js';
+import { pigeonholeTemplate } from './pigeonhole.js';
 
 export const APPLICATION_TEMPLATES = [
   shoppingTemplate, timeTemplate, comparisonTemplate, chickenRabbitTemplate,
@@ -33,6 +42,9 @@ export const APPLICATION_TEMPLATES = [
   // Plan B: 5 more application templates
   engineeringTemplate, concentrationTemplate, distanceTemplate,
   ratioTemplate, statisticsTemplate,
+  // Batch E: 5 more application templates
+  treePlantingTemplate, profitLossTemplate, ageProblemTemplate,
+  unitaryTemplate, reverseTemplate,
 ];
 
 export const OLYMPIAD_TEMPLATES = [
@@ -40,6 +52,9 @@ export const OLYMPIAD_TEMPLATES = [
   // Plan C: 6 olympiad-depth templates
   numberTheoryTemplate, combinatoricsTemplate, probabilityTemplate,
   inequalityTemplate, geometryCountTemplate, advancedLogicTemplate,
+  // Batch E: 4 olympiad templates
+  magicSquareTemplate, matchstickTemplate,
+  equationTransformTemplate, pigeonholeTemplate,
 ];
 
 export function templatesFor(type, grade) {

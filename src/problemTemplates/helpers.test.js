@@ -17,6 +17,9 @@ import {
   comb,
   lcm,
   isPrime,
+  makeRng,
+  simplifyFraction,
+  formatFraction,
 } from './helpers.js';
 
 describe('BANDS', () => {
@@ -262,3 +265,59 @@ describe('band helpers: degenerate ranges', () => {
 });
 });
 
+
+describe('simplifyFraction', () => {
+  it('should simplify 4/8 to 1/2', () => {
+    expect(simplifyFraction(4, 8)).toEqual({ numerator: 1, denominator: 2 });
+  });
+  it('should keep negative numerator', () => {
+    expect(simplifyFraction(-4, 8)).toEqual({ numerator: -1, denominator: 2 });
+  });
+  it('should normalize negative denominator', () => {
+    expect(simplifyFraction(4, -8)).toEqual({ numerator: -1, denominator: 2 });
+  });
+  it('should throw on zero denominator', () => {
+    expect(() => simplifyFraction(1, 0)).toThrow();
+  });
+});
+
+describe('formatFraction', () => {
+  it('should format integer as plain number', () => {
+    expect(formatFraction(5, 1)).toBe('5');
+    expect(formatFraction(-3, 1)).toBe('-3');
+  });
+  it('should format proper fraction', () => {
+    expect(formatFraction(1, 2)).toBe('1/2');
+  });
+  it('should format improper fraction as mixed', () => {
+    expect(formatFraction(7, 3)).toBe('2 1/3');
+  });
+  it('should format negative improper fraction', () => {
+    expect(formatFraction(-7, 3)).toBe('-2 1/3');
+  });
+});
+
+describe('makeRng', () => {
+  it('falls back to Math.random when rng is undefined', () => {
+    const r = makeRng(undefined);
+    const v = r.int(5, 10);
+    expect(v).toBeGreaterThanOrEqual(5);
+    expect(v).toBeLessThanOrEqual(10);
+  });
+  it('falls back to Math.random when rng has no .int', () => {
+    const r = makeRng({});
+    const v = r.int(1, 3);
+    expect(v).toBeGreaterThanOrEqual(1);
+    expect(v).toBeLessThanOrEqual(3);
+  });
+  it('uses provided rng.int and rng.pick when present', () => {
+    let calls = 0;
+    const r = makeRng({
+      int: (a, b) => { calls++; return a + 1; },
+      pick: (arr) => { calls++; return arr[0]; },
+    });
+    expect(r.int(0, 9)).toBe(1);
+    expect(r.pick(['a', 'b'])).toBe('a');
+    expect(calls).toBe(2);
+  });
+});

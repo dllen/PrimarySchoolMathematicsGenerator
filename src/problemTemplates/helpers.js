@@ -159,3 +159,42 @@ export function isPrime(n) {
   }
   return true;
 }
+
+/** 化简分数:返回 { numerator, denominator } (最简分数,denom > 0)。 */
+export function simplifyFraction(num, den) {
+  if (den === 0) throw new Error('simplifyFraction: denominator cannot be 0');
+  const sign = (num < 0) !== (den < 0) ? -1 : 1;
+  const absNum = Math.abs(num);
+  const absDen = Math.abs(den);
+  const g = gcd(absNum, absDen);
+  return { numerator: sign * (absNum / g), denominator: absDen / g };
+}
+
+/** 把分数格式化为字符串:真分数返回 "a/b";整数返回 "a";带分数返回 "a b/c"。 */
+export function formatFraction(num, den) {
+  const { numerator, denominator } = simplifyFraction(num, den);
+  if (denominator === 1) return String(numerator);
+  if (Math.abs(numerator) >= denominator) {
+    const whole = Math.trunc(numerator / denominator);
+    const rem = numerator - whole * denominator;
+    if (rem === 0) return String(whole);
+    const s = simplifyFraction(Math.abs(rem), denominator);
+    return `${whole} ${s.numerator}/${s.denominator}`;
+  }
+  return `${numerator}/${denominator}`;
+}
+
+/**
+ * 规范化 rng:有 rng 则使用 rng.int/pick,否则回退到 Math.random。
+ * 这样所有 strategy/template 都可以统一用 r(n,m) / rPick(arr) 而不必每次重复三元表达式。
+ */
+export function makeRng(rng) {
+  const useMathRandom = !rng || !rng.int;
+  const int = useMathRandom
+    ? (a, b) => Math.floor(Math.random() * (b - a + 1)) + a
+    : (a, b) => rng.int(a, b);
+  const pick = useMathRandom
+    ? (arr) => arr[Math.floor(Math.random() * arr.length)]
+    : (arr) => rng.pick(arr);
+  return { int, pick };
+}
