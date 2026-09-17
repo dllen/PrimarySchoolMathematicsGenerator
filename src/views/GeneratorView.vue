@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import { ref, onBeforeUnmount } from 'vue'
+import { ref, onBeforeUnmount, onUnmounted } from 'vue'
 import { BaseButton, BaseTabs } from '../components/base'
 import GradeCard from '../components/workbench/GradeCard.vue'
 import WorkbenchHero from '../components/workbench/WorkbenchHero.vue'
@@ -178,6 +178,10 @@ export default {
     // 解构顶层 refs,以便在模板中自动解包(Boolean / String / Object 类型 prop)
     const { previewVisible, previewType, previewData, exporting, env } = enhancedExport
     const toast = useToast()
+
+    // 卸载守卫:避免 canvas.toBlob / async 操作在组件 unmount 后
+    // 触发响应式 mutation(toast / preview),从而踩中 Vue 调度器过渡态 race。
+    let isMounted = true
     const { success, error, warning, info, showToast } = toast
 
     // 响应式断点(替换 UA 嗅探)
@@ -219,6 +223,8 @@ export default {
       const startTime = Date.now()
       try {
         const list = await generator.generate(config.value)
+        // 卸载守卫:async 期间组件可能已 unmount,跳过 reactive 写
+        if (!isMounted) return
         problems.value = list
         const duration = ((Date.now() - startTime) / 1000).toFixed(1)
         showToast({
@@ -228,6 +234,7 @@ export default {
         })
         await addProblemSet(list, config.value)
       } catch (err) {
+        if (!isMounted) return
         showToast({
           type: 'error',
           message: '生成失败',
@@ -259,20 +266,31 @@ export default {
         info('正在生成分享图片...')
         const canvas = await html2canvas(printRoot.value, { scale: 2, useCORS: true })
         canvas.toBlob(async (blob) => {
+          // 卸载守卫:组件已经卸载 → 不要再触发响应式 toast/preview
+          if (!isMounted) return
           if (!blob) {
             error('分享失败', '图片生成失败')
             return
           }
           const file = new File([blob], `数学练习题_${today}.png`, { type: 'image/png' })
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file], title: '数学练习题' })
-            success('分享成功')
+            try {
+              await navigator.share({ files: [file], title: '数学练习题' })
+              if (isMounted) success('分享成功')
+            } catch (err) {
+              // 用户在系统分享面板里取消(AbortError)或组件卸载 → 静默
+              if (err && err.name !== 'AbortError' && isMounted) {
+                error('分享失败', err.message || '未知错误')
+              }
+            }
           } else {
-            warning('浏览器不支持分享', '已自动下载图片')
+            if (isMounted) warning('浏览器不支持分享', '已自动下载图片')
             const link = document.createElement('a')
             link.href = URL.createObjectURL(blob)
             link.download = `数学练习题_${today}.png`
             link.click()
+            // 释放 object URL,避免内存泄漏(原先未清理)
+            setTimeout(() => URL.revokeObjectURL(link.href), 0)
           }
         })
       } catch (err) {
@@ -280,9 +298,17 @@ export default {
       }
     }
 
-    // 卸载时取消挂起的导出
+    // 卸载时取消挂起的导出、关闭所有 toast 残留、并标记 isMounted = false
+    // 防止 async callback(canvas.toBlob / share / generate)在组件已 unmount
+    // 之后继续触发响应式更新。
     onBeforeUnmount(() => {
       exportController.value.abort()
+      isMounted = false
+      toast.clearAll()
+    })
+    // onUnmounted 触发时机更晚(整个组件子树完全销毁),此处再保险一次
+    onUnmounted(() => {
+      isMounted = false
     })
 
     return {

@@ -63,6 +63,9 @@ vi.mock('../../src/composables/useToast.js', () => ({
     warning: vi.fn(),
     info: vi.fn(),
     showToast: vi.fn(),
+    removeToast: vi.fn(),
+    clearAll: vi.fn(),
+    toasts: ref([]),
   }),
 }))
 
